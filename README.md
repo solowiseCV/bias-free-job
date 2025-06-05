@@ -82,7 +82,7 @@ npm install
 
 - Express
 
-- Mongoose (with MongoDB)
+- Prisma (with MongoDB)
 
 
 
