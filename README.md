@@ -1,4 +1,4 @@
-# 🚀 Bias Blind Job recruitment project Api
+# 🚀 Bias Free Job Board  Api
 
 A modern Node.js application built with TypeScript for improved type safety, maintainability, and scalability.
 
