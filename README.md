@@ -16,7 +16,34 @@ A modern Node.js application built with TypeScript for improved type safety, mai
 
 ##  Project Structure
 
-<pre><code>```text project-root/ ├── dist/ # Compiled JavaScript output ├── node_modules/ # Project dependencies ├── prisma/ # Prisma ORM schema │ └── schema.prisma ├── src/ # Application source code │ ├── configs/ # Environment and app configuration │ ├── features/ # Modular features (e.g. auth, users) │ │ └── authentication/ # Auth-related logic and controllers │ ├── lib/ # External utilities or shared services │ ├── middlewares/ # Express middlewares (auth, error, etc.) │ ├── utils/ # Helper functions and utilities │ ├── validations/ # Request/response validation schemas │ ├── appRoute.ts # Route definitions │ ├── app.ts # Express app configuration │ └── server.ts # Application entry point ├── .env # Local environment configuration ├── .env.example # Example environment configuration ├── .gitignore # Git ignored files ├── package.json # NPM project metadata and scripts ├── package-lock.json # Exact dependency versions ├── tsconfig.json # TypeScript configuration └── README.md # Project documentation ``` </code></pre>
+### 📁 Project Structure
+
+```text
+project-root/
+├── dist/                   # Compiled JavaScript output
+├── node_modules/           # Project dependencies
+├── prisma/                 # Prisma ORM schema
+│   └── schema.prisma
+├── src/                    # Application source code
+│   ├── configs/            # Environment and app configuration
+│   ├── features/           # Modular features (e.g. auth, users)
+│   │   └── authentication/ # Auth-related logic and controllers
+│   ├── lib/                # External utilities or shared services
+│   ├── middlewares/        # Express middlewares (auth, error, etc.)
+│   ├── utils/              # Helper functions and utilities
+│   ├── validations/        # Request/response validation schemas
+│   ├── appRoute.ts         # Route definitions
+│   ├── app.ts              # Express app configuration
+│   └── server.ts           # Application entry point
+├── .env                    # Local environment configuration
+├── .env.example            # Example environment configuration
+├── .gitignore              # Git ignored files
+├── package.json            # NPM project metadata and scripts
+├── package-lock.json       # Exact dependency versions
+├── tsconfig.json           # TypeScript configuration
+└── README.md               # Project documentation
+```
+
 
 
 
