@@ -52,7 +52,7 @@ project-root/
 
 ### 1 Clone the repo
 
-git clone https://github.com/your-username/your-repo-name.git
+git clone https://github.com/Bias-free-job-board/Api.git
 
 
 
@@ -82,7 +82,7 @@ npm install
 
 - Express
 
-- Mongoose (with MongoDB)
+- Prisma (with MongoDB)
 
 
 
