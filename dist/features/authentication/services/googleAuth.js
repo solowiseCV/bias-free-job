@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 class GoogleAuthService {
@@ -37,4 +38,5 @@ GoogleAuthService.registerUser = (data) => __awaiter(void 0, void 0, void 0, fun
         data,
     });
 });
-module.exports = new GoogleAuthService();
+exports.default = GoogleAuthService;
+// module.exports = new GoogleAuthService();

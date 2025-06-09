@@ -3,16 +3,14 @@ const prisma = new PrismaClient();
 
 interface User {
   email: string;
-  username: String;
-  fullname: String;
   lastname: String;
   firstname: String;
-  password: String | null;
   avatar: String | null;
   authId: String;
+  userType: string;
 }
 
-class GoogleAuthService {
+export default class GoogleAuthService {
   static getUserByEmail = async (email: string) => {
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -20,7 +18,10 @@ class GoogleAuthService {
     return existingUser;
   };
 
-  static getExistingUser = async (authId: string | null, email: string) => {
+  static getExistingUser = async (
+    authId: string | null,
+    email: string | null
+  ) => {
     const conditions: any[] = [{ email }];
     if (authId) {
       conditions.push({ authId });
@@ -42,4 +43,4 @@ class GoogleAuthService {
   };
 }
 
-module.exports = new GoogleAuthService();
+// module.exports = new GoogleAuthService();
