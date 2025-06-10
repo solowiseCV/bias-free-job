@@ -10,6 +10,7 @@ const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const errors_middleware_1 = __importDefault(require("./errors.middleware"));
+const appRoute_1 = __importDefault(require("../features/appRoute"));
 exports.default = (app) => {
     // Logging middleware
     app.use((0, morgan_1.default)("combined"));
@@ -32,5 +33,5 @@ exports.default = (app) => {
     // Custom error handling middleware
     app.use(errors_middleware_1.default);
     // Mounting routes
-    //   app.use(BASEPATH, indexRoutes);
+    app.use("/api/v1", appRoute_1.default);
 };

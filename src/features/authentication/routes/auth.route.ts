@@ -1,5 +1,28 @@
-import express from 'express'
+import express from "express";
+import { GoogleAuthController } from "../controllers/googleAuth";
+import { AuthController } from "../controllers/registerUser";
+import { LoginController } from "../controllers/loginUser";
+import { authMiddleware } from "../../../middlewares/authMiddleware";
+import { PasswordResetController } from "../controllers/resetUserPassword";
+import { ForgotPasswordController } from "../controllers/forgetPassword";
+import { ChangePasswordController } from "../controllers/changePassword";
 
 const router = express.Router();
+
+router.post("/google", GoogleAuthController.googleAuth);
+
+router.post("/register", AuthController.register);
+
+router.post("/login", LoginController.login);
+
+router.post("/forgot-password", ForgotPasswordController.forgotPassword);
+
+router.post(
+  "/change-password",
+  authMiddleware,
+  ChangePasswordController.changePassword
+);
+
+router.patch("/reset-password", PasswordResetController.resetPassword);
 
 export default router;

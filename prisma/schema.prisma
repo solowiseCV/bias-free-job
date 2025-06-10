@@ -9,14 +9,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserType{
+  job_seeker,
+  hirer
+}
+
 model User {
   id                     String            @id @default(auto()) @map("_id") @db.ObjectId
   email                  String            @unique
-  username               String
-  fullname               String
   lastname               String
   firstname              String
-  password               String
+  password               String?
   avatar                 String?
-
+  authId                 String?           @unique
+  userType               UserType 
 }
