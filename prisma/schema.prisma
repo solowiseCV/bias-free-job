@@ -10,7 +10,7 @@ datasource db {
 }
 
 enum UserType{
-  job_seeker,
+  job_seeker
   hirer
 }
 
@@ -23,4 +23,6 @@ model User {
   avatar                 String?
   authId                 String?           @unique
   userType               UserType 
+  resetToken             String?
+  resetTokenExpires DateTime?
 }

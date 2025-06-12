@@ -8,26 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ForgotPasswordController = void 0;
-const sendEmail_1 = require("../../../utils/sendEmail");
-const registerUser_1 = require("../services/registerUser");
-const jwt_1 = require("../../../utils/jwt");
+const forgetPassword_1 = require("../services/forgetPassword");
+const response_util_1 = __importDefault(require("../../../utils/helpers/response.util"));
 class ForgotPasswordController {
-    static forgotPassword(req, res) {
+    static forgotPassword(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email } = req.body;
-            const user = yield registerUser_1.AuthService.getUserByEmail(email);
-            if (!user) {
-                res.status(404).json({ success: false, message: "User doesn't exist!" });
-                return;
+            try {
+                const { email } = req.body;
+                const result = yield forgetPassword_1.ForgotPasswordService.forgotPassword(email);
+                new response_util_1.default(200, true, "sucess", res, result);
             }
-            const resetToken = jwt_1.tokenService.generateResetToken(user.id);
-            yield (0, sendEmail_1.sendResetEmail)(email, resetToken);
-            res
-                .status(200)
-                .json({ success: true, message: "Reset link sent to email" });
-            return;
+            catch (error) {
+                next(error);
+            }
         });
     }
 }

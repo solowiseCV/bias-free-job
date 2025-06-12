@@ -1,21 +1,33 @@
-import nodemailer from "nodemailer";
 
-// You can use any SMTP provider (Gmail, Mailtrap, SendGrid, etc.)
-const transporter = nodemailer.createTransport({
-  service: "gmail", // or use `host`, `port`, `secure`, etc. for custom SMTP
-  auth: {
-    user: process.env.EMAIL_USER, // your email address
-    pass: process.env.EMAIL_PASSWORD, // your email app password (not your actual password!)
-  },
-});
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
 
-export const sendMail = async (to: string, subject: string, html: string) => {
-  const mailOptions = {
-    from: `"Your App Name" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    html,
-  };
+export const sendEmail = async (data :any) => {
+  try {
+    const transport = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.NODE_MAILER_USER,
+        pass: process.env.NODE_MAILER_PASS 
+      },
+    });
 
-  return transporter.sendMail(mailOptions);
+    const mailOptions = {
+      from: `Bias project <${process.env.NODE_MAILER_USER}>`,
+      to: data.email,
+      subject: data.subject,
+      html: data.html,
+    };
+
+    const info = await transport.sendMail(mailOptions);
+    console.log(`Message sent: ${info.messageId}`);
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw new Error('Error sending email');
+  }
 };
+
+

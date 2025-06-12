@@ -12,23 +12,33 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendMail = void 0;
+exports.sendEmail = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
-// You can use any SMTP provider (Gmail, Mailtrap, SendGrid, etc.)
-const transporter = nodemailer_1.default.createTransport({
-    service: "gmail", // or use `host`, `port`, `secure`, etc. for custom SMTP
-    auth: {
-        user: process.env.EMAIL_USER, // your email address
-        pass: process.env.EMAIL_PASSWORD, // your email app password (not your actual password!)
-    },
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const sendEmail = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const transport = nodemailer_1.default.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: process.env.NODE_MAILER_USER,
+                pass: process.env.NODE_MAILER_PASS
+            },
+        });
+        const mailOptions = {
+            from: `Bias project <${process.env.NODE_MAILER_USER}>`,
+            to: data.email,
+            subject: data.subject,
+            html: data.html,
+        };
+        const info = yield transport.sendMail(mailOptions);
+        console.log(`Message sent: ${info.messageId}`);
+    }
+    catch (error) {
+        console.error('Error sending email:', error);
+        throw new Error('Error sending email');
+    }
 });
-const sendMail = (to, subject, html) => __awaiter(void 0, void 0, void 0, function* () {
-    const mailOptions = {
-        from: `"Your App Name" <${process.env.EMAIL_USER}>`,
-        to,
-        subject,
-        html,
-    };
-    return transporter.sendMail(mailOptions);
-});
-exports.sendMail = sendMail;
+exports.sendEmail = sendEmail;

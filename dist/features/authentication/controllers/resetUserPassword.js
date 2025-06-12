@@ -8,27 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PasswordResetController = void 0;
-const jwt_1 = require("../../../utils/jwt");
 const resetUserPassword_1 = require("../services/resetUserPassword");
+const response_util_1 = __importDefault(require("../../../utils/helpers/response.util"));
 class PasswordResetController {
-    static resetPassword(req, res) {
+    static resetPassword(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { token, newPassword } = req.body;
             try {
-                const payload = jwt_1.tokenService.verifyToken(token);
-                yield resetUserPassword_1.PasswordResetService.updatePassword(payload.userId, newPassword);
-                res
-                    .status(200)
-                    .json({ success: true, message: "Password reset successful" });
-                return;
+                const { token, newPassword, confirmPassword } = req.body;
+                const result = yield resetUserPassword_1.PasswordResetService.resetPassword(token, newPassword, confirmPassword);
+                new response_util_1.default(200, true, "Password reset successfully", res, result);
             }
-            catch (err) {
-                res
-                    .status(400)
-                    .json({ success: false, message: "Invalid or expired token" });
-                return;
+            catch (error) {
+                next(error);
             }
         });
     }
