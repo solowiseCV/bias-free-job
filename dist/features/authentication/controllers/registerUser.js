@@ -21,6 +21,7 @@ class AuthController {
                 const firstname = req.body.firstname;
                 const lastname = req.body.lastname;
                 const password = req.body.password;
+                const userType = req.body.userType;
                 const existingUser = yield registerUser_1.AuthService.getUserByEmail(email);
                 if (existingUser) {
                     res
@@ -36,6 +37,7 @@ class AuthController {
                     firstname,
                     fullname,
                     password: hashedPassword,
+                    userType,
                 };
                 const user = yield registerUser_1.AuthService.registerUser(userData);
                 const token = jwt_1.tokenService.generateToken(user.id);
