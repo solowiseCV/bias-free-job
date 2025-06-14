@@ -5,8 +5,8 @@ interface User {
   email: string;
   lastname: String;
   firstname: String;
-  fullname: String;
   password: String;
+  userType: String;
 }
 
 export class AuthService {

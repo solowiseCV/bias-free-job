@@ -7,7 +7,6 @@ interface User {
   email: string;
   lastname: String;
   firstname: String;
-  fullname: String;
   password: String;
   userType: string;
 }
@@ -15,11 +14,7 @@ interface User {
 export class AuthController {
   static async register(req: Request, res: Response): Promise<void> {
     try {
-      const email: string = req.body.email;
-      const firstname: string = req.body.firstname;
-      const lastname: string = req.body.lastname;
-      const password: string = req.body.password;
-      const userType: string = req.body.userType;
+      const { email, firstname, lastname, password, userType } = req.body;
 
       const existingUser = await AuthService.getUserByEmail(email);
 
@@ -31,12 +26,10 @@ export class AuthController {
       }
 
       const hashedPassword = await hashPassword(password);
-      const fullname = `${firstname} ${lastname}`;
       const userData: User = {
         email,
         lastname,
         firstname,
-        fullname,
         password: hashedPassword,
         userType,
       };

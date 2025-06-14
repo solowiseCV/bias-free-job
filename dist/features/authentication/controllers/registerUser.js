@@ -17,11 +17,7 @@ class AuthController {
     static register(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const email = req.body.email;
-                const firstname = req.body.firstname;
-                const lastname = req.body.lastname;
-                const password = req.body.password;
-                const userType = req.body.userType;
+                const { email, firstname, lastname, password, userType } = req.body;
                 const existingUser = yield registerUser_1.AuthService.getUserByEmail(email);
                 if (existingUser) {
                     res
@@ -30,12 +26,10 @@ class AuthController {
                     return;
                 }
                 const hashedPassword = yield (0, hash_1.hashPassword)(password);
-                const fullname = `${firstname} ${lastname}`;
                 const userData = {
                     email,
                     lastname,
                     firstname,
-                    fullname,
                     password: hashedPassword,
                     userType,
                 };
