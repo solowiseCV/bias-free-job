@@ -9,6 +9,7 @@ interface User {
   firstname: String;
   fullname: String;
   password: String;
+  userType: string;
 }
 
 export class AuthController {
@@ -18,6 +19,7 @@ export class AuthController {
       const firstname: string = req.body.firstname;
       const lastname: string = req.body.lastname;
       const password: string = req.body.password;
+      const userType: string = req.body.userType;
 
       const existingUser = await AuthService.getUserByEmail(email);
 
@@ -36,6 +38,7 @@ export class AuthController {
         firstname,
         fullname,
         password: hashedPassword,
+        userType,
       };
 
       const user = await AuthService.registerUser(userData);
