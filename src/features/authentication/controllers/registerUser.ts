@@ -7,7 +7,6 @@ interface User {
   email: string;
   lastname: String;
   firstname: String;
-  fullname: String;
   password: String;
   userType: string;
 }
@@ -31,12 +30,10 @@ export class AuthController {
       }
 
       const hashedPassword = await hashPassword(password);
-      const fullname = `${firstname} ${lastname}`;
       const userData: User = {
         email,
         lastname,
         firstname,
-        fullname,
         password: hashedPassword,
         userType,
       };
