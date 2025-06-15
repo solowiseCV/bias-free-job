@@ -21,8 +21,8 @@ export class GoogleAuthController {
     try {
       const { idToken, userType } = req.body;
 
-      if (!idToken || userType) {
-        res.status(400).json({ error: "idToken is missing" });
+      if (!idToken || !userType) {
+        res.status(400).json({ error: "Incomplete details" });
         return;
       }
 
