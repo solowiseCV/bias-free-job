@@ -19,50 +19,95 @@ const googleAuth_1 = __importDefault(require("../services/googleAuth"));
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new google_auth_library_1.OAuth2Client(CLIENT_ID);
 class GoogleAuthController {
+    // static async googleAuth(req: Request, res: Response): Promise<void> {
+    //   try {
+    //     const { idToken, userType } = req.body;
+    //     if (!idToken || !userType) {
+    //       res.status(400).json({ error: "Incomplete details" });
+    //       return;
+    //     }
+    //     const ticket = await client.verifyIdToken({
+    //       idToken: idToken,
+    //       audience: CLIENT_ID,
+    //     });
+    //     const payload = ticket.getPayload();
+    //     if (!payload) {
+    //       res.status(400).json({ error: "Invalid token" });
+    //       return;
+    //     }
+    //     const email = payload["email"] || null;
+    //     const authId = payload["sub"] || null;
+    //     if (!email || !authId) {
+    //       res.status(400).json({ error: "User data missing from token" });
+    //       return;
+    //     }
+    //     const existingUserByEmail = await GoogleAuthService.getUserByEmail(email);
+    //     const existingUserByAuthId = await GoogleAuthService.getUserByAuthId(
+    //       authId
+    //     );
+    //     const userData: User = {
+    //       authId,
+    //       email,
+    //       avatar: payload["picture"] || "",
+    //       firstname: payload["given_name"] || "",
+    //       lastname: payload["family_name"] || "",
+    //       userType,
+    //     };
+    //     let user;
+    //     if (!existingUserByEmail && !existingUserByAuthId) {
+    //       user = await GoogleAuthService.registerUser(userData);
+    //     } else {
+    //       user = existingUserByEmail;
+    //     }
+    //     const { id, lastname, firstname } = user;
+    //     const token = tokenService.generateToken(user.id);
+    //     const data = { id, email, lastname, firstname, userType };
+    //     res.status(200).json({
+    //       success: true,
+    //       message: "Successful!",
+    //       data,
+    //       token,
+    //     });
+    //     return;
+    //   } catch (err: any) {
+    //     res.status(500).json({
+    //       success: false,
+    //       message: err.message,
+    //     });
+    //     return;
+    //   }
+    // }
     static googleAuth(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { idToken, userType } = req.body;
-                if (!idToken || !userType) {
-                    res.status(400).json({ error: "Incomplete details" });
-                    return;
-                }
-                const ticket = yield client.verifyIdToken({
-                    idToken: idToken,
-                    audience: CLIENT_ID,
-                });
-                const payload = ticket.getPayload();
-                if (!payload) {
-                    res.status(400).json({ error: "Invalid token" });
-                    return;
-                }
-                const email = payload["email"] || null;
-                const authId = payload["sub"] || null;
-                if (!email || !authId) {
-                    res.status(400).json({ error: "User data missing from token" });
-                    return;
-                }
-                const existingUser = yield googleAuth_1.default.getExistingUser(email, authId);
+                const { email, picture, userType, given_name, family_name, sub } = req.body;
+                const authId = sub;
+                const existingUserByEmail = yield googleAuth_1.default.getUserByEmail(email);
+                // const existingUserByAuthId = await GoogleAuthService.getUserByAuthId(
+                //   authId
+                // );
                 const userData = {
                     authId,
                     email,
-                    avatar: payload["picture"] || "",
-                    firstname: payload["given_name"] || "",
-                    lastname: payload["family_name"] || "",
+                    avatar: picture,
+                    firstname: given_name,
+                    lastname: family_name,
                     userType,
                 };
                 let user;
-                if (!existingUser) {
+                if (!existingUserByEmail) {
                     user = yield googleAuth_1.default.registerUser(userData);
                 }
                 else {
-                    user = existingUser;
+                    user = existingUserByEmail;
                 }
+                const { id, lastname, firstname } = user;
                 const token = jwt_1.tokenService.generateToken(user.id);
+                const data = { id, email, lastname, firstname, userType };
                 res.status(200).json({
                     success: true,
-                    message: "Registration successful!",
-                    data: user,
+                    message: "Successful!",
+                    data,
                     token,
                 });
                 return;

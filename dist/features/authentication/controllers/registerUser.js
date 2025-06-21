@@ -34,11 +34,17 @@ class AuthController {
                     userType,
                 };
                 const user = yield registerUser_1.AuthService.registerUser(userData);
+                const data = {
+                    email,
+                    lastname,
+                    firstname,
+                    userType,
+                };
                 const token = jwt_1.tokenService.generateToken(user.id);
                 res.status(200).json({
                     success: true,
                     message: "Registration successful!",
-                    data: user,
+                    data,
                     token,
                 });
                 return;
