@@ -19,12 +19,12 @@ export default class GoogleAuthService {
     return existingUser;
   };
 
-  static getUserByAuthId = async (authId: string) => {
-    const existingUser = await prisma.user.findUnique({
-      where: { authId },
-    });
-    return existingUser;
-  };
+  // static getUserByAuthId = async (authId: string) => {
+  //   const existingUser = await prisma.user.findUnique({
+  //     where: { authId },
+  //   });
+  //   return existingUser;
+  // };
 
   static getExistingUser = async (
     authId: string | null,

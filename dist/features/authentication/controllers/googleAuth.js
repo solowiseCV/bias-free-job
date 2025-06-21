@@ -83,7 +83,9 @@ class GoogleAuthController {
                 const { email, picture, userType, given_name, family_name, sub } = req.body;
                 const authId = sub;
                 const existingUserByEmail = yield googleAuth_1.default.getUserByEmail(email);
-                const existingUserByAuthId = yield googleAuth_1.default.getUserByAuthId(authId);
+                // const existingUserByAuthId = await GoogleAuthService.getUserByAuthId(
+                //   authId
+                // );
                 const userData = {
                     authId,
                     email,
@@ -93,7 +95,7 @@ class GoogleAuthController {
                     userType,
                 };
                 let user;
-                if (!existingUserByEmail && !existingUserByAuthId) {
+                if (!existingUserByEmail) {
                     user = yield googleAuth_1.default.registerUser(userData);
                 }
                 else {
