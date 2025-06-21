@@ -8,7 +8,6 @@ interface User {
   avatar: String | null;
   authId: String;
 
-  
   userType: string;
 }
 
@@ -16,6 +15,13 @@ export default class GoogleAuthService {
   static getUserByEmail = async (email: string) => {
     const existingUser = await prisma.user.findUnique({
       where: { email },
+    });
+    return existingUser;
+  };
+
+  static getUserByAuthId = async (authId: string) => {
+    const existingUser = await prisma.user.findUnique({
+      where: { authId },
     });
     return existingUser;
   };

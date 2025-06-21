@@ -21,6 +21,12 @@ GoogleAuthService.getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, 
     });
     return existingUser;
 });
+GoogleAuthService.getUserByAuthId = (authId) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingUser = yield prisma.user.findUnique({
+        where: { authId },
+    });
+    return existingUser;
+});
 GoogleAuthService.getExistingUser = (authId, email) => __awaiter(void 0, void 0, void 0, function* () {
     const conditions = [{ email }];
     if (authId) {

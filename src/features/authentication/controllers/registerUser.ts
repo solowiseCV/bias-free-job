@@ -35,13 +35,19 @@ export class AuthController {
       };
 
       const user = await AuthService.registerUser(userData);
+      const data = {
+        email,
+        lastname,
+        firstname,
+        userType,
+      };
 
       const token = tokenService.generateToken(user.id);
 
       res.status(200).json({
         success: true,
         message: "Registration successful!",
-        data: user,
+        data,
         token,
       });
       return;
