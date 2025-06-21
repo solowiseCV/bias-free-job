@@ -94,9 +94,9 @@ export class GoogleAuthController {
       const authId = sub;
 
       const existingUserByEmail = await GoogleAuthService.getUserByEmail(email);
-      const existingUserByAuthId = await GoogleAuthService.getUserByAuthId(
-        authId
-      );
+      // const existingUserByAuthId = await GoogleAuthService.getUserByAuthId(
+      //   authId
+      // );
       const userData: User = {
         authId,
         email,
@@ -108,7 +108,7 @@ export class GoogleAuthController {
 
       let user;
 
-      if (!existingUserByEmail && !existingUserByAuthId) {
+      if (!existingUserByEmail) {
         user = await GoogleAuthService.registerUser(userData);
       } else {
         user = existingUserByEmail;
