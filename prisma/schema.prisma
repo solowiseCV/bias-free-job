@@ -21,7 +21,7 @@ model User {
   firstname              String
   password               String?
   avatar                 String?
-  authId                 String?           @unique
+  authId                 String?
   userType               UserType 
   resetToken             String?
   resetTokenExpires DateTime?
