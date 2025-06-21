@@ -7,8 +7,6 @@ interface User {
   firstname: String;
   avatar: String | null;
   authId: String;
-
-  
   userType: string;
 }
 

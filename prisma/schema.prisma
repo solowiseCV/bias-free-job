@@ -1,5 +1,3 @@
-// npx prisma db push
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,9 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserType{
+enum UserType {
   job_seeker
-  hirer
+  recruiter
+  
 }
 
 model User {
@@ -21,8 +20,40 @@ model User {
   firstname              String
   password               String?
   avatar                 String?
-  authId                 String?           @unique
+  authId                 String?          
   userType               UserType 
   resetToken             String?
-  resetTokenExpires DateTime?
+  resetTokenExpires      DateTime?
+  companyProfiles        CompanyProfile[]  @relation("UserCompanyProfiles")
+}
+
+model CompanyProfile {
+  id                     String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId                 String            @db.ObjectId
+  user                   User              @relation("UserCompanyProfiles", fields: [userId], references: [id])
+  companyName            String
+  description            String
+  industry               String
+  website                String?
+  location               String?
+  numberOfEmployees      String?
+  hiringTeams            HiringTeam[]      @relation("CompanyHiringTeams")
+  createdAt              DateTime          @default(now())
+}
+
+model HiringTeam {
+  id                     String            @id @default(auto()) @map("_id") @db.ObjectId
+  companyProfileId       String            @db.ObjectId
+  companyProfile         CompanyProfile    @relation("CompanyHiringTeams", fields: [companyProfileId], references: [id])
+  teamMembers            TeamMember[]      @relation("HiringTeamMembers")
+  createdAt              DateTime          @default(now())
+}
+
+model TeamMember {
+  id                     String            @id @default(auto()) @map("_id") @db.ObjectId
+  hiringTeamId           String            @db.ObjectId
+  hiringTeam             HiringTeam        @relation("HiringTeamMembers", fields: [hiringTeamId], references: [id])
+  email                  String            
+  role                   String
+  createdAt              DateTime          @default(now())
 }
