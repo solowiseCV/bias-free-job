@@ -1,17 +1,20 @@
-import { Request, Response } from 'express';
-import { JobPostingService } from '../services/jobService';
-import { jobPostingSchema, updateJobPostingSchema } from '../../../validations/job.validation';
-import { getDataUri, FileData } from '../../../middlewares/multer';
-import configureCloudinary from '../../../configs/cloudinary';
-import { JobPostingDTO, UpdateJobPostingDTO } from '../dtos/postJob.dto';
+import { Request, Response } from "express";
+import { JobPostingService } from "../services/jobService";
+import {
+  jobPostingSchema,
+  updateJobPostingSchema,
+} from "../../../validations/job.validation";
+import { getDataUri, FileData } from "../../../middlewares/multer";
+import configureCloudinary from "../../../configs/cloudinary";
+import { JobPostingDTO, UpdateJobPostingDTO } from "../dtos/postJob.dto";
 
 const jobPostingService = new JobPostingService();
 const cloudinary = configureCloudinary();
 
 export class JobPostingController {
   async createJobPosting(req: Request, res: Response) {
-    if (!req.file && !req.body.assessment) {
-      res.status(400).json({ error: 'Assessment is required (URL or file)' });
+    if (!req.file && !req.body.assessment && !req.body.assessmentUrlInput) {
+      res.status(400).json({ error: "Assessment is required (URL or file)" });
       return;
     }
 
@@ -21,18 +24,28 @@ export class JobPostingController {
       return;
     }
 
-    let assessmentUrl: string | undefined = req.body.assessment;
+    let assessmentUrl: string | undefined;
+
+    if (req.body.assessmentUrlInput) {
+      assessmentUrl = req.body.assessmentUrlInput;
+    } else if (req.body.assessment) {
+      assessmentUrl = req.body.assessment;
+    }
+
     if (req.file) {
       try {
-        const fileData: FileData = { originalname: req.file.originalname, buffer: req.file.buffer };
+        const fileData: FileData = {
+          originalname: req.file.originalname,
+          buffer: req.file.buffer,
+        };
         const dataUri = getDataUri(fileData);
         const result = await cloudinary.uploader.upload(dataUri.content, {
-          folder: 'job_assessments',
-          resource_type: 'auto',
+          folder: "job_assessments",
+          resource_type: "auto",
         });
         assessmentUrl = result.secure_url;
       } catch (uploadErr) {
-        res.status(500).json({ error: 'Failed to upload file to Cloudinary' });
+        res.status(500).json({ error: "Failed to upload file to Cloudinary" });
         return;
       }
     }
@@ -47,17 +60,23 @@ export class JobPostingController {
       employmentType: req.body.employmentType,
       experienceLevel: req.body.experienceLevel,
       education: req.body.education,
-      monthlySalaryMin: req.body.monthlySalaryMin ? parseFloat(req.body.monthlySalaryMin) : undefined,
-      monthlySalaryMax: req.body.monthlySalaryMax ? parseFloat(req.body.monthlySalaryMax) : undefined,
+      monthlySalaryMin: req.body.monthlySalaryMin
+        ? parseFloat(req.body.monthlySalaryMin)
+        : undefined,
+      monthlySalaryMax: req.body.monthlySalaryMax
+        ? parseFloat(req.body.monthlySalaryMax)
+        : undefined,
       jobDescription: req.body.jobDescription,
       requirements: req.body.requirements,
       assessmentUrl,
-      status: req.body.status, 
+      status: req.body.status,
     };
-    console.log(data);
 
     try {
-      const jobPosting = await jobPostingService.createJobPosting(req.user.id, data);
+      const jobPosting = await jobPostingService.createJobPosting(
+        req.user.id,
+        data
+      );
       res.status(201).json(jobPosting);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
@@ -65,7 +84,15 @@ export class JobPostingController {
   }
 
   async getJobPostings(req: Request, res: Response) {
-    const { page = 1, limit = 10, search, industry, location, status, bestMatches } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      industry,
+      location,
+      status,
+      bestMatches,
+    } = req.query;
 
     try {
       const jobPostings = await jobPostingService.getJobPostings(
@@ -85,33 +112,45 @@ export class JobPostingController {
   }
 
   async updateJobPosting(req: Request, res: Response) {
-    if (req.file && req.body.assessment) {
-      res.status(400).json({ error: 'Provide either a file or a URL, not both' });
-      return;
-    }
+    //  if (!req.file && !req.body.assessment && !req.body.assessmentUrlInput) {
+    //   res.status(400).json({ error: "Assessment is required (URL or file)" });
+    //   return;
+    // }
 
     const { error } = updateJobPostingSchema.validate(req.body);
+
+
     if (error) {
       res.status(400).json({ error: error.details[0].message });
       return;
     }
 
-    let assessmentUrl: string | undefined;
+     let assessmentUrl: string | undefined;
+
+    if (req.body.assessmentUrlInput) {
+      assessmentUrl = req.body.assessmentUrlInput;
+    } else if (req.body.assessment) {
+      assessmentUrl = req.body.assessment;
+    }
+
     if (req.file) {
       try {
-        const fileData: FileData = { originalname: req.file.originalname, buffer: req.file.buffer };
+        const fileData: FileData = {
+          originalname: req.file.originalname,
+          buffer: req.file.buffer,
+        };
         const dataUri = getDataUri(fileData);
         const result = await cloudinary.uploader.upload(dataUri.content, {
-          folder: 'job_assessments',
-          resource_type: 'auto',
+          folder: "job_assessments",
+          resource_type: "auto",
         });
         assessmentUrl = result.secure_url;
       } catch (uploadErr) {
-        res.status(500).json({ error: 'Failed to upload file to Cloudinary' });
+        res.status(500).json({ error: "Failed to upload file to Cloudinary" });
         return;
       }
     } else {
-      assessmentUrl = req.body.assessment;
+      assessmentUrl = req.body.assessmen;
     }
 
     const data: Partial<UpdateJobPostingDTO> = {
@@ -124,8 +163,12 @@ export class JobPostingController {
       employmentType: req.body.employmentType,
       experienceLevel: req.body.experienceLevel,
       education: req.body.education,
-      monthlySalaryMin: req.body.monthlySalaryMin ? parseFloat(req.body.monthlySalaryMin) : undefined,
-      monthlySalaryMax: req.body.monthlySalaryMax ? parseFloat(req.body.monthlySalaryMax) : undefined,
+      monthlySalaryMin: req.body.monthlySalaryMin
+        ? parseFloat(req.body.monthlySalaryMin)
+        : undefined,
+      monthlySalaryMax: req.body.monthlySalaryMax
+        ? parseFloat(req.body.monthlySalaryMax)
+        : undefined,
       jobDescription: req.body.jobDescription,
       requirements: req.body.requirements,
       assessmentUrl,
@@ -138,7 +181,10 @@ export class JobPostingController {
     );
 
     try {
-      const jobPosting = await jobPostingService.updateJobPosting(req.params.id, updateData);
+      const jobPosting = await jobPostingService.updateJobPosting(
+        req.params.id,
+        updateData
+      );
       res.status(200).json(jobPosting);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
@@ -147,8 +193,13 @@ export class JobPostingController {
 
   async deleteJobPosting(req: Request, res: Response) {
     try {
-      const jobPosting = await jobPostingService.deleteJobPosting(req.user.id, req.params.id);
-      res.status(200).json({ message: 'Job posting deleted successfully', jobPosting });
+      const jobPosting = await jobPostingService.deleteJobPosting(
+        req.user.id,
+        req.params.id
+      );
+      res
+        .status(200)
+        .json({ message: "Job posting deleted successfully", jobPosting });
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }

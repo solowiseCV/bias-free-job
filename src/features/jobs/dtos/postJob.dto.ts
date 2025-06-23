@@ -5,8 +5,8 @@ export interface JobPostingDTO {
   workLocation: 'office' | 'hybrid' | 'remote';
   industry: string;
   companyFunction?: string;
-  employmentType: 'full-time' | 'part-time' | 'contract' | 'internship';
-  experienceLevel?: 'entry-level' | 'mid-level' | 'senior-level';
+  employmentType: 'full_time' | 'part_time' | 'contract' | 'internship';
+  experienceLevel?: 'entry_level' | 'mid_level' | 'senior_level';
   education?: string;
   monthlySalaryMin?: number;
   monthlySalaryMax?: number;
@@ -24,8 +24,8 @@ export interface UpdateJobPostingDTO {
   workLocation?: 'office' | 'hybrid' | 'remote';
   industry?: string;
   companyFunction?: string;
-  employmentType?: 'full-time' | 'part-time' | 'contract' | 'internship';
-  experienceLevel?: 'entry-level' | 'mid-level' | 'senior-level';
+  employmentType?: 'full_time' | 'part_time' | 'contract' | 'internship';
+  experienceLevel?: 'entry_level' | 'mid_level' | 'senior_level';
   education?: string;
   monthlySalaryMin?: number;
   monthlySalaryMax?: number;
