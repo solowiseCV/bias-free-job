@@ -17,76 +17,6 @@ interface User {
 }
 
 export class GoogleAuthController {
-  // static async googleAuth(req: Request, res: Response): Promise<void> {
-  //   try {
-  //     const { idToken, userType } = req.body;
-
-  //     if (!idToken || !userType) {
-  //       res.status(400).json({ error: "Incomplete details" });
-  //       return;
-  //     }
-
-  //     const ticket = await client.verifyIdToken({
-  //       idToken: idToken,
-  //       audience: CLIENT_ID,
-  //     });
-
-  //     const payload = ticket.getPayload();
-  //     if (!payload) {
-  //       res.status(400).json({ error: "Invalid token" });
-  //       return;
-  //     }
-
-  //     const email = payload["email"] || null;
-  //     const authId = payload["sub"] || null;
-
-  //     if (!email || !authId) {
-  //       res.status(400).json({ error: "User data missing from token" });
-  //       return;
-  //     }
-
-  //     const existingUserByEmail = await GoogleAuthService.getUserByEmail(email);
-  //     const existingUserByAuthId = await GoogleAuthService.getUserByAuthId(
-  //       authId
-  //     );
-  //     const userData: User = {
-  //       authId,
-  //       email,
-  //       avatar: payload["picture"] || "",
-  //       firstname: payload["given_name"] || "",
-  //       lastname: payload["family_name"] || "",
-  //       userType,
-  //     };
-
-  //     let user;
-
-  //     if (!existingUserByEmail && !existingUserByAuthId) {
-  //       user = await GoogleAuthService.registerUser(userData);
-  //     } else {
-  //       user = existingUserByEmail;
-  //     }
-
-  //     const { id, lastname, firstname } = user;
-
-  //     const token = tokenService.generateToken(user.id);
-  //     const data = { id, email, lastname, firstname, userType };
-
-  //     res.status(200).json({
-  //       success: true,
-  //       message: "Successful!",
-  //       data,
-  //       token,
-  //     });
-
-  //     return;
-  //   } catch (err: any) {
-  //     res.status(500).json({
-  //       success: false,
-  //       message: err.message,
-  //     });
-  //     return;
-  //   }
-  // }
   static async googleAuth(req: Request, res: Response): Promise<void> {
     try {
       const { email, picture, userType, given_name, family_name, sub } =
@@ -94,9 +24,7 @@ export class GoogleAuthController {
       const authId = sub;
 
       const existingUserByEmail = await GoogleAuthService.getUserByEmail(email);
-      // const existingUserByAuthId = await GoogleAuthService.getUserByAuthId(
-      //   authId
-      // );
+
       const userData: User = {
         authId,
         email,

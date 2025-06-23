@@ -8,44 +8,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GoogleAuthController = void 0;
+exports.AuthController = void 0;
 const jwt_1 = require("../../../utils/jwt");
-const google_auth_library_1 = require("google-auth-library");
-const googleAuth_1 = __importDefault(require("../services/googleAuth"));
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const client = new google_auth_library_1.OAuth2Client(CLIENT_ID);
-class GoogleAuthController {
-    static googleAuth(req, res) {
+const registerUser_1 = require("../services/registerUser");
+const hash_1 = require("../../../utils/hash");
+class AuthController {
+    static register(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { email, picture, userType, given_name, family_name, sub } = req.body;
-                const authId = sub;
-                const existingUserByEmail = yield googleAuth_1.default.getUserByEmail(email);
+                const { email, firstname, lastname, password, userType } = req.body;
+                const existingUser = yield registerUser_1.AuthService.getUserByEmail(email);
+                if (existingUser) {
+                    res
+                        .status(500)
+                        .json({ success: false, message: "Email already in use!" });
+                    return;
+                }
+                const hashedPassword = yield (0, hash_1.hashPassword)(password);
                 const userData = {
-                    authId,
                     email,
-                    avatar: picture,
-                    firstname: given_name,
-                    lastname: family_name,
+                    lastname,
+                    firstname,
+                    password: hashedPassword,
                     userType,
                 };
-                let user;
-                if (!existingUserByEmail) {
-                    user = yield googleAuth_1.default.registerUser(userData);
-                }
-                else {
-                    user = existingUserByEmail;
-                }
-                const { id, lastname, firstname } = user;
+                const user = yield registerUser_1.AuthService.registerUser(userData);
+                const data = {
+                    email,
+                    lastname,
+                    firstname,
+                    userType,
+                };
                 const token = jwt_1.tokenService.generateToken(user.id);
-                const data = { id, email, lastname, firstname, userType };
                 res.status(200).json({
                     success: true,
-                    message: "Successful!",
+                    message: "Registration successful!",
                     data,
                     token,
                 });
@@ -61,4 +59,4 @@ class GoogleAuthController {
         });
     }
 }
-exports.GoogleAuthController = GoogleAuthController;
+exports.AuthController = AuthController;

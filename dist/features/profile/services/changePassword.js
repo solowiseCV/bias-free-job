@@ -10,33 +10,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChangePasswordService = void 0;
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-class GoogleAuthService {
+const hash_1 = require("../../../utils/hash");
+class ChangePasswordService {
 }
-_a = GoogleAuthService;
-GoogleAuthService.getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const existingUser = yield prisma.user.findUnique({
-        where: { email },
-    });
-    return existingUser;
+exports.ChangePasswordService = ChangePasswordService;
+_a = ChangePasswordService;
+ChangePasswordService.getUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield prisma.user.findUnique({ where: { id: userId } });
 });
-GoogleAuthService.getExistingUser = (authId, email) => __awaiter(void 0, void 0, void 0, function* () {
-    const conditions = [{ email }];
-    if (authId) {
-        conditions.push({ authId });
-    }
-    const existingUser = yield prisma.user.findFirst({
-        where: {
-            OR: conditions,
-        },
-    });
-    return existingUser;
-});
-GoogleAuthService.registerUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma.user.create({
-        data,
+ChangePasswordService.updatePassword = (userId, newPassword) => __awaiter(void 0, void 0, void 0, function* () {
+    const hashed = yield (0, hash_1.hashPassword)(newPassword);
+    return prisma.user.update({
+        where: { id: userId },
+        data: { password: hashed },
     });
 });
-exports.default = GoogleAuthService;
-// module.exports = new GoogleAuthService();

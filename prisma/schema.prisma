@@ -1,5 +1,4 @@
-// npx prisma db push
-
+the current schema,
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,20 +8,188 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserType{
+enum UserType {
   job_seeker
-  hirer
+  recruiter
+}
+
+enum WorkLocation {
+  office
+  hybrid
+  remote
+}
+
+enum EmploymentType {
+  full_time
+  part_time
+  contract
+  internship
+}
+
+enum ExperienceLevel {
+  entry_level
+  mid_level
+  senior_level
+}
+
+enum ApplicationStatus {
+  pending
+  reviewed
+  accepted
+  rejected
+}
+
+enum InterviewStatus {
+  scheduled
+  completed
+  cancelled
 }
 
 model User {
-  id                     String            @id @default(auto()) @map("_id") @db.ObjectId
-  email                  String            @unique
-  lastname               String
-  firstname              String
-  password               String?
-  avatar                 String?
-  authId                 String?
-  userType               UserType 
-  resetToken             String?
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  email           String            @unique
+  lastname        String
+  firstname       String
+  password        String?
+  avatar          String?
+  authId          String?
+  userType        UserType
+  resetToken      String?
   resetTokenExpires DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  companyProfile  CompanyProfile?   @relation("UserCompanyProfiles")
+  applicants      Applicant[]       @relation("UserApplicant")
+  interviewsAsApplicant Interview[] @relation("UserInterviewsAsApplicant")
+}
+
+model CompanyProfile {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String            @unique @db.ObjectId
+  user            User              @relation("UserCompanyProfiles", fields: [userId], references: [id], onDelete: Cascade)
+  companyName     String            @unique
+  description     String
+  industry        String
+  website         String?
+  location        String?
+  numberOfEmployees String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  jobPostings     JobPosting[]      @relation("CompanyJobPostings")
+  hiringTeams     HiringTeam[]      @relation("CompanyHiringTeams")
+  interviews      Interview[]       @relation("CompanyInterviews")
+}
+
+model HiringTeam {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  companyProfileId String           @db.ObjectId
+  companyProfile  CompanyProfile    @relation("CompanyHiringTeams", fields: [companyProfileId], references: [id], onDelete: Cascade)
+  teamMembers     TeamMember[]      @relation("HiringTeamMembers")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([companyProfileId])
+}
+
+model TeamMember {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  hiringTeamId    String            @db.ObjectId
+  hiringTeam      HiringTeam        @relation("HiringTeamMembers", fields: [hiringTeamId], references: [id], onDelete: Cascade)
+  email           String
+  role            String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([hiringTeamId])
+}
+
+model JobPosting {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  companyProfileId String           @db.ObjectId
+  companyProfile  CompanyProfile    @relation("CompanyJobPostings", fields: [companyProfileId], references: [id], onDelete: Cascade)
+  jobTitle        String
+  department      String?
+  companyLocation String
+  workLocation    WorkLocation      @default(office)
+  industry        String
+  companyFunction String?
+  employmentType  EmploymentType    @default(full_time)
+  experienceLevel ExperienceLevel?
+  education       String?
+  monthlySalaryMin Float?
+  monthlySalaryMax Float?
+  jobDescription  String
+  requirements    String?
+  assessment      String?
+  status          String            @default("active")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  applications    Application[]     @relation("JobApplications")
+  interviews      Interview[]       @relation("JobInterviews")
+
+  @@unique([companyProfileId, jobTitle, companyLocation, industry])
+  @@index([companyProfileId])
+}
+
+model Applicant {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String?      @db.ObjectId
+  user        User?        @relation("UserApplicant", fields: [userId], references: [id], onDelete: SetNull)
+  name        String
+  email       String       @unique
+  resume      String?      @db.String
+  phone       String?      @db.String
+  status      String       @default("applied")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  applications Application[] @relation("ApplicantApplications")
+  interviews   Interview[]  @relation("ApplicantInterviews")
+
+  @@index([userId])
+}
+
+model Application {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  applicantId String       @db.ObjectId
+  applicant   Applicant    @relation("ApplicantApplications", fields: [applicantId], references: [id], onDelete: Cascade)
+  jobPostingId String      @db.ObjectId
+  jobPosting  JobPosting   @relation("JobApplications", fields: [jobPostingId], references: [id], onDelete: Cascade)
+  status      ApplicationStatus @default(pending)
+  appliedAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  coverLetter String?      @db.String
+
+  @@unique([applicantId, jobPostingId])
+  @@index([applicantId])
+  @@index([jobPostingId])
+}
+
+model Interview {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  jobPostingId  String       @db.ObjectId
+  jobPosting    JobPosting   @relation("JobInterviews", fields: [jobPostingId], references: [id], onDelete: Cascade)
+  applicantId   String       @db.ObjectId
+  applicant     Applicant    @relation("ApplicantInterviews", fields: [applicantId], references: [id], onDelete: Cascade)
+  companyProfileId String?   @db.ObjectId
+  companyProfile CompanyProfile? @relation("CompanyInterviews", fields: [companyProfileId], references: [id], onDelete: SetNull)
+  dateTime      DateTime
+  location      String
+  interviewType String       @default("Technical")
+  duration      String       @default("1 hour")
+  notes         String?      @db.String
+  status        InterviewStatus @default(scheduled)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  userId        String?      @db.ObjectId
+  user          User?        @relation("UserInterviewsAsApplicant", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([jobPostingId])
+  @@index([applicantId])
+  @@index([dateTime])
+  @@index([companyProfileId])
 }
