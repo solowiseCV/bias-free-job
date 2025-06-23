@@ -37,6 +37,7 @@ model CompanyProfile {
   website                String?
   location               String?
   numberOfEmployees      String?
+  jobPostings            JobPosting[]      @relation("CompanyJobPostings")
   hiringTeams            HiringTeam[]      @relation("CompanyHiringTeams")
   createdAt              DateTime          @default(now())
 }
@@ -55,5 +56,28 @@ model TeamMember {
   hiringTeam             HiringTeam        @relation("HiringTeamMembers", fields: [hiringTeamId], references: [id])
   email                  String            
   role                   String
+  createdAt              DateTime          @default(now())
+}
+
+
+model JobPosting {
+  id                     String            @id @default(auto()) @map("_id") @db.ObjectId
+  companyProfileId       String            @db.ObjectId
+  companyProfile         CompanyProfile    @relation("CompanyJobPostings", fields: [companyProfileId], references: [id])
+  jobTitle               String
+  department             String?
+  companyLocation        String
+  workLocation           String            @default("office") // Options: "office", "hybrid", "remote"
+  industry               String
+  companyFunction        String?
+  employmentType         String            @default("full-time") // Options: "full-time", "part-time", "contract", "internship"
+  experienceLevel        String?           // Options: "entry-level", "mid-level", "senior-level"
+  education              String?
+  monthlySalaryMin       Float?
+  monthlySalaryMax       Float?
+  jobDescription         String
+  requirements           String?
+  assessment             String?
+  status                 String            @default("active")
   createdAt              DateTime          @default(now())
 }
