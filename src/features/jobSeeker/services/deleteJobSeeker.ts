@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-import { CreateJobSeekerDto } from "../dtos/createJobSeekerDto";
-
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 export class DeleteJobSeekerService {

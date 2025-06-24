@@ -17,9 +17,14 @@ export class AuthService {
     return existingUser;
   };
 
+  static getUserUsers = async () => {
+    return await prisma.user.findMany();
+  };
+
   static registerUser = async (data: User) => {
     return await prisma.user.create({
-      data,
+      ...data,
+      createdAt: Date.now(),
     });
   };
 }

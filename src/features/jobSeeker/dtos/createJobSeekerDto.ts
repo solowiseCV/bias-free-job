@@ -1,8 +1,4 @@
-// dto/create-jobseeker.dto.ts
-
-import { ExperienceLevel, WorkMode, JobType } from "@prisma/client";
-
-export interface CreateJobSeekerDto {
+export interface JobSeekerDto {
   bio?: string;
   location?: {
     city?: string;
@@ -10,11 +6,12 @@ export interface CreateJobSeekerDto {
   };
   hasDisability?: boolean;
   interestedRoles?: string[];
-  experienceLevel?: ExperienceLevel;
-  workMode?: WorkMode;
-  jobType?: JobType;
+  experienceLevel?: "entry_level" | "mid_level" | "senior_level";
+  workMode?: "office" | "hybrid" | "remote";
+  jobType?: "full_time" | "part_time" | "contract" | "internship";
   skills?: string[];
   industry?: string;
+  resume?: string;
 
   experience?: Array<{
     title: string;
@@ -51,12 +48,6 @@ export interface CreateJobSeekerDto {
     link?: string;
     technologies?: string[];
   }>;
-
-  resume?: {
-    fileName: string;
-    url: string;
-    uploadedAt?: Date;
-  };
 
   interests?: string[];
 }

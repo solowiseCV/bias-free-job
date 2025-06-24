@@ -58,5 +58,19 @@ class AuthController {
             }
         });
     }
+    static getUsers(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const users = yield registerUser_1.AuthService.getUserUsers();
+                res.status(200).json(users);
+            }
+            catch (err) {
+                res.status(500).json({
+                    message: err.message,
+                });
+                return;
+            }
+        });
+    }
 }
 exports.AuthController = AuthController;

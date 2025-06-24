@@ -1,32 +1,47 @@
 import express from "express";
-import { DeleteobSeekerController } from "../controllers/deleteJobSeeker";
+import { DeleteJobSeekerController } from "../controllers/deleteJobSeeker";
 import { QueryJobSeekerController } from "../controllers/queryJobSeeker";
 import { UpdateJobSeekerController } from "../controllers/updateJobSeeker";
 import { authMiddleware } from "../../../middlewares/authMiddleware";
 
 import { GetJobSeekerController } from "../controllers/getJobSeeker";
 import { CreateJobSeekerController } from "../controllers/createJobSeeker";
+import { singleupload } from "../../../middlewares/multer";
 
 const router = express.Router();
 
-router.post("/:userid", authMiddleware, CreateJobSeekerController.create);
-
-router.get("/:id", authMiddleware, GetJobSeekerController.getSeekerById);
+router.post(
+  "/create/:userId",
+  authMiddleware,
+  singleupload,
+  CreateJobSeekerController.create
+);
 
 router.get(
-  "/user/:userid",
+  "/profile/:id",
+  authMiddleware,
+  GetJobSeekerController.getSeekerById
+);
+
+router.get(
+  "/user/:userId",
   authMiddleware,
   GetJobSeekerController.getSeekerByUSerId
 );
 
-router.patch("/:id", authMiddleware, UpdateJobSeekerController.updateSeeker);
-
-router.delete(
-  "/:userid",
+router.patch(
+  "/profile/:id",
+  singleupload,
   authMiddleware,
-  DeleteobSeekerController.deleteSeeker
+  UpdateJobSeekerController.updateSeeker
 );
 
-router.post("/search", QueryJobSeekerController.querySeeker);
+router.delete(
+  "/profile/:id",
+  authMiddleware,
+  DeleteJobSeekerController.deleteSeeker
+);
+
+router.get("/search", QueryJobSeekerController.querySeeker);
 
 export default router;

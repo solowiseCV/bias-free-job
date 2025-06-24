@@ -39,7 +39,8 @@ export default class GoogleAuthService {
 
   static registerUser = async (data: User) => {
     return await prisma.user.create({
-      data,
+      ...data,
+      createdAt: Date.now(),
     });
   };
 }

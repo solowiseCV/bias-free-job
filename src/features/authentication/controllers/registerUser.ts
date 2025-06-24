@@ -59,4 +59,17 @@ export class AuthController {
       return;
     }
   }
+
+  static async getUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const users = await AuthService.getUserUsers();
+
+      res.status(200).json(users);
+    } catch (err: any) {
+      res.status(500).json({
+        message: err.message,
+      });
+      return;
+    }
+  }
 }

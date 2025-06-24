@@ -1,14 +1,13 @@
-import { NextFunction, Request, Response } from "express";
-import { ForgotPasswordService } from "../services/deleteJobSeeker";
-import CustomResponse from "../../../utils/helpers/response.util";
+import { Request, Response } from "express";
+import { SearchJobSeekerService } from "../services/queryJobSeeker";
+
 export class QueryJobSeekerController {
-  static async querySeeker(req: Request, res: Response, next: NextFunction) {
+  static async querySeeker(req: Request, res: Response) {
     try {
-      const { email } = req.body;
-      const result = await ForgotPasswordService.forgotPassword(email);
-      new CustomResponse(200, true, "sucess", res, result);
-    } catch (error) {
-      next(error);
+      const result = await SearchJobSeekerService.searchJobSeekers(req.query);
+      res.status(200).json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
     }
   }
 }

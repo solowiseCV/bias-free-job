@@ -1,34 +1,24 @@
-import { NextFunction, Request, Response } from "express";
-import CustomResponse from "../../../utils/helpers/response.util";
+import { Request, Response } from "express";
 import { GetJobSeekerService } from "../services/getJobSeeker";
+
 export class GetJobSeekerController {
-  static async getSeekerById(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  static async getSeekerById(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const result = await GetJobSeekerService.getJobSeekerById(id);
-      new CustomResponse(200, true, "sucess", res, result);
-      return;
-    } catch (error) {
-      next(error);
+      res.status(200).json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
     }
   }
 
-  static async getSeekerByUSerId(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  static async getSeekerByUSerId(req: Request, res: Response) {
     try {
-      const userId = req.user.userId;
+      const userId = req.params.userId;
       const result = await GetJobSeekerService.getJobSeekerByUserId(userId);
-      new CustomResponse(200, true, "sucess", res, result);
-      return;
-    } catch (error) {
-      next(error);
+      res.status(200).json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
     }
   }
 }
