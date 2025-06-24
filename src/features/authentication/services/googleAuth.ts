@@ -19,13 +19,6 @@ export default class GoogleAuthService {
     return existingUser;
   };
 
-  // static getUserByAuthId = async (authId: string) => {
-  //   const existingUser = await prisma.user.findUnique({
-  //     where: { authId },
-  //   });
-  //   return existingUser;
-  // };
-
   static getExistingUser = async (
     authId: string | null,
     email: string | null
@@ -46,7 +39,8 @@ export default class GoogleAuthService {
 
   static registerUser = async (data: User) => {
     return await prisma.user.create({
-      data,
+      ...data,
+      createdAt: Date.now(),
     });
   };
 }

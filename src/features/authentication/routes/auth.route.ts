@@ -13,6 +13,8 @@ router.post("/google", GoogleAuthController.googleAuth);
 
 router.post("/register", AuthController.register);
 
+router.get("/", AuthController.getUsers);
+
 router.post("/login", LoginController.login);
 
 router.post("/forgot-password", ForgotPasswordController.forgotPassword);

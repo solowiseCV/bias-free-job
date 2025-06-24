@@ -2,11 +2,11 @@ export interface JobPostingDTO {
   jobTitle: string;
   department?: string;
   companyLocation: string;
-  workLocation: 'office' | 'hybrid' | 'remote';
+  workLocation: "office" | "hybrid" | "remote";
   industry: string;
   companyFunction?: string;
-  employmentType: 'full_time' | 'part_time' | 'contract' | 'internship';
-  experienceLevel?: 'entry_level' | 'mid_level' | 'senior_level';
+  employmentType: "full_time" | "part_time" | "contract" | "internship";
+  experienceLevel?: "entry_level" | "mid_level" | "senior_level";
   education?: string;
   monthlySalaryMin?: number;
   monthlySalaryMax?: number;
@@ -14,18 +14,18 @@ export interface JobPostingDTO {
   requirements?: string;
   assessmentUrl?: string;
   assessmentFile?: Express.Multer.File;
-  status?: 'active' | 'closed' | 'declined'; 
+  status?: "active" | "closed" | "declined";
 }
 
 export interface UpdateJobPostingDTO {
   jobTitle?: string;
   department?: string;
   companyLocation?: string;
-  workLocation?: 'office' | 'hybrid' | 'remote';
+  workLocation?: "office" | "hybrid" | "remote";
   industry?: string;
   companyFunction?: string;
-  employmentType?: 'full_time' | 'part_time' | 'contract' | 'internship';
-  experienceLevel?: 'entry_level' | 'mid_level' | 'senior_level';
+  employmentType?: "full_time" | "part_time" | "contract" | "internship";
+  experienceLevel?: "entry_level" | "mid_level" | "senior_level";
   education?: string;
   monthlySalaryMin?: number;
   monthlySalaryMax?: number;
@@ -33,5 +33,5 @@ export interface UpdateJobPostingDTO {
   requirements?: string;
   assessmentUrl?: string;
   assessmentFile?: Express.Multer.File;
-  status?: 'active' | 'closed' | 'declined'; 
+  status?: "active" | "closed" | "declined";
 }

@@ -44,6 +44,12 @@ enum InterviewStatus {
   cancelled
 }
 
+enum JobType {
+  fulltime
+  parttime
+  internship
+}
+
 model User {
   id              String            @id @default(auto()) @map("_id") @db.ObjectId
   email           String            @unique
@@ -61,6 +67,33 @@ model User {
   companyProfile  CompanyProfile?   @relation("UserCompanyProfiles")
   applicants      Applicant[]       @relation("UserApplicant")
   interviewsAsApplicant Interview[] @relation("UserInterviewsAsApplicant")
+  jobSeeker                JobSeeker?
+}
+
+model JobSeeker {
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId              String           @unique                          @db.ObjectId
+  user                User             @relation(fields: [userId], references: [id])
+
+  bio                 String?
+  location            LocationInfo?
+  hasDisability       Boolean?
+  interestedRoles     String[]
+  experienceLevel     ExperienceLevel?
+  workMode            WorkLocation?
+  jobType             EmploymentType?
+  skills              String[]
+  industry            String?
+
+  experience          ExperienceEntry[]
+  education           EducationEntry[]
+  certifications      Certification[]
+  portfolio           PortfolioEntry[]
+  resume              String?
+  interests           String[]
+
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
 }
 
 model CompanyProfile {
@@ -191,4 +224,43 @@ model Interview {
   @@index([applicantId])
   @@index([dateTime])
   @@index([companyProfileId])
+}
+
+type ExperienceEntry {
+  title        String
+  company      String
+  location     String?
+  startDate    DateTime
+  endDate      DateTime?
+  currentlyWorking Boolean @default(false)
+  description  String?
+}
+
+type EducationEntry {
+  institution  String
+  degree       String
+  field        String
+  startDate    DateTime
+  endDate      DateTime?
+  grade        String?
+  description  String?
+}
+
+type Certification {
+  title        String
+  authority    String
+  issueDate    DateTime
+}
+
+type PortfolioEntry {
+  title        String
+  description  String?
+  link         String?
+  technologies String[]
+}
+
+
+type LocationInfo {
+  city        String?
+  country       String?
 }

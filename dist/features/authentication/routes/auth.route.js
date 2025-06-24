@@ -14,6 +14,7 @@ const changePassword_1 = require("../controllers/changePassword");
 const router = express_1.default.Router();
 router.post("/google", googleAuth_1.GoogleAuthController.googleAuth);
 router.post("/register", registerUser_1.AuthController.register);
+router.get("/", registerUser_1.AuthController.getUsers);
 router.post("/login", loginUser_1.LoginController.login);
 router.post("/forgot-password", forgetPassword_1.ForgotPasswordController.forgotPassword);
 router.post("/change-password", authMiddleware_1.authMiddleware, changePassword_1.ChangePasswordController.changePassword);

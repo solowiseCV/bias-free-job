@@ -21,12 +21,6 @@ GoogleAuthService.getUserByEmail = (email) => __awaiter(void 0, void 0, void 0, 
     });
     return existingUser;
 });
-// static getUserByAuthId = async (authId: string) => {
-//   const existingUser = await prisma.user.findUnique({
-//     where: { authId },
-//   });
-//   return existingUser;
-// };
 GoogleAuthService.getExistingUser = (authId, email) => __awaiter(void 0, void 0, void 0, function* () {
     const conditions = [{ email }];
     if (authId) {
@@ -40,9 +34,7 @@ GoogleAuthService.getExistingUser = (authId, email) => __awaiter(void 0, void 0,
     return existingUser;
 });
 GoogleAuthService.registerUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma.user.create({
-        data,
-    });
+    return yield prisma.user.create(Object.assign(Object.assign({}, data), { createdAt: Date.now() }));
 });
 exports.default = GoogleAuthService;
 // module.exports = new GoogleAuthService();
