@@ -7,18 +7,18 @@ export const jobPostingSchema = Joi.object({
   workLocation: Joi.string().valid('office', 'hybrid', 'remote').required(),
   industry: Joi.string().required(),
   companyFunction: Joi.string().optional(),
-  employmentType: Joi.string().valid('full-time', 'part-time', 'contract', 'internship').required(),
-  experienceLevel: Joi.string().valid('entry-level', 'mid-level', 'senior-level').optional(),
+  employmentType: Joi.string().valid('full_time', 'part_time', 'contract', 'internship').required(),
+  experienceLevel: Joi.string().valid('entry_level', 'mid_level', 'senior+level').optional(),
   education: Joi.string().optional(),
   monthlySalaryMin: Joi.number().min(0).optional(),
   monthlySalaryMax: Joi.number().min(Joi.ref('monthlySalaryMin')).optional(),
   jobDescription: Joi.string().required(),
   requirements: Joi.string().optional(),
    assessment: Joi.alternatives().try(
-    Joi.string().uri().optional(), // For URL
-    Joi.string().optional() // For file path (validated in controller)
+    Joi.string().uri().optional(), 
+    Joi.string().optional() 
   ),
-  
+  assessmentUrlInput: Joi.string().optional() 
 });
 
 export const updateJobPostingSchema = Joi.object({
@@ -39,4 +39,6 @@ export const updateJobPostingSchema = Joi.object({
     Joi.string().uri().optional(), 
     Joi.string().optional() 
   ),
+  assessmentUrlInput: Joi.string().optional() 
+
 }).min(0); 
