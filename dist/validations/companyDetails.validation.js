@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.companyTeamSchema = void 0;
+exports.updateCompanyTeamSchema = exports.companyTeamSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.companyTeamSchema = joi_1.default.object({
     companyName: joi_1.default.string().required(),
@@ -17,3 +17,4 @@ exports.companyTeamSchema = joi_1.default.object({
         role: joi_1.default.string().required(),
     })).min(1).required(),
 });
+exports.updateCompanyTeamSchema = exports.companyTeamSchema.fork(Object.keys(exports.companyTeamSchema.describe().keys), (schema) => schema.optional());
