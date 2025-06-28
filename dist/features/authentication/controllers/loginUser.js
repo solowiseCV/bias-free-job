@@ -13,11 +13,15 @@ exports.LoginController = void 0;
 const jwt_1 = require("../../../utils/jwt");
 const registerUser_1 = require("../services/registerUser");
 const hash_1 = require("../../../utils/hash");
+const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
+const company_1 = require("../../Recruiter/services/company");
+const companyTeamService = new company_1.CompanyTeamService();
 class LoginController {
     static login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { email, password } = req.body;
+                let profile = null;
                 const user = yield registerUser_1.AuthService.getUserByEmail(email);
                 if (!user) {
                     res.status(404).json({
@@ -34,11 +38,17 @@ class LoginController {
                     });
                     return;
                 }
+                if (user.userType === "job_seeker") {
+                    profile = yield getJobSeeker_1.GetJobSeekerService.getJobSeekerByUserId(user.id);
+                }
+                else {
+                    profile = yield companyTeamService.getCompanyTeam(user.id);
+                }
                 const token = jwt_1.tokenService.generateToken(user.id);
                 res.status(200).json({
                     success: true,
                     message: "Login successful!",
-                    data: user,
+                    data: { user, profile },
                     token,
                 });
                 return;

@@ -16,14 +16,18 @@ exports.GoogleAuthController = void 0;
 const jwt_1 = require("../../../utils/jwt");
 const google_auth_library_1 = require("google-auth-library");
 const googleAuth_1 = __importDefault(require("../services/googleAuth"));
+const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
+const company_1 = require("../../Recruiter/services/company");
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new google_auth_library_1.OAuth2Client(CLIENT_ID);
+const companyTeamService = new company_1.CompanyTeamService();
 class GoogleAuthController {
     static googleAuth(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { email, picture, userType, given_name, family_name, sub } = req.body;
                 const authId = sub;
+                let profile = null;
                 const existingUserByEmail = yield googleAuth_1.default.getUserByEmail(email);
                 const userData = {
                     authId,
@@ -39,6 +43,12 @@ class GoogleAuthController {
                 }
                 else {
                     user = existingUserByEmail;
+                    if (existingUserByEmail.userType === "job_seeker") {
+                        profile = yield getJobSeeker_1.GetJobSeekerService.getJobSeekerByUserId(existingUserByEmail.id);
+                    }
+                    else {
+                        profile = yield companyTeamService.getCompanyTeam(existingUserByEmail.id);
+                    }
                 }
                 const { id, lastname, firstname } = user;
                 const token = jwt_1.tokenService.generateToken(user.id);
@@ -46,7 +56,7 @@ class GoogleAuthController {
                 res.status(200).json({
                     success: true,
                     message: "Successful!",
-                    data,
+                    data: { user: data, profile },
                     token,
                 });
                 return;

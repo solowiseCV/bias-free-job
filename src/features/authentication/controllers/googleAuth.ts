@@ -2,10 +2,14 @@ import { Request, Response } from "express";
 import { tokenService } from "../../../utils/jwt";
 import { OAuth2Client } from "google-auth-library";
 import GoogleAuthService from "../services/googleAuth";
+import { GetJobSeekerService } from "../../jobSeeker/services/getJobSeeker";
+import { CompanyTeamService } from "../../Recruiter/services/company";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 const client = new OAuth2Client(CLIENT_ID);
+
+const companyTeamService = new CompanyTeamService();
 
 interface User {
   email: string;
@@ -22,6 +26,7 @@ export class GoogleAuthController {
       const { email, picture, userType, given_name, family_name, sub } =
         req.body;
       const authId = sub;
+      let profile: any = null;
 
       const existingUserByEmail = await GoogleAuthService.getUserByEmail(email);
 
@@ -40,6 +45,15 @@ export class GoogleAuthController {
         user = await GoogleAuthService.registerUser(userData);
       } else {
         user = existingUserByEmail;
+        if (existingUserByEmail.userType === "job_seeker") {
+          profile = await GetJobSeekerService.getJobSeekerByUserId(
+            existingUserByEmail.id
+          );
+        } else {
+          profile = await companyTeamService.getCompanyTeam(
+            existingUserByEmail.id
+          );
+        }
       }
 
       const { id, lastname, firstname } = user;
@@ -50,7 +64,7 @@ export class GoogleAuthController {
       res.status(200).json({
         success: true,
         message: "Successful!",
-        data,
+        data: { user: data, profile },
         token,
       });
 
