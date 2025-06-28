@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { CompanyTeamService } from '../services/companyProfile';
-import { companyTeamSchema, updateCompanyTeamSchema } from '../../../validations/companyDetails.validation';
+import { companyTeamSchema, updateCompanyTeamSchema } from '../../../../validations/companyDetails.validation';
 
 const companyTeamService = new CompanyTeamService();
 

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { JobPostingController } from '../controllers/jobController';
-import { authMiddleware } from '../../../middlewares/authMiddleware';
-import { singleupload } from '../../../middlewares/multer';
+import { authMiddleware } from '../../../../middlewares/authMiddleware';
+import { singleupload } from '../../../../middlewares/multer';
 import { JobSeekerController } from '../controllers/fetchJobs';
 
 const jobsRoutes = Router();

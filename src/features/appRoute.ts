@@ -3,7 +3,7 @@ const appRouter = express.Router();
 
 import authRoutes from "./authentication/routes/auth.route";
 import jobSeekerRoute from "./jobSeeker/routes/jobSeeker.route";
-import CompanyRoutes from "./Recruiter/routes/company";
+import CompanyRoutes from "./Recruiter/companyProfile/routes/company";
 import jobsRoutes from "./jobs/routes/job.route";
 
 appRouter.use("/auth", authRoutes);
