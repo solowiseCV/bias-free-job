@@ -3,7 +3,7 @@ import { tokenService } from "../../../utils/jwt";
 import { AuthService } from "../services/registerUser";
 import { comparePassword } from "../../../utils/hash";
 import { GetJobSeekerService } from "../../jobSeeker/services/getJobSeeker";
-import { CompanyTeamService } from "../../Recruiter/services/company";
+import { CompanyTeamService } from "../../Recruiter/services/companyProfile";
 
 const companyTeamService = new CompanyTeamService();
 

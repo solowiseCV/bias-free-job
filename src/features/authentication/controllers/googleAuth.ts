@@ -3,7 +3,7 @@ import { tokenService } from "../../../utils/jwt";
 import { OAuth2Client } from "google-auth-library";
 import GoogleAuthService from "../services/googleAuth";
 import { GetJobSeekerService } from "../../jobSeeker/services/getJobSeeker";
-import { CompanyTeamService } from "../../Recruiter/services/company";
+import { CompanyTeamService } from "../../Recruiter/services/companyProfile";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 

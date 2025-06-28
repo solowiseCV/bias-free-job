@@ -12,16 +12,15 @@ exports.jobPostingSchema = joi_1.default.object({
     workLocation: joi_1.default.string().valid('office', 'hybrid', 'remote').required(),
     industry: joi_1.default.string().required(),
     companyFunction: joi_1.default.string().optional(),
-    employmentType: joi_1.default.string().valid('full-time', 'part-time', 'contract', 'internship').required(),
-    experienceLevel: joi_1.default.string().valid('entry-level', 'mid-level', 'senior-level').optional(),
+    employmentType: joi_1.default.string().valid('full_time', 'part_time', 'contract', 'internship').required(),
+    experienceLevel: joi_1.default.string().valid('entry_level', 'mid_level', 'senior+level').optional(),
     education: joi_1.default.string().optional(),
     monthlySalaryMin: joi_1.default.number().min(0).optional(),
     monthlySalaryMax: joi_1.default.number().min(joi_1.default.ref('monthlySalaryMin')).optional(),
     jobDescription: joi_1.default.string().required(),
     requirements: joi_1.default.string().optional(),
-    assessment: joi_1.default.alternatives().try(joi_1.default.string().uri().optional(), // For URL
-    joi_1.default.string().optional() // For file path (validated in controller)
-    ),
+    assessment: joi_1.default.alternatives().try(joi_1.default.string().uri().optional(), joi_1.default.string().optional()),
+    assessmentUrlInput: joi_1.default.string().optional()
 });
 exports.updateJobPostingSchema = joi_1.default.object({
     jobTitle: joi_1.default.string().optional(),
@@ -38,4 +37,5 @@ exports.updateJobPostingSchema = joi_1.default.object({
     jobDescription: joi_1.default.string().optional(),
     requirements: joi_1.default.string().optional(),
     assessment: joi_1.default.alternatives().try(joi_1.default.string().uri().optional(), joi_1.default.string().optional()),
+    assessmentUrlInput: joi_1.default.string().optional()
 }).min(0);

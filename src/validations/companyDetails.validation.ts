@@ -14,3 +14,7 @@ export const companyTeamSchema = Joi.object({
     })
   ).min(1).required(),
 });
+
+export const updateCompanyTeamSchema = companyTeamSchema.fork(Object.keys(companyTeamSchema.describe().keys), (schema) => 
+  schema.optional()
+);

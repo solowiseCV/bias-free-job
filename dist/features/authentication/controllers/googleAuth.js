@@ -17,10 +17,10 @@ const jwt_1 = require("../../../utils/jwt");
 const google_auth_library_1 = require("google-auth-library");
 const googleAuth_1 = __importDefault(require("../services/googleAuth"));
 const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
-const company_1 = require("../../Recruiter/services/company");
+const companyProfile_1 = require("../../Recruiter/services/companyProfile");
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new google_auth_library_1.OAuth2Client(CLIENT_ID);
-const companyTeamService = new company_1.CompanyTeamService();
+const companyTeamService = new companyProfile_1.CompanyTeamService();
 class GoogleAuthController {
     static googleAuth(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

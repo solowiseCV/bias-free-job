@@ -14,8 +14,8 @@ const jwt_1 = require("../../../utils/jwt");
 const registerUser_1 = require("../services/registerUser");
 const hash_1 = require("../../../utils/hash");
 const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
-const company_1 = require("../../Recruiter/services/company");
-const companyTeamService = new company_1.CompanyTeamService();
+const companyProfile_1 = require("../../Recruiter/services/companyProfile");
+const companyTeamService = new companyProfile_1.CompanyTeamService();
 class LoginController {
     static login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

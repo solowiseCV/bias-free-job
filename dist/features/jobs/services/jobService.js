@@ -15,9 +15,22 @@ const prisma = new client_1.PrismaClient();
 class JobPostingService {
     createJobPosting(userId, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const companyProfile = yield prisma.companyProfile.findFirst({ where: { userId } });
+            const companyProfile = yield prisma.companyProfile.findFirst({
+                where: { userId },
+            });
             if (!companyProfile)
-                throw new Error('No company profile found for this user');
+                throw new Error("No company profile found for this user");
+            const existingJob = yield prisma.jobPosting.findFirst({
+                where: {
+                    companyProfileId: companyProfile.id,
+                    jobTitle: data.jobTitle,
+                    companyLocation: data.companyLocation,
+                    industry: data.industry,
+                },
+            });
+            if (existingJob) {
+                throw new Error("A job with the same title, location, and industry already exists for this company");
+            }
             return prisma.jobPosting.create({
                 data: {
                     companyProfileId: companyProfile.id,
@@ -35,38 +48,42 @@ class JobPostingService {
                     jobDescription: data.jobDescription,
                     requirements: data.requirements,
                     assessment: data.assessmentUrl,
-                    status: data.status || 'active',
+                    status: data.status || "active",
                 },
             });
         });
     }
     getJobPostings(userId, page, limit, search, industry, location, status, bestMatches) {
         return __awaiter(this, void 0, void 0, function* () {
-            const companyProfile = yield prisma.companyProfile.findFirst({ where: { userId } });
+            const companyProfile = yield prisma.companyProfile.findFirst({
+                where: { userId },
+            });
             if (!companyProfile)
                 return { jobs: [], total: 0 };
-            const whereClause = { companyProfileId: companyProfile.id };
+            const whereClause = {
+                companyProfileId: companyProfile.id,
+            };
             // Apply filters
             if (search) {
-                whereClause.jobTitle = { contains: search, mode: 'insensitive' };
+                whereClause.jobTitle = { contains: search, mode: "insensitive" };
             }
             if (industry) {
-                whereClause.industry = { contains: industry, mode: 'insensitive' };
+                whereClause.industry = { contains: industry, mode: "insensitive" };
             }
             if (location) {
-                whereClause.companyLocation = { contains: location, mode: 'insensitive' };
+                whereClause.companyLocation = { contains: location, mode: "insensitive" };
             }
             if (status) {
                 whereClause.status = status;
             }
-            if (bestMatches === 'true') {
-                whereClause.status = 'active';
+            if (bestMatches === "true") {
+                whereClause.status = "active";
             }
             const take = limit ? parseInt(limit) : 10;
             const skip = page ? (parseInt(page) - 1) * take : 0;
-            const orderBy = bestMatches === 'true'
-                ? [{ createdAt: 'desc' }, { monthlySalaryMax: 'desc' }]
-                : [{ createdAt: 'desc' }];
+            const orderBy = bestMatches === "true"
+                ? [{ createdAt: "desc" }, { monthlySalaryMax: "desc" }]
+                : [{ createdAt: "desc" }];
             const [jobs, total] = yield prisma.$transaction([
                 prisma.jobPosting.findMany({
                     where: whereClause,
@@ -100,7 +117,7 @@ class JobPostingService {
         return __awaiter(this, void 0, void 0, function* () {
             const jobPosting = yield prisma.jobPosting.findUnique({ where: { id } });
             if (!jobPosting)
-                throw new Error('Job posting not found');
+                throw new Error("Job posting not found");
             return prisma.jobPosting.update({
                 where: { id },
                 data,
@@ -109,14 +126,16 @@ class JobPostingService {
     }
     deleteJobPosting(userId, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const companyProfile = yield prisma.companyProfile.findFirst({ where: { userId } });
+            const companyProfile = yield prisma.companyProfile.findFirst({
+                where: { userId },
+            });
             if (!companyProfile)
-                throw new Error('No company profile found for this user');
+                throw new Error("No company profile found for this user");
             const jobPosting = yield prisma.jobPosting.findUnique({ where: { id } });
             if (!jobPosting)
-                throw new Error('Job posting not found');
+                throw new Error("Job posting not found");
             if (jobPosting.companyProfileId !== companyProfile.id)
-                throw new Error('Unauthorized to delete this job posting');
+                throw new Error("Unauthorized to delete this job posting");
             return prisma.jobPosting.delete({
                 where: { id },
             });
