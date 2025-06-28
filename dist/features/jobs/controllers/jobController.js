@@ -22,8 +22,8 @@ const cloudinary = (0, cloudinary_1.default)();
 class JobPostingController {
     createJobPosting(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!req.file && !req.body.assessment) {
-                res.status(400).json({ error: 'Assessment is required (URL or file)' });
+            if (!req.file && !req.body.assessment && !req.body.assessmentUrlInput) {
+                res.status(400).json({ error: "Assessment is required (URL or file)" });
                 return;
             }
             const { error } = job_validation_1.jobPostingSchema.validate(req.body);
@@ -31,19 +31,28 @@ class JobPostingController {
                 res.status(400).json({ error: error.details[0].message });
                 return;
             }
-            let assessmentUrl = req.body.assessment;
+            let assessmentUrl;
+            if (req.body.assessmentUrlInput) {
+                assessmentUrl = req.body.assessmentUrlInput;
+            }
+            else if (req.body.assessment) {
+                assessmentUrl = req.body.assessment;
+            }
             if (req.file) {
                 try {
-                    const fileData = { originalname: req.file.originalname, buffer: req.file.buffer };
+                    const fileData = {
+                        originalname: req.file.originalname,
+                        buffer: req.file.buffer,
+                    };
                     const dataUri = (0, multer_1.getDataUri)(fileData);
                     const result = yield cloudinary.uploader.upload(dataUri.content, {
-                        folder: 'job_assessments',
-                        resource_type: 'auto',
+                        folder: "job_assessments",
+                        resource_type: "auto",
                     });
                     assessmentUrl = result.secure_url;
                 }
                 catch (uploadErr) {
-                    res.status(500).json({ error: 'Failed to upload file to Cloudinary' });
+                    res.status(500).json({ error: "Failed to upload file to Cloudinary" });
                     return;
                 }
             }
@@ -57,14 +66,17 @@ class JobPostingController {
                 employmentType: req.body.employmentType,
                 experienceLevel: req.body.experienceLevel,
                 education: req.body.education,
-                monthlySalaryMin: req.body.monthlySalaryMin ? parseFloat(req.body.monthlySalaryMin) : undefined,
-                monthlySalaryMax: req.body.monthlySalaryMax ? parseFloat(req.body.monthlySalaryMax) : undefined,
+                monthlySalaryMin: req.body.monthlySalaryMin
+                    ? parseFloat(req.body.monthlySalaryMin)
+                    : undefined,
+                monthlySalaryMax: req.body.monthlySalaryMax
+                    ? parseFloat(req.body.monthlySalaryMax)
+                    : undefined,
                 jobDescription: req.body.jobDescription,
                 requirements: req.body.requirements,
                 assessmentUrl,
                 status: req.body.status,
             };
-            console.log(data);
             try {
                 const jobPosting = yield jobPostingService.createJobPosting(req.user.id, data);
                 res.status(201).json(jobPosting);
@@ -76,7 +88,7 @@ class JobPostingController {
     }
     getJobPostings(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { page = 1, limit = 10, search, industry, location, status, bestMatches } = req.query;
+            const { page = 1, limit = 10, search, industry, location, status, bestMatches, } = req.query;
             try {
                 const jobPostings = yield jobPostingService.getJobPostings(req.user.id, parseInt(page), parseInt(limit), search, industry, location, status, bestMatches);
                 res.status(200).json(jobPostings);
@@ -88,33 +100,42 @@ class JobPostingController {
     }
     updateJobPosting(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (req.file && req.body.assessment) {
-                res.status(400).json({ error: 'Provide either a file or a URL, not both' });
-                return;
-            }
+            //  if (!req.file && !req.body.assessment && !req.body.assessmentUrlInput) {
+            //   res.status(400).json({ error: "Assessment is required (URL or file)" });
+            //   return;
+            // }
             const { error } = job_validation_1.updateJobPostingSchema.validate(req.body);
             if (error) {
                 res.status(400).json({ error: error.details[0].message });
                 return;
             }
             let assessmentUrl;
+            if (req.body.assessmentUrlInput) {
+                assessmentUrl = req.body.assessmentUrlInput;
+            }
+            else if (req.body.assessment) {
+                assessmentUrl = req.body.assessment;
+            }
             if (req.file) {
                 try {
-                    const fileData = { originalname: req.file.originalname, buffer: req.file.buffer };
+                    const fileData = {
+                        originalname: req.file.originalname,
+                        buffer: req.file.buffer,
+                    };
                     const dataUri = (0, multer_1.getDataUri)(fileData);
                     const result = yield cloudinary.uploader.upload(dataUri.content, {
-                        folder: 'job_assessments',
-                        resource_type: 'auto',
+                        folder: "job_assessments",
+                        resource_type: "auto",
                     });
                     assessmentUrl = result.secure_url;
                 }
                 catch (uploadErr) {
-                    res.status(500).json({ error: 'Failed to upload file to Cloudinary' });
+                    res.status(500).json({ error: "Failed to upload file to Cloudinary" });
                     return;
                 }
             }
             else {
-                assessmentUrl = req.body.assessment;
+                assessmentUrl = req.body.assessmen;
             }
             const data = {
                 jobTitle: req.body.jobTitle,
@@ -126,8 +147,12 @@ class JobPostingController {
                 employmentType: req.body.employmentType,
                 experienceLevel: req.body.experienceLevel,
                 education: req.body.education,
-                monthlySalaryMin: req.body.monthlySalaryMin ? parseFloat(req.body.monthlySalaryMin) : undefined,
-                monthlySalaryMax: req.body.monthlySalaryMax ? parseFloat(req.body.monthlySalaryMax) : undefined,
+                monthlySalaryMin: req.body.monthlySalaryMin
+                    ? parseFloat(req.body.monthlySalaryMin)
+                    : undefined,
+                monthlySalaryMax: req.body.monthlySalaryMax
+                    ? parseFloat(req.body.monthlySalaryMax)
+                    : undefined,
                 jobDescription: req.body.jobDescription,
                 requirements: req.body.requirements,
                 assessmentUrl,
@@ -148,7 +173,9 @@ class JobPostingController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const jobPosting = yield jobPostingService.deleteJobPosting(req.user.id, req.params.id);
-                res.status(200).json({ message: 'Job posting deleted successfully', jobPosting });
+                res
+                    .status(200)
+                    .json({ message: "Job posting deleted successfully", jobPosting });
             }
             catch (err) {
                 res.status(400).json({ error: err.message });
