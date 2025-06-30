@@ -1,13 +1,9 @@
 import { Request, Response } from "express";
 import { tokenService } from "../../../utils/jwt";
-import { OAuth2Client } from "google-auth-library";
 import GoogleAuthService from "../services/googleAuth";
 import { GetJobSeekerService } from "../../jobSeeker/services/getJobSeeker";
 import { CompanyTeamService } from "../../Recruiter/services/companyProfile";
-
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-
-const client = new OAuth2Client(CLIENT_ID);
+import { googleAuthSchema } from "../../../validations/googleAuth.validation";
 
 const companyTeamService = new CompanyTeamService();
 
@@ -23,8 +19,16 @@ interface User {
 export class GoogleAuthController {
   static async googleAuth(req: Request, res: Response): Promise<void> {
     try {
+      const { error } = googleAuthSchema.validate(req.body);
+
+      if (error) {
+        res.status(400).json({ error: error.details[0].message });
+        return;
+      }
+
       const { email, picture, userType, given_name, family_name, sub } =
         req.body;
+
       const authId = sub;
       let profile: any = null;
 
@@ -60,6 +64,13 @@ export class GoogleAuthController {
 
       const token = tokenService.generateToken(user.id);
       const data = { id, email, lastname, firstname, userType };
+
+      res.cookie("userType", userType, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
       res.status(200).json({
         success: true,

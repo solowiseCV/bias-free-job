@@ -14,17 +14,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoogleAuthController = void 0;
 const jwt_1 = require("../../../utils/jwt");
-const google_auth_library_1 = require("google-auth-library");
 const googleAuth_1 = __importDefault(require("../services/googleAuth"));
 const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
 const companyProfile_1 = require("../../Recruiter/services/companyProfile");
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const client = new google_auth_library_1.OAuth2Client(CLIENT_ID);
+const googleAuth_validation_1 = require("../../../validations/googleAuth.validation");
 const companyTeamService = new companyProfile_1.CompanyTeamService();
 class GoogleAuthController {
     static googleAuth(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const { error } = googleAuth_validation_1.googleAuthSchema.validate(req.body);
+                if (error) {
+                    res.status(400).json({ error: error.details[0].message });
+                    return;
+                }
                 const { email, picture, userType, given_name, family_name, sub } = req.body;
                 const authId = sub;
                 let profile = null;
@@ -53,6 +56,12 @@ class GoogleAuthController {
                 const { id, lastname, firstname } = user;
                 const token = jwt_1.tokenService.generateToken(user.id);
                 const data = { id, email, lastname, firstname, userType };
+                res.cookie("userType", userType, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "lax",
+                    maxAge: 7 * 24 * 60 * 60 * 1000,
+                });
                 res.status(200).json({
                     success: true,
                     message: "Successful!",

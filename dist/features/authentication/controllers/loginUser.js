@@ -15,11 +15,17 @@ const registerUser_1 = require("../services/registerUser");
 const hash_1 = require("../../../utils/hash");
 const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
 const companyProfile_1 = require("../../Recruiter/services/companyProfile");
+const login_validation_1 = require("../../../validations/login.validation");
 const companyTeamService = new companyProfile_1.CompanyTeamService();
 class LoginController {
     static login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const { error } = login_validation_1.loginSchema.validate(req.body);
+                if (error) {
+                    res.status(400).json({ error: error.details[0].message });
+                    return;
+                }
                 const { email, password } = req.body;
                 let profile = null;
                 const user = yield registerUser_1.AuthService.getUserByEmail(email);
@@ -45,6 +51,13 @@ class LoginController {
                     profile = yield companyTeamService.getCompanyTeam(user.id);
                 }
                 const token = jwt_1.tokenService.generateToken(user.id);
+                res.cookie("userType", user.userType, {
+                    httpOnly: true,
+                    secure: true,
+                    // process.env.NODE_ENV === "production",
+                    sameSite: "lax",
+                    maxAge: 7 * 24 * 60 * 60 * 1000,
+                });
                 res.status(200).json({
                     success: true,
                     message: "Login successful!",

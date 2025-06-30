@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { tokenService } from "../../../utils/jwt";
 import { AuthService } from "../services/registerUser";
 import { hashPassword } from "../../../utils/hash";
+import { signinSchema } from "../../../validations/signup.validation";
 
 interface User {
   email: string;
@@ -14,6 +15,11 @@ interface User {
 export class AuthController {
   static async register(req: Request, res: Response): Promise<void> {
     try {
+      const { error } = signinSchema.validate(req.body);
+      if (error) {
+        res.status(400).json({ error: error.details[0].message });
+        return;
+      }
       const { email, firstname, lastname, password, userType } = req.body;
 
       const existingUser = await AuthService.getUserByEmail(email);
@@ -43,6 +49,14 @@ export class AuthController {
       };
 
       const token = tokenService.generateToken(user.id);
+
+      res.cookie("userType", user.userType, {
+        httpOnly: true,
+        secure: true,
+        // process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
       res.status(200).json({
         success: true,
