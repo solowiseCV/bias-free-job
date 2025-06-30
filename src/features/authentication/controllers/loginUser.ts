@@ -4,12 +4,18 @@ import { AuthService } from "../services/registerUser";
 import { comparePassword } from "../../../utils/hash";
 import { GetJobSeekerService } from "../../jobSeeker/services/getJobSeeker";
 import { CompanyTeamService } from "../../Recruiter/services/companyProfile";
+import { loginSchema } from "../../../validations/login.validation";
 
 const companyTeamService = new CompanyTeamService();
 
 export class LoginController {
   static async login(req: Request, res: Response): Promise<void> {
     try {
+      const { error } = loginSchema.validate(req.body);
+      if (error) {
+        res.status(400).json({ error: error.details[0].message });
+        return;
+      }
       const { email, password } = req.body;
       let profile = null;
 
@@ -41,6 +47,14 @@ export class LoginController {
       }
 
       const token = tokenService.generateToken(user.id);
+
+      res.cookie("userType", user.userType, {
+        httpOnly: true,
+        secure: true,
+        // process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
       res.status(200).json({
         success: true,
