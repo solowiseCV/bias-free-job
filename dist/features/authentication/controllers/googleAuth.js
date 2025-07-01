@@ -17,31 +17,32 @@ const jwt_1 = require("../../../utils/jwt");
 const googleAuth_1 = __importDefault(require("../services/googleAuth"));
 const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
 const companyProfile_1 = require("../../Recruiter/services/companyProfile");
-const googleAuth_validation_1 = require("../../../validations/googleAuth.validation");
 const companyTeamService = new companyProfile_1.CompanyTeamService();
 class GoogleAuthController {
     static googleAuth(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { error } = googleAuth_validation_1.googleAuthSchema.validate(req.body);
-                if (error) {
-                    res.status(400).json({ error: error.details[0].message });
-                    return;
-                }
-                const { email, picture, userType, given_name, family_name, sub } = req.body;
-                const authId = sub;
+                const { email, userType } = req.body;
                 let profile = null;
                 const existingUserByEmail = yield googleAuth_1.default.getUserByEmail(email);
-                const userData = {
-                    authId,
-                    email,
-                    avatar: picture,
-                    firstname: given_name,
-                    lastname: family_name,
-                    userType,
-                };
                 let user;
                 if (!existingUserByEmail) {
+                    if (!userType) {
+                        res.status(200).json({
+                            success: false,
+                            message: "User type is required",
+                        });
+                        return;
+                    }
+                    const { given_name, family_name, sub, picture } = req.body;
+                    const userData = {
+                        authId: sub,
+                        email,
+                        avatar: picture,
+                        firstname: given_name,
+                        lastname: family_name,
+                        userType,
+                    };
                     user = yield googleAuth_1.default.registerUser(userData);
                 }
                 else {
@@ -55,7 +56,7 @@ class GoogleAuthController {
                 }
                 const { id, lastname, firstname } = user;
                 const token = jwt_1.tokenService.generateToken(user.id);
-                const data = { id, email, lastname, firstname, userType };
+                const data = { id, email, lastname, firstname, userType: user.userType };
                 res.cookie("userType", userType, {
                     httpOnly: true,
                     secure: true,

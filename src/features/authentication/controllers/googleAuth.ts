@@ -16,36 +16,48 @@ interface User {
   userType: string;
 }
 
+interface ExistingUser {
+  id: string;
+  email: string;
+  lastname: String;
+  firstname: String;
+  avatar: String | null;
+  authId: String;
+  userType: string;
+}
+
 export class GoogleAuthController {
   static async googleAuth(req: Request, res: Response): Promise<void> {
     try {
-      const { error } = googleAuthSchema.validate(req.body);
+      const { email, userType } = req.body;
 
-      if (error) {
-        res.status(400).json({ error: error.details[0].message });
-        return;
-      }
-
-      const { email, picture, userType, given_name, family_name, sub } =
-        req.body;
-
-      const authId = sub;
       let profile: any = null;
 
-      const existingUserByEmail = await GoogleAuthService.getUserByEmail(email);
+      const existingUserByEmail: ExistingUser | null =
+        await GoogleAuthService.getUserByEmail(email);
 
-      const userData: User = {
-        authId,
-        email,
-        avatar: picture,
-        firstname: given_name,
-        lastname: family_name,
-        userType,
-      };
-
-      let user;
+      let user: ExistingUser;
 
       if (!existingUserByEmail) {
+        if (!userType) {
+          res.status(200).json({
+            success: false,
+            message: "User type is required",
+          });
+          return;
+        }
+
+        const { given_name, family_name, sub, picture } = req.body;
+
+        const userData: User = {
+          authId: sub,
+          email,
+          avatar: picture,
+          firstname: given_name,
+          lastname: family_name,
+          userType,
+        };
+
         user = await GoogleAuthService.registerUser(userData);
       } else {
         user = existingUserByEmail;
@@ -63,7 +75,7 @@ export class GoogleAuthController {
       const { id, lastname, firstname } = user;
 
       const token = tokenService.generateToken(user.id);
-      const data = { id, email, lastname, firstname, userType };
+      const data = { id, email, lastname, firstname, userType: user.userType };
 
       res.cookie("userType", userType, {
         httpOnly: true,
