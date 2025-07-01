@@ -27,5 +27,7 @@ AuthService.getUserUsers = () => __awaiter(void 0, void 0, void 0, function* () 
     return yield prisma.user.findMany();
 });
 AuthService.registerUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma.user.create(Object.assign(Object.assign({}, data), { createdAt: Date.now() }));
+    return yield prisma.user.create({
+        data,
+    });
 });

@@ -23,8 +23,7 @@ export class AuthService {
 
   static registerUser = async (data: User) => {
     return await prisma.user.create({
-      ...data,
-      createdAt: Date.now(),
+      data,
     });
   };
 }
