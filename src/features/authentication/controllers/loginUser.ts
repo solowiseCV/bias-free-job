@@ -3,8 +3,8 @@ import { tokenService } from "../../../utils/jwt";
 import { AuthService } from "../services/registerUser";
 import { comparePassword } from "../../../utils/hash";
 import { GetJobSeekerService } from "../../jobSeeker/services/getJobSeeker";
-import { CompanyTeamService } from "../../Recruiter/services/companyProfile";
 import { loginSchema } from "../../../validations/login.validation";
+import { CompanyTeamService } from "../../Recruiter/companyProfile/services/companyProfile";
 
 const companyTeamService = new CompanyTeamService();
 
