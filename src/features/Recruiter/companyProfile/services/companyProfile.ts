@@ -1,7 +1,7 @@
-import { PrismaClient, Prisma } from "@prisma/client";
-import { hiringTeamMailOptionSendEmail } from "../../../utils/mail";
-import { CompanyTeamDTO, UpdateCompanyTeamDTO } from "../dtos/compant.dto";
-import { transporter } from "../../../utils/nodemailer";
+import { PrismaClient, Prisma } from '@prisma/client';
+import { hiringTeamMailOptionSendEmail } from '../../../../utils/mail'; 
+import { CompanyTeamDTO, UpdateCompanyTeamDTO } from '../dtos/compant.dto'; 
+import { transporter } from '../../../../utils/nodemailer';
 
 const prisma = new PrismaClient();
 
@@ -14,6 +14,8 @@ export class CompanyTeamService {
           const existingProfile = await tx.companyProfile.findFirst({
             where: { userId },
           });
+
+          
           if (existingProfile) {
             throw new Error("A company profile already exists for this user.");
           }

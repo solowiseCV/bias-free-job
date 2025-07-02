@@ -252,6 +252,8 @@ type Certification {
   issueDate    DateTime
 }
 
+
+
 type PortfolioEntry {
   title        String
   description  String?

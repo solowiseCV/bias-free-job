@@ -3,9 +3,9 @@ import { JobPostingService } from "../services/jobService";
 import {
   jobPostingSchema,
   updateJobPostingSchema,
-} from "../../../validations/job.validation";
-import { getDataUri, FileData } from "../../../middlewares/multer";
-import configureCloudinary from "../../../configs/cloudinary";
+} from "../../../../validations/job.validation";
+import { getDataUri, FileData } from "../../../../middlewares/multer";
+import configureCloudinary from "../../../../configs/cloudinary";
 import { JobPostingDTO, UpdateJobPostingDTO } from "../dtos/postJob.dto";
 
 const jobPostingService = new JobPostingService();
