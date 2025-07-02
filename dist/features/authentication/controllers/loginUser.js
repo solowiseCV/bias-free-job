@@ -14,8 +14,8 @@ const jwt_1 = require("../../../utils/jwt");
 const registerUser_1 = require("../services/registerUser");
 const hash_1 = require("../../../utils/hash");
 const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
-const companyProfile_1 = require("../../Recruiter/services/companyProfile");
 const login_validation_1 = require("../../../validations/login.validation");
+const companyProfile_1 = require("../../Recruiter/companyProfile/services/companyProfile");
 const companyTeamService = new companyProfile_1.CompanyTeamService();
 class LoginController {
     static login(req, res) {

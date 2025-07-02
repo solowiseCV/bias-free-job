@@ -20,9 +20,11 @@ class CompanyTeamService {
             try {
                 const result = yield prisma.$transaction((tx) => __awaiter(this, void 0, void 0, function* () {
                     // Check for existing company profile with the same userId
-                    const existingProfile = yield tx.companyProfile.findFirst({ where: { userId } });
+                    const existingProfile = yield tx.companyProfile.findFirst({
+                        where: { userId },
+                    });
                     if (existingProfile) {
-                        throw new Error('A company profile already exists for this user.');
+                        throw new Error("A company profile already exists for this user.");
                     }
                     const companyProfile = yield tx.companyProfile.create({
                         data: {
@@ -58,7 +60,9 @@ class CompanyTeamService {
                 });
                 // Send emails after transaction success
                 yield Promise.all(result.teamMembers.map((member) => __awaiter(this, void 0, void 0, function* () {
-                    const isExistingUser = yield prisma.user.findUnique({ where: { email: member.email } });
+                    const isExistingUser = yield prisma.user.findUnique({
+                        where: { email: member.email },
+                    });
                     const mailOptions = yield (0, mail_1.hiringTeamMailOptionSendEmail)(member.email, result.companyName, !!isExistingUser);
                     yield nodemailer_1.transporter.sendMail(mailOptions);
                 })));
@@ -69,13 +73,20 @@ class CompanyTeamService {
             }
             catch (error) {
                 if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
-                    if (error.code === 'P2002') {
-                        throw new Error('A company profile with this user ID already exists. Please use a different user or update the existing profile.');
+                    if (error.code === "P2002") {
+                        throw new Error("A company profile with this user ID already exists. Please use a different user or update the existing profile.");
                     }
                     throw new Error(`Database error: ${error.message}`);
                 }
                 throw error;
             }
+        });
+    }
+    getCompanyTeam(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield prisma.companyProfile.findFirst({
+                where: { userId },
+            });
         });
     }
     // async getCompanyTeam(userId: string) {
@@ -115,9 +126,11 @@ class CompanyTeamService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const result = yield prisma.$transaction((tx) => __awaiter(this, void 0, void 0, function* () {
-                    const companyProfile = yield tx.companyProfile.findFirst({ where: { userId } });
+                    const companyProfile = yield tx.companyProfile.findFirst({
+                        where: { userId },
+                    });
                     if (!companyProfile) {
-                        throw new Error('No company profile found for this user.');
+                        throw new Error("No company profile found for this user.");
                     }
                     const updatedProfile = yield tx.companyProfile.update({
                         where: { id: companyProfile.id },
@@ -130,10 +143,14 @@ class CompanyTeamService {
                             numberOfEmployees: data.numberOfEmployees,
                         },
                     });
-                    const hiringTeam = yield tx.hiringTeam.findFirst({ where: { companyProfileId: companyProfile.id } });
+                    const hiringTeam = yield tx.hiringTeam.findFirst({
+                        where: { companyProfileId: companyProfile.id },
+                    });
                     if (hiringTeam && data.teamMembers) {
                         // Delete existing team members
-                        yield tx.teamMember.deleteMany({ where: { hiringTeamId: hiringTeam.id } });
+                        yield tx.teamMember.deleteMany({
+                            where: { hiringTeamId: hiringTeam.id },
+                        });
                         // Create new team members
                         yield tx.teamMember.createMany({
                             data: data.teamMembers.map((member) => ({
@@ -164,19 +181,25 @@ class CompanyTeamService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const result = yield prisma.$transaction((tx) => __awaiter(this, void 0, void 0, function* () {
-                    const companyProfile = yield tx.companyProfile.findFirst({ where: { userId } });
+                    const companyProfile = yield tx.companyProfile.findFirst({
+                        where: { userId },
+                    });
                     if (!companyProfile) {
-                        throw new Error('No company profile found for this user.');
+                        throw new Error("No company profile found for this user.");
                     }
                     // Delete team members
-                    const hiringTeam = yield tx.hiringTeam.findFirst({ where: { companyProfileId: companyProfile.id } });
+                    const hiringTeam = yield tx.hiringTeam.findFirst({
+                        where: { companyProfileId: companyProfile.id },
+                    });
                     if (hiringTeam) {
-                        yield tx.teamMember.deleteMany({ where: { hiringTeamId: hiringTeam.id } });
+                        yield tx.teamMember.deleteMany({
+                            where: { hiringTeamId: hiringTeam.id },
+                        });
                         yield tx.hiringTeam.delete({ where: { id: hiringTeam.id } });
                     }
                     // Delete company profile
                     yield tx.companyProfile.delete({ where: { id: companyProfile.id } });
-                    return { message: 'Company team deleted successfully' };
+                    return { message: "Company team deleted successfully" };
                 }), {
                     timeout: 15000,
                 });
