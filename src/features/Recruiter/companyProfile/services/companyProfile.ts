@@ -14,6 +14,8 @@ export class CompanyTeamService {
           const existingProfile = await tx.companyProfile.findFirst({
             where: { userId },
           });
+
+          
           if (existingProfile) {
             throw new Error("A company profile already exists for this user.");
           }
