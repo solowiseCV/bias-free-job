@@ -37,3 +37,5 @@ export default (app: Application) => {
   // Mounting routes
   app.use("/api/v1", indexRoutes);
 };
+
+
