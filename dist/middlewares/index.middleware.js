@@ -18,7 +18,8 @@ exports.default = (app) => {
     app.use((0, cors_1.default)({
         origin: "*",
         methods: ["GET", "POST", "PUT", "PATCH"],
-        allowedHeaders: ['Content-Type', 'Authorization']
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
     }));
     // Configuration setup (dotenv)
     if (process.env.NODE_ENV !== 'production')
