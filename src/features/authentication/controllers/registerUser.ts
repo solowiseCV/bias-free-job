@@ -42,10 +42,11 @@ export class AuthController {
 
       const user = await AuthService.registerUser(userData);
       const data = {
-        email,
-        lastname,
-        firstname,
-        userType,
+        id: user.id,
+        email: user.email,
+        lastname: user.lastname,
+        firstname: user.firstname,
+        userType: user.userType,
       };
 
       const token = tokenService.generateToken(user.id);
