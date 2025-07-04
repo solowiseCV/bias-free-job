@@ -41,10 +41,11 @@ class AuthController {
                 };
                 const user = yield registerUser_1.AuthService.registerUser(userData);
                 const data = {
-                    email,
-                    lastname,
-                    firstname,
-                    userType,
+                    id: user.id,
+                    email: user.email,
+                    lastname: user.lastname,
+                    firstname: user.firstname,
+                    userType: user.userType,
                 };
                 const token = jwt_1.tokenService.generateToken(user.id);
                 res.cookie("userType", user.userType, {
