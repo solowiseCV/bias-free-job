@@ -1,4 +1,4 @@
-// src/middleware/errors.middleware.ts
+
 import { Request, Response, NextFunction } from "express";
 import logger from "./logger.middleware";
 import CustomResponse from "../utils/helpers/response.util";
@@ -11,6 +11,5 @@ export default function errorHandler(
   next: NextFunction
 ): void {
   logger.error(error);
-
   new CustomResponse(INTERNAL_SERVER_ERROR, false, error.message, res);
 }

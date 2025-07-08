@@ -15,7 +15,8 @@ export default (app: Application) => {
   app.use(cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "PATCH"],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   }));
 
   // Configuration setup (dotenv)
@@ -37,3 +38,5 @@ export default (app: Application) => {
   // Mounting routes
   app.use("/api/v1", indexRoutes);
 };
+
+

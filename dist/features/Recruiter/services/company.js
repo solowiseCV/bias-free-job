@@ -51,7 +51,9 @@ class CompanyTeamService {
                 timeout: 15000,
             });
             yield Promise.all(result.teamMembers.map((member) => __awaiter(this, void 0, void 0, function* () {
-                const isExistingUser = yield prisma.user.findUnique({ where: { email: member.email } });
+                const isExistingUser = yield prisma.user.findUnique({
+                    where: { email: member.email },
+                });
                 const mailOptions = yield (0, mail_1.hiringTeamMailOptionSendEmail)(member.email, result.companyName, !!isExistingUser);
                 yield nodemailer_1.transporter.sendMail(mailOptions);
             })));
@@ -59,6 +61,13 @@ class CompanyTeamService {
                 companyProfileId: result.companyProfileId,
                 hiringTeamId: result.hiringTeamId,
             };
+        });
+    }
+    getCompanyTeam(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield prisma.companyProfile.findUnique({
+                where: { userId },
+            });
         });
     }
 }

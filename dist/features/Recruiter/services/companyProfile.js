@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CompanyTeamService = void 0;
 const client_1 = require("@prisma/client");
-const mail_1 = require("../../../../utils/mail");
-const nodemailer_1 = require("../../../../utils/nodemailer");
+const mail_1 = require("../../../utils/mail");
+const nodemailer_1 = require("../../../utils/nodemailer");
 const prisma = new client_1.PrismaClient();
 class CompanyTeamService {
     createCompanyTeam(userId, data) {
