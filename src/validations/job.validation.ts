@@ -5,6 +5,7 @@ export const jobPostingSchema = Joi.object({
   department: Joi.string().optional(),
   companyLocation: Joi.string().required(),
   workLocation: Joi.string().valid('office', 'hybrid', 'remote').required(),
+  
   industry: Joi.string().required(),
   companyFunction: Joi.string().optional(),
   employmentType: Joi.string().valid('full_time', 'part_time', 'contract', 'internship').required(),
@@ -12,6 +13,8 @@ export const jobPostingSchema = Joi.object({
   education: Joi.string().optional(),
   monthlySalaryMin: Joi.number().min(0).optional(),
   monthlySalaryMax: Joi.number().min(Joi.ref('monthlySalaryMin')).optional(),
+  currency : Joi.string().optional(),
+  deadline : Joi.string().optional(),
   jobDescription: Joi.string().required(),
   requirements: Joi.string().optional(),
    assessment: Joi.alternatives().try(
