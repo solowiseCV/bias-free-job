@@ -35,6 +35,8 @@ export class JobPostingService {
         workLocation: data.workLocation,
         industry: data.industry,
         companyFunction: data.companyFunction,
+        currency: data.currency || "NGN",
+        deadline: data.deadline || new Date().toISOString(),
         employmentType: data.employmentType,
         experienceLevel: data.experienceLevel,
         education: data.education,

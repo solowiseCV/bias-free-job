@@ -152,6 +152,8 @@ model JobPosting {
   education       String?
   monthlySalaryMin Float?
   monthlySalaryMax Float?
+  currency          String?
+  deadline           String?
   jobDescription  String
   requirements    String?
   assessment      String?
