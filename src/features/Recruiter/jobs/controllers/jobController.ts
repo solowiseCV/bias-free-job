@@ -8,7 +8,7 @@ import { getDataUri, FileData } from "../../../../middlewares/multer";
 import configureCloudinary from "../../../../configs/cloudinary";
 import { JobPostingDTO, UpdateJobPostingDTO } from "../dtos/postJob.dto";
 import { BadRequestError } from "../../../../lib/appError";
-
+import  CustomResponse from "../../../../utils/helpers/response.util";
 const jobPostingService = new JobPostingService();
 const cloudinary = configureCloudinary();
 
@@ -52,7 +52,8 @@ async createJobPosting(req: Request, res: Response) {
       assessmentUrl = uploadResult.secure_url;
     } catch (uploadError) {
       console.error("Cloudinary upload error:", uploadError);
-       res.status(400).json({ error: "Failed to upload assessment to Cloudinary" });
+      //  res.status(400).json({ error: "Failed to upload assessment to Cloudinary" });
+       new CustomResponse(400, true, "Failed to upload assessment to Cloudinary", res, uploadError);
       return;
     }
   }
@@ -79,10 +80,12 @@ async createJobPosting(req: Request, res: Response) {
   // Create job posting
   try {
     const jobPosting = await jobPostingService.createJobPosting(req.user.id, data);
-    res.status(201).json(jobPosting);
+    new CustomResponse(201, true, "Job created successfully", res, jobPosting);
+
   } catch (err: any) {
     const status = err.statusCode || 500;
-    res.status(status).json({ error: err.message });
+    // res.status(status).json({ error: err.message });
+    new CustomResponse(status, true, err.message, res, err);
   }
 }
 
@@ -108,11 +111,27 @@ async createJobPosting(req: Request, res: Response) {
         status as string,
         bestMatches as string
       );
-      res.status(200).json(jobPostings);
+      // res.status(200).json(jobPostings);
+      new CustomResponse(200, true, "Job postings retrieved successfully", res, jobPostings);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }
   }
+
+  async getJobPostingById(req: Request, res: Response) {
+    try {
+      const jobPosting = await jobPostingService.getJobPostingById(
+        req.params.id
+      );
+      if (!jobPosting) {
+        throw new BadRequestError("Job posting not found");
+      }
+      new CustomResponse(200, true, "Job posting retrieved successfully", res, jobPosting);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+
 
   async updateJobPosting(req: Request, res: Response) {
     //  if (!req.file && !req.body.assessment && !req.body.assessmentUrlInput) {
@@ -149,7 +168,8 @@ async createJobPosting(req: Request, res: Response) {
         });
         assessmentUrl = result.secure_url;
       } catch (uploadErr) {
-        res.status(500).json({ error: "Failed to upload file to Cloudinary" });
+        // res.status(500).json({ error: "Failed to upload file to Cloudinary" });
+        new CustomResponse(500, true, "Failed to upload file to Cloudinary", res, uploadErr);
         return;
       }
     } else {
@@ -200,9 +220,11 @@ async createJobPosting(req: Request, res: Response) {
         req.user.id,
         req.params.id
       );
-      res
-        .status(200)
-        .json({ message: "Job posting deleted successfully", jobPosting });
+      // res
+        // .status(200)
+        // .json({ message: "Job posting deleted successfully", jobPosting });
+      new CustomResponse(200, true, "Job posting deleted successfully", res, jobPosting);
+
     } catch (err: any) {
       res.status(400).json({ error: err.message });
     }

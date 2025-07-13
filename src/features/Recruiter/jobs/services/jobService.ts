@@ -125,7 +125,29 @@ export class JobPostingService {
       limit: take,
     };
   }
-
+  
+async getJobPostingById(id: string) {
+    const jobPosting = await prisma.jobPosting.findUnique({ 
+      where: { id },
+      include: { companyProfile: { select: { companyName: true } } },
+    });
+    if (!jobPosting) throw new Error("Job posting not found");
+    return {
+      id: jobPosting.id,
+      jobTitle: jobPosting.jobTitle,
+      companyName: jobPosting.companyProfile.companyName,
+      companyLocation: jobPosting.companyLocation,
+      workLocation: jobPosting.workLocation,
+      industry: jobPosting.industry,
+      employmentType: jobPosting.employmentType,
+      monthlySalaryMin: jobPosting.monthlySalaryMin,
+      monthlySalaryMax: jobPosting.monthlySalaryMax,
+      status: jobPosting.status,
+      jobDescription: jobPosting.jobDescription,
+      requirements: jobPosting.requirements,
+      assessmentUrl: jobPosting.assessment,
+    };
+  }
   async updateJobPosting(id: string, data: Partial<UpdateJobPostingDTO>) {
     const jobPosting = await prisma.jobPosting.findUnique({ where: { id } });
     if (!jobPosting) throw new Error("Job posting not found");

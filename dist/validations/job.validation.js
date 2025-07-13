@@ -17,6 +17,8 @@ exports.jobPostingSchema = joi_1.default.object({
     education: joi_1.default.string().optional(),
     monthlySalaryMin: joi_1.default.number().min(0).optional(),
     monthlySalaryMax: joi_1.default.number().min(joi_1.default.ref('monthlySalaryMin')).optional(),
+    currency: joi_1.default.string().optional(),
+    deadline: joi_1.default.string().optional(),
     jobDescription: joi_1.default.string().required(),
     requirements: joi_1.default.string().optional(),
     assessment: joi_1.default.alternatives().try(joi_1.default.string().uri().optional(), joi_1.default.string().optional()),

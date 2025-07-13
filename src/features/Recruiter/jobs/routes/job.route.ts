@@ -10,6 +10,7 @@ const jobSeekerController= new JobSeekerController();
 
 jobsRoutes.post('/postJob',authMiddleware, singleupload, controller.createJobPosting);
 jobsRoutes.get('/alljobs',authMiddleware, controller.getJobPostings);
+jobsRoutes.get('/job/:id', authMiddleware, controller.getJobPostingById);
 jobsRoutes.get('/seekersjobs', jobSeekerController.getAllJobs);
 jobsRoutes.patch('/update/:id', authMiddleware,singleupload, controller.updateJobPosting);
 jobsRoutes.delete('/delete/:id', authMiddleware,singleupload, controller.deleteJobPosting);
