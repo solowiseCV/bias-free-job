@@ -89,7 +89,7 @@ async createJobPosting(req: Request, res: Response) {
   }
 }
 
-  async getJobPostings(req: Request, res: Response) {
+ async getJobPostings(req: Request, res: Response) {
     const {
       page = 1,
       limit = 10,
@@ -111,7 +111,6 @@ async createJobPosting(req: Request, res: Response) {
         status as string,
         bestMatches as string
       );
-      // res.status(200).json(jobPostings);
       new CustomResponse(200, true, "Job postings retrieved successfully", res, jobPostings);
     } catch (err: any) {
       res.status(400).json({ error: err.message });

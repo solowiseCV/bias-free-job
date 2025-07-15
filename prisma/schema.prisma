@@ -36,7 +36,10 @@ enum ApplicationStatus {
   reviewed
   accepted
   rejected
+  interviewed
+  hired
 }
+
 
 enum InterviewStatus {
   scheduled
@@ -49,6 +52,7 @@ enum JobType {
   parttime
   internship
 }
+
 
 model User {
   id              String            @id @default(auto()) @map("_id") @db.ObjectId
