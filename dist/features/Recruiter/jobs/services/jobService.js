@@ -92,26 +92,66 @@ class JobPostingService {
                     take,
                     skip,
                     orderBy,
-                    include: { companyProfile: { select: { companyName: true } } },
+                    include: {
+                        companyProfile: { select: { companyName: true } },
+                        applications: true,
+                        interviews: true,
+                    },
                 }),
                 prisma.jobPosting.count({ where: whereClause }),
             ]);
             return {
-                jobs: jobs.map((job) => ({
-                    id: job.id,
-                    jobTitle: job.jobTitle,
-                    companyName: job.companyProfile.companyName,
-                    companyLocation: job.companyLocation,
-                    workLocation: job.workLocation,
-                    industry: job.industry,
-                    employmentType: job.employmentType,
-                    monthlySalaryMin: job.monthlySalaryMin,
-                    monthlySalaryMax: job.monthlySalaryMax,
-                    status: job.status,
-                })),
+                jobs: jobs.map((job) => {
+                    // Calculate best matches as applications with status 'accepted' or 'hired'
+                    const bestMatches = job.applications
+                        ? job.applications.filter((app) => app.status === 'accepted' || app.status === 'hired').length
+                        : 0;
+                    return {
+                        id: job.id,
+                        jobTitle: job.jobTitle,
+                        companyName: job.companyProfile.companyName,
+                        companyLocation: job.companyLocation,
+                        workLocation: job.workLocation,
+                        industry: job.industry,
+                        employmentType: job.employmentType,
+                        monthlySalaryMin: job.monthlySalaryMin,
+                        monthlySalaryMax: job.monthlySalaryMax,
+                        status: job.status,
+                        totalApplications: job.applications ? job.applications.length : 0,
+                        peopleInterviewed: job.interviews ? job.interviews.length : 0,
+                        applications: job.applications || [],
+                        interviews: job.interviews || [],
+                        bestMatches,
+                    };
+                }),
                 total,
                 page: page || 1,
                 limit: take,
+            };
+        });
+    }
+    getJobPostingById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const jobPosting = yield prisma.jobPosting.findUnique({
+                where: { id },
+                include: { companyProfile: { select: { companyName: true } } },
+            });
+            if (!jobPosting)
+                throw new Error("Job posting not found");
+            return {
+                id: jobPosting.id,
+                jobTitle: jobPosting.jobTitle,
+                companyName: jobPosting.companyProfile.companyName,
+                companyLocation: jobPosting.companyLocation,
+                workLocation: jobPosting.workLocation,
+                industry: jobPosting.industry,
+                employmentType: jobPosting.employmentType,
+                monthlySalaryMin: jobPosting.monthlySalaryMin,
+                monthlySalaryMax: jobPosting.monthlySalaryMax,
+                status: jobPosting.status,
+                jobDescription: jobPosting.jobDescription,
+                requirements: jobPosting.requirements,
+                assessmentUrl: jobPosting.assessment,
             };
         });
     }
