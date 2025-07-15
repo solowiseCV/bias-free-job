@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { DeleteJobSeekerService } from "../services/deleteJobSeeker";
-import CustomResponse from "../../../utils/helpers/response.util";
+import CustomResponse from "../../../../utils/helpers/response.util";
 
 export class DeleteJobSeekerController {
   static async deleteSeeker(req: Request, res: Response, next: NextFunction) {

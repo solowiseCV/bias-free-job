@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { tokenService } from "../../../utils/jwt";
 import GoogleAuthService from "../services/googleAuth";
-import { GetJobSeekerService } from "../../jobSeeker/services/getJobSeeker";
+import { GetJobSeekerService } from "../../jobSeeker/jobSeekerProfile/services/getJobSeeker";
 import { googleAuthSchema } from "../../../validations/googleAuth.validation";
 import { CompanyTeamService } from "../../Recruiter/companyProfile/services/companyProfile";
 

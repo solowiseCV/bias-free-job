@@ -17,6 +17,7 @@ const jobService_1 = require("../services/jobService");
 const job_validation_1 = require("../../../../validations/job.validation");
 const multer_1 = require("../../../../middlewares/multer");
 const cloudinary_1 = __importDefault(require("../../../../configs/cloudinary"));
+const appError_1 = require("../../../../lib/appError");
 const response_util_1 = __importDefault(require("../../../../utils/helpers/response.util"));
 const jobPostingService = new jobService_1.JobPostingService();
 const cloudinary = (0, cloudinary_1.default)();
@@ -100,6 +101,20 @@ class JobPostingController {
                 const jobPostings = yield jobPostingService.getJobPostings(req.user.id, parseInt(page), parseInt(limit), search, industry, location, status, bestMatches);
                 // res.status(200).json(jobPostings);
                 new response_util_1.default(200, true, "Job postings retrieved successfully", res, jobPostings);
+            }
+            catch (err) {
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
+    getJobPostingById(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const jobPosting = yield jobPostingService.getJobPostingById(req.params.id);
+                if (!jobPosting) {
+                    throw new appError_1.BadRequestError("Job posting not found");
+                }
+                new response_util_1.default(200, true, "Job posting retrieved successfully", res, jobPosting);
             }
             catch (err) {
                 res.status(400).json({ error: err.message });

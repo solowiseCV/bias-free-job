@@ -94,6 +94,8 @@ model JobSeeker {
 
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
+
+  applications Application[] @relation("ApplicantApplications")
 }
 
 model CompanyProfile {
@@ -189,7 +191,7 @@ model Applicant {
 model Application {
   id          String       @id @default(auto()) @map("_id") @db.ObjectId
   applicantId String       @db.ObjectId
-  applicant   Applicant    @relation("ApplicantApplications", fields: [applicantId], references: [id], onDelete: Cascade)
+  applicant   JobSeeker    @relation("ApplicantApplications", fields: [applicantId], references: [id], onDelete: Cascade)
   jobPostingId String      @db.ObjectId
   jobPosting  JobPosting   @relation("JobApplications", fields: [jobPostingId], references: [id], onDelete: Cascade)
   status      ApplicationStatus @default(pending)

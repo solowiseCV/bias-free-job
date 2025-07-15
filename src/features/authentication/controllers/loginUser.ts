@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { tokenService } from "../../../utils/jwt";
 import { AuthService } from "../services/registerUser";
 import { comparePassword } from "../../../utils/hash";
-import { GetJobSeekerService } from "../../jobSeeker/services/getJobSeeker";
+import { GetJobSeekerService } from "../../jobSeeker/jobSeekerProfile/services/getJobSeeker";
 import { loginSchema } from "../../../validations/login.validation";
 import { CompanyTeamService } from "../../Recruiter/companyProfile/services/companyProfile";
 

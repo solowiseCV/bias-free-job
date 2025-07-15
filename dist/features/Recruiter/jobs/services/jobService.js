@@ -115,6 +115,31 @@ class JobPostingService {
             };
         });
     }
+    getJobPostingById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const jobPosting = yield prisma.jobPosting.findUnique({
+                where: { id },
+                include: { companyProfile: { select: { companyName: true } } },
+            });
+            if (!jobPosting)
+                throw new Error("Job posting not found");
+            return {
+                id: jobPosting.id,
+                jobTitle: jobPosting.jobTitle,
+                companyName: jobPosting.companyProfile.companyName,
+                companyLocation: jobPosting.companyLocation,
+                workLocation: jobPosting.workLocation,
+                industry: jobPosting.industry,
+                employmentType: jobPosting.employmentType,
+                monthlySalaryMin: jobPosting.monthlySalaryMin,
+                monthlySalaryMax: jobPosting.monthlySalaryMax,
+                status: jobPosting.status,
+                jobDescription: jobPosting.jobDescription,
+                requirements: jobPosting.requirements,
+                assessmentUrl: jobPosting.assessment,
+            };
+        });
+    }
     updateJobPosting(id, data) {
         return __awaiter(this, void 0, void 0, function* () {
             const jobPosting = yield prisma.jobPosting.findUnique({ where: { id } });
