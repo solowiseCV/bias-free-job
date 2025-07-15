@@ -8,6 +8,7 @@ export class JobPostingService {
     const companyProfile = await prisma.companyProfile.findFirst({
       where: { userId },
     });
+
     if (!companyProfile)
       throw new Error("No company profile found for this user");
 
@@ -94,38 +95,60 @@ export class JobPostingService {
         ? [{ createdAt: "desc" }, { monthlySalaryMax: "desc" }]
         : [{ createdAt: "desc" }];
 
-    const [jobs, total] = await prisma.$transaction([
+
+      const [jobs, total] = await prisma.$transaction([
       prisma.jobPosting.findMany({
         where: whereClause,
         take,
         skip,
         orderBy,
-        include: { companyProfile: { select: { companyName: true } } },
+        include: {
+          companyProfile: { select: { companyName: true } },
+          applications: true,
+          interviews: true,
+        },
       }),
       prisma.jobPosting.count({ where: whereClause }),
     ]);
 
     return {
       jobs: jobs.map(
-        (job: JobPosting & { companyProfile: { companyName: string } }) => ({
-          id: job.id,
-          jobTitle: job.jobTitle,
-          companyName: job.companyProfile.companyName,
-          companyLocation: job.companyLocation,
-          workLocation: job.workLocation,
-          industry: job.industry,
-          employmentType: job.employmentType,
-          monthlySalaryMin: job.monthlySalaryMin,
-          monthlySalaryMax: job.monthlySalaryMax,
-          status: job.status,
-        })
+        (job: JobPosting & { companyProfile: { companyName: string }, applications: any[], interviews: any[] }) => {
+          // Calculate best matches as applications with status 'accepted' or 'hired'
+          const bestMatches = job.applications
+            ? job.applications.filter((app: any) => app.status === 'accepted' || app.status === 'hired').length
+            : 0;
+          return {
+            id: job.id,
+            jobTitle: job.jobTitle,
+            companyName: job.companyProfile.companyName,
+            companyLocation: job.companyLocation,
+            workLocation: job.workLocation,
+            industry: job.industry,
+            employmentType: job.employmentType,
+            monthlySalaryMin: job.monthlySalaryMin,
+            monthlySalaryMax: job.monthlySalaryMax,
+            status: job.status,
+            totalApplications: job.applications ? job.applications.length : 0,
+            peopleInterviewed: job.interviews ? job.interviews.length : 0,
+            applications: job.applications || [],
+            interviews: job.interviews || [],
+            bestMatches,
+          };
+        }
       ),
       total,
       page: page || 1,
       limit: take,
     };
   }
+
   
+
+
+
+
+
 async getJobPostingById(id: string) {
     const jobPosting = await prisma.jobPosting.findUnique({ 
       where: { id },
