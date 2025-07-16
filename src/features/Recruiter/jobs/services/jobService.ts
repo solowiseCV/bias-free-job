@@ -87,6 +87,8 @@ export class JobPostingService {
       whereClause.status = "active";
     }
 
+    
+
     const take = limit ? parseInt(limit as any) : 10;
     const skip = page ? (parseInt(page as any) - 1) * take : 0;
 
