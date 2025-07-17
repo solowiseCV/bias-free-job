@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { JobSeekerDto } from "../dtos/createJobSeekerDto";
 import { JobSeekerService } from "../services/createJobSeeker";
-import { FileData, getDataUri } from "../../../middlewares/multer";
-import configureCloudinary from "../../../configs/cloudinary";
+import { FileData, getDataUri } from "../../../../middlewares/multer";
+import configureCloudinary from "../../../../configs/cloudinary";
 
 const cloudinary = configureCloudinary();
 

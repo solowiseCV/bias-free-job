@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { tokenService } from "../../../utils/jwt";
 import { AuthService } from "../services/registerUser";
 import { comparePassword } from "../../../utils/hash";
-import { GetJobSeekerService } from "../../jobSeeker/services/getJobSeeker";
+import { GetJobSeekerService } from "../../jobSeeker/jobSeekerProfile/services/getJobSeeker";
 import { loginSchema } from "../../../validations/login.validation";
 import { CompanyTeamService } from "../../Recruiter/companyProfile/services/companyProfile";
 
@@ -46,7 +46,7 @@ export class LoginController {
         profile = await companyTeamService.getCompanyTeam(user.id);
       }
 
-      const token = tokenService.generateToken(user.id);
+      const token = tokenService.generateToken(user.id, user.userType);
 
       res.cookie("userType", user.userType, {
         httpOnly: true,

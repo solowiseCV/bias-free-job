@@ -13,7 +13,7 @@ exports.LoginController = void 0;
 const jwt_1 = require("../../../utils/jwt");
 const registerUser_1 = require("../services/registerUser");
 const hash_1 = require("../../../utils/hash");
-const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
+const getJobSeeker_1 = require("../../jobSeeker/jobSeekerProfile/services/getJobSeeker");
 const login_validation_1 = require("../../../validations/login.validation");
 const companyProfile_1 = require("../../Recruiter/companyProfile/services/companyProfile");
 const companyTeamService = new companyProfile_1.CompanyTeamService();
@@ -50,7 +50,7 @@ class LoginController {
                 else {
                     profile = yield companyTeamService.getCompanyTeam(user.id);
                 }
-                const token = jwt_1.tokenService.generateToken(user.id);
+                const token = jwt_1.tokenService.generateToken(user.id, user.userType);
                 res.cookie("userType", user.userType, {
                     httpOnly: true,
                     secure: true,

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JobPostingService = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
+// @ts-nocheck
 class JobPostingService {
     createJobPosting(userId, data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -181,6 +182,11 @@ class JobPostingService {
             return prisma.jobPosting.delete({
                 where: { id },
             });
+        });
+    }
+    getJobs() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield prisma.jobPosting.findRaw();
         });
     }
 }

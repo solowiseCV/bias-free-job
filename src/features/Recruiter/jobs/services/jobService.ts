@@ -2,6 +2,7 @@ import { PrismaClient, JobPosting, Prisma } from "@prisma/client";
 import { JobPostingDTO, UpdateJobPostingDTO } from "../dtos/postJob.dto";
 
 const prisma = new PrismaClient();
+// @ts-nocheck
 
 export class JobPostingService {
   async createJobPosting(userId: string, data: JobPostingDTO) {
@@ -97,8 +98,7 @@ export class JobPostingService {
         ? [{ createdAt: "desc" }, { monthlySalaryMax: "desc" }]
         : [{ createdAt: "desc" }];
 
-
-      const [jobs, total] = await prisma.$transaction([
+    const [jobs, total] = await prisma.$transaction([
       prisma.jobPosting.findMany({
         where: whereClause,
         take,
@@ -115,10 +115,19 @@ export class JobPostingService {
 
     return {
       jobs: jobs.map(
-        (job: JobPosting & { companyProfile: { companyName: string }, applications: any[], interviews: any[] }) => {
+        (
+          job: JobPosting & {
+            companyProfile: { companyName: string };
+            applications: any[];
+            interviews: any[];
+          }
+        ) => {
           // Calculate best matches as applications with status 'accepted' or 'hired'
           const bestMatches = job.applications
-            ? job.applications.filter((app: any) => app.status === 'accepted' || app.status === 'hired').length
+            ? job.applications.filter(
+                (app: any) =>
+                  app.status === "accepted" || app.status === "hired"
+              ).length
             : 0;
           return {
             id: job.id,
@@ -147,14 +156,8 @@ export class JobPostingService {
     };
   }
 
-  
-
-
-
-
-
-async getJobPostingById(id: string) {
-    const jobPosting = await prisma.jobPosting.findUnique({ 
+  async getJobPostingById(id: string) {
+    const jobPosting = await prisma.jobPosting.findUnique({
       where: { id },
       include: { companyProfile: { select: { companyName: true } } },
     });
@@ -200,5 +203,9 @@ async getJobPostingById(id: string) {
     return prisma.jobPosting.delete({
       where: { id },
     });
+  }
+
+  async getJobs() {
+    return await prisma.jobPosting.findRaw();
   }
 }

@@ -75,8 +75,12 @@ class JobPostingController {
                 employmentType: req.body.employmentType,
                 experienceLevel: req.body.experienceLevel,
                 education: req.body.education,
-                monthlySalaryMin: req.body.monthlySalaryMin ? parseFloat(req.body.monthlySalaryMin) : undefined,
-                monthlySalaryMax: req.body.monthlySalaryMax ? parseFloat(req.body.monthlySalaryMax) : undefined,
+                monthlySalaryMin: req.body.monthlySalaryMin
+                    ? parseFloat(req.body.monthlySalaryMin)
+                    : undefined,
+                monthlySalaryMax: req.body.monthlySalaryMax
+                    ? parseFloat(req.body.monthlySalaryMax)
+                    : undefined,
                 jobDescription: req.body.jobDescription,
                 requirements: req.body.requirements,
                 assessmentUrl,
@@ -196,6 +200,20 @@ class JobPostingController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const jobPosting = yield jobPostingService.deleteJobPosting(req.user.id, req.params.id);
+                // res
+                // .status(200)
+                // .json({ message: "Job posting deleted successfully", jobPosting });
+                new response_util_1.default(200, true, "Job posting deleted successfully", res, jobPosting);
+            }
+            catch (err) {
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
+    getJobs(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const jobPosting = yield jobPostingService.getJobs();
                 // res
                 // .status(200)
                 // .json({ message: "Job posting deleted successfully", jobPosting });

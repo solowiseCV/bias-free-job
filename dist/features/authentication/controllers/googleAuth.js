@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoogleAuthController = void 0;
 const jwt_1 = require("../../../utils/jwt");
 const googleAuth_1 = __importDefault(require("../services/googleAuth"));
-const getJobSeeker_1 = require("../../jobSeeker/services/getJobSeeker");
+const getJobSeeker_1 = require("../../jobSeeker/jobSeekerProfile/services/getJobSeeker");
 const companyProfile_1 = require("../../Recruiter/companyProfile/services/companyProfile");
 const companyTeamService = new companyProfile_1.CompanyTeamService();
 class GoogleAuthController {
@@ -55,7 +55,7 @@ class GoogleAuthController {
                     }
                 }
                 const { id, lastname, firstname } = user;
-                const token = jwt_1.tokenService.generateToken(user.id);
+                const token = jwt_1.tokenService.generateToken(user.id, user.userType);
                 const data = { id, email, lastname, firstname, userType: user.userType };
                 res.cookie("userType", userType, {
                     httpOnly: true,

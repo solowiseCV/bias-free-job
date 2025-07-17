@@ -2,11 +2,11 @@ import express from "express";
 import { DeleteJobSeekerController } from "../controllers/deleteJobSeeker";
 import { QueryJobSeekerController } from "../controllers/queryJobSeeker";
 import { UpdateJobSeekerController } from "../controllers/updateJobSeeker";
-import { authMiddleware } from "../../../middlewares/authMiddleware";
+import { authMiddleware } from "../../../../middlewares/authMiddleware";
 
 import { GetJobSeekerController } from "../controllers/getJobSeeker";
 import { CreateJobSeekerController } from "../controllers/createJobSeeker";
-import { singleupload } from "../../../middlewares/multer";
+import { singleupload } from "../../../../middlewares/multer";
 
 const router = express.Router();
 

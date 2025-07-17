@@ -12,14 +12,14 @@ if (!jwtSecret) {
     throw new Error("JWT_SECRET is not defined in environment variables");
 }
 class TokenService {
-    generateToken(userId) {
-        return jsonwebtoken_1.default.sign({ userId }, jwtSecret, { expiresIn: "14d" });
+    generateToken(userId, userType) {
+        return jsonwebtoken_1.default.sign({ userId, userType }, jwtSecret, { expiresIn: "14d" });
     }
-    generateResetToken(userId) {
-        return jsonwebtoken_1.default.sign({ userId }, jwtSecret, { expiresIn: "15m" });
+    generateResetToken(userId, userType) {
+        return jsonwebtoken_1.default.sign({ userId, userType }, jwtSecret, { expiresIn: "15m" });
     }
-    generateRefreshToken(userId) {
-        return jsonwebtoken_1.default.sign({ userId }, jwtSecret, { expiresIn: "14d" });
+    generateRefreshToken(userId, userType) {
+        return jsonwebtoken_1.default.sign({ userId, userType }, jwtSecret, { expiresIn: "14d" });
     }
     verifyToken(token) {
         return jsonwebtoken_1.default.verify(token, jwtSecret);

@@ -10,8 +10,8 @@ export interface JobPostingDTO {
   education?: string;
   monthlySalaryMin?: number;
   monthlySalaryMax?: number;
-  currency?   :      string
-  deadline?   :      string
+  currency?: string;
+  deadline?: string;
   jobDescription: string;
   requirements?: string;
   assessmentUrl?: string;
