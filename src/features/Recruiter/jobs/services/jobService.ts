@@ -88,6 +88,8 @@ export class JobPostingService {
       whereClause.status = "active";
     }
 
+    
+
     const take = limit ? parseInt(limit as any) : 10;
     const skip = page ? (parseInt(page as any) - 1) * take : 0;
 
@@ -138,6 +140,8 @@ export class JobPostingService {
             monthlySalaryMin: job.monthlySalaryMin,
             monthlySalaryMax: job.monthlySalaryMax,
             status: job.status,
+            postedOn: job.createdAt,
+            
             totalApplications: job.applications ? job.applications.length : 0,
             peopleInterviewed: job.interviews ? job.interviews.length : 0,
             applications: job.applications || [],
