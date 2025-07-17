@@ -46,7 +46,7 @@ export class LoginController {
         profile = await companyTeamService.getCompanyTeam(user.id);
       }
 
-      const token = tokenService.generateToken(user.id);
+      const token = tokenService.generateToken(user.id, user.userType);
 
       res.cookie("userType", user.userType, {
         httpOnly: true,

@@ -49,7 +49,7 @@ export class AuthController {
         userType: user.userType,
       };
 
-      const token = tokenService.generateToken(user.id);
+      const token = tokenService.generateToken(user.id, user.userType);
 
       res.cookie("userType", user.userType, {
         httpOnly: true,
@@ -57,8 +57,6 @@ export class AuthController {
         sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-
-      
 
       res.status(200).json({
         success: true,

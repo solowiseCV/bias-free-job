@@ -89,25 +89,25 @@ class JobApplicationService {
     updateApplication(updatData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, data } = updatData;
-            const prismaData = Object.assign({}, data);
-            if (data.status !== undefined) {
-                prismaData.status = { set: data.status };
-            }
             return yield prisma.application.update({
                 where: { id },
-                data: prismaData,
+                data,
             });
         });
     }
     deleteApplication(applicantId, jobPostingId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma.application.delete({
+            const data = yield prisma.application.findFirst({
                 where: {
-                    applicantId_jobPostingId: {
-                        applicantId,
-                        jobPostingId,
-                    },
+                    applicantId,
+                    jobPostingId,
                 },
+            });
+            if (!data)
+                return "Data not found";
+            const id = data.id;
+            return yield prisma.application.delete({
+                where: { id },
             });
         });
     }

@@ -18,7 +18,7 @@ applicationRoutes.get(
 );
 
 applicationRoutes.get(
-  "/user-applications/:userId",
+  "/user-applications/",
   authMiddleware,
   controller.getUserApplications
 );

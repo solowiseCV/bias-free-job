@@ -92,28 +92,27 @@ export class JobApplicationService {
     };
   }
 
-  async updateApplication(updatData: UpdateApplicationDTO) {
+  async updateApplication(updatData: any) {
     const { id, data } = updatData;
-
-    const prismaData: any = { ...data };
-    if (data.status !== undefined) {
-      prismaData.status = { set: data.status };
-    }
 
     return await prisma.application.update({
       where: { id },
-      data: prismaData,
+      data,
     });
   }
 
   async deleteApplication(applicantId: string, jobPostingId: string) {
-    return await prisma.application.delete({
+    const data = await prisma.application.findFirst({
       where: {
-        applicantId_jobPostingId: {
-          applicantId,
-          jobPostingId,
-        },
+        applicantId,
+        jobPostingId,
       },
+    });
+    if (!data) return "Data not found";
+
+    const id = data.id;
+    return await prisma.application.delete({
+      where: { id },
     });
   }
 }

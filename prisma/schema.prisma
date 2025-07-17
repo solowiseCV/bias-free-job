@@ -99,7 +99,8 @@ model JobSeeker {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
-  applications Application[] @relation("ApplicantApplications")
+  applications        Application[]    @relation("ApplicantApplications")
+  interviews          Interview[]      @relation("ApplicantInterviews")
 }
 
 model CompanyProfile {
@@ -165,7 +166,7 @@ model JobPosting {
   assessment      String?
   status          String            @default("active")
   createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  updatedAt       DateTime?          @updatedAt
 
   applications    Application[]     @relation("JobApplications")
   interviews      Interview[]       @relation("JobInterviews")
@@ -186,8 +187,8 @@ model Applicant {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  applications Application[] @relation("ApplicantApplications")
-  interviews   Interview[]  @relation("ApplicantInterviews")
+  
+  
 
   @@index([userId])
 }
@@ -213,7 +214,7 @@ model Interview {
   jobPostingId  String       @db.ObjectId
   jobPosting    JobPosting   @relation("JobInterviews", fields: [jobPostingId], references: [id], onDelete: Cascade)
   applicantId   String       @db.ObjectId
-  applicant     Applicant    @relation("ApplicantInterviews", fields: [applicantId], references: [id], onDelete: Cascade)
+  applicant     JobSeeker    @relation("ApplicantInterviews", fields: [applicantId], references: [id], onDelete: Cascade)
   companyProfileId String?   @db.ObjectId
   companyProfile CompanyProfile? @relation("CompanyInterviews", fields: [companyProfileId], references: [id], onDelete: SetNull)
   dateTime      DateTime

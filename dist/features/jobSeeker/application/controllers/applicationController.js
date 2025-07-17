@@ -23,7 +23,7 @@ class ApplicationController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // Create job application
-                const application = yield jobApplicationService.createJobApplication(req.user.id, req.params.jobPostingId);
+                const application = yield jobApplicationService.createJobApplication(req.user.userId, req.params.jobPostingId);
                 new response_util_1.default(201, true, "Application successful!", res, application);
             }
             catch (err) {
@@ -38,7 +38,7 @@ class ApplicationController {
         return __awaiter(this, void 0, void 0, function* () {
             const { page = 1, limit = 10 } = req.query;
             const data = {
-                userId: req.user.id,
+                userId: req.user.userId,
                 page: typeof page === "string" ? parseInt(page, 10) : Number(page),
                 limit: typeof limit === "string" ? parseInt(limit, 10) : Number(limit),
             };
@@ -82,8 +82,8 @@ class ApplicationController {
                     id: req.params.id,
                     data: req.body,
                 };
-                const application = jobApplicationService.updateApplication(updatedata);
-                res.status(200).json(application);
+                const application = yield jobApplicationService.updateApplication(updatedata);
+                new response_util_1.default(200, true, "Job aplication updated successfully", res, application);
             }
             catch (err) {
                 console.log("Failed to update application: ", err);
@@ -95,7 +95,7 @@ class ApplicationController {
     deleteApplication(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield jobApplicationService.deleteApplication(req.user.id, req.params.id);
+                yield jobApplicationService.deleteApplication(req.user.userId, req.params.id);
                 new response_util_1.default(200, true, "Application deleted successfully", res);
             }
             catch (err) {

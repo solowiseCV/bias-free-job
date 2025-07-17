@@ -15,7 +15,7 @@ export class ApplicationController {
     try {
       // Create job application
       const application = await jobApplicationService.createJobApplication(
-        req.user.id,
+        req.user.userId,
         req.params.jobPostingId
       );
       new CustomResponse(
@@ -37,7 +37,7 @@ export class ApplicationController {
     const { page = 1, limit = 10 } = req.query;
 
     const data: GetUserApplicationsDTO = {
-      userId: req.user.id,
+      userId: req.user.userId,
       page: typeof page === "string" ? parseInt(page, 10) : Number(page),
       limit: typeof limit === "string" ? parseInt(limit, 10) : Number(limit),
     };
@@ -95,8 +95,17 @@ export class ApplicationController {
         id: req.params.id,
         data: req.body,
       };
-      const application = jobApplicationService.updateApplication(updatedata);
-      res.status(200).json(application);
+      const application = await jobApplicationService.updateApplication(
+        updatedata
+      );
+
+      new CustomResponse(
+        200,
+        true,
+        "Job aplication updated successfully",
+        res,
+        application
+      );
     } catch (err: any) {
       console.log("Failed to update application: ", err);
       res.status(400).json({ error: err.message });
@@ -106,7 +115,11 @@ export class ApplicationController {
   // Delete application
   async deleteApplication(req: Request, res: Response) {
     try {
-      await jobApplicationService.deleteApplication(req.user.id, req.params.id);
+      await jobApplicationService.deleteApplication(
+        req.user.userId,
+        req.params.id
+      );
+
       new CustomResponse(200, true, "Application deleted successfully", res);
     } catch (err: any) {
       console.log("Failed to delete application: ", err);
