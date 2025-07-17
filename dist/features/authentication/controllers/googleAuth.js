@@ -55,7 +55,7 @@ class GoogleAuthController {
                     }
                 }
                 const { id, lastname, firstname } = user;
-                const token = jwt_1.tokenService.generateToken(user.id);
+                const token = jwt_1.tokenService.generateToken(user.id, user.userType);
                 const data = { id, email, lastname, firstname, userType: user.userType };
                 res.cookie("userType", userType, {
                     httpOnly: true,

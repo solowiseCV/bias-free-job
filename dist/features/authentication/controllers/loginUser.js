@@ -50,7 +50,7 @@ class LoginController {
                 else {
                     profile = yield companyTeamService.getCompanyTeam(user.id);
                 }
-                const token = jwt_1.tokenService.generateToken(user.id);
+                const token = jwt_1.tokenService.generateToken(user.id, user.userType);
                 res.cookie("userType", user.userType, {
                     httpOnly: true,
                     secure: true,
