@@ -40,7 +40,7 @@ export class GoogleAuthController {
 
       if (!existingUserByEmail) {
         if (!userType) {
-          res.status(200).json({
+          res.status(401).json({
             success: false,
             message: "User type is required",
           });
