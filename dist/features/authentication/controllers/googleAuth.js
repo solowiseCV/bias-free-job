@@ -22,6 +22,7 @@ class GoogleAuthController {
     static googleAuth(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                console.log("Logging in");
                 const { email, userType } = req.body;
                 let profile = null;
                 const existingUserByEmail = yield googleAuth_1.default.getUserByEmail(email);
