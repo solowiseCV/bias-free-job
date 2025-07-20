@@ -29,7 +29,6 @@ interface ExistingUser {
 export class GoogleAuthController {
   static async googleAuth(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Logging in");
       const { email, userType } = req.body;
 
       let profile: any = null;
