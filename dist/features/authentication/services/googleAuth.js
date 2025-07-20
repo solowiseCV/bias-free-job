@@ -34,7 +34,9 @@ GoogleAuthService.getExistingUser = (authId, email) => __awaiter(void 0, void 0,
     return existingUser;
 });
 GoogleAuthService.registerUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma.user.create(Object.assign(Object.assign({}, data), { createdAt: Date.now() }));
+    return yield prisma.user.create({
+        data: Object.assign(Object.assign({}, data), { createdAt: new Date(Date.now()) }),
+    });
 });
 exports.default = GoogleAuthService;
 // module.exports = new GoogleAuthService();
