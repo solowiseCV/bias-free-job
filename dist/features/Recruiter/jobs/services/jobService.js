@@ -105,7 +105,7 @@ class JobPostingService {
                 jobs: jobs.map((job) => {
                     // Calculate best matches as applications with status 'accepted' or 'hired'
                     const bestMatches = job.applications
-                        ? job.applications.filter((app) => app.status === "accepted" || app.status === "hired").length
+                        ? job.applications.filter((app) => app.status === 'accepted' || app.status === 'hired').length
                         : 0;
                     return {
                         id: job.id,
