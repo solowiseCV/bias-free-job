@@ -9,9 +9,10 @@ import configureCloudinary from "../../../../configs/cloudinary";
 import { JobPostingDTO, UpdateJobPostingDTO } from "../dtos/postJob.dto";
 import { BadRequestError } from "../../../../lib/appError";
 import CustomResponse from "../../../../utils/helpers/response.util";
+import { PrismaClient } from "@prisma/client";
 const jobPostingService = new JobPostingService();
 const cloudinary = configureCloudinary();
-
+const prisma = new PrismaClient
 export class JobPostingController {
   async createJobPosting(req: Request, res: Response) {
     // Validate required assessment input
@@ -160,91 +161,164 @@ export class JobPostingController {
     }
   }
 
+  // async updateJobPosting(req: Request, res: Response) {
+   
+  //   const { error } = updateJobPostingSchema.validate(req.body);
+
+  //   if (error) {
+  //     res.status(400).json({ error: error.details[0].message });
+  //     return;
+  //   }
+
+  //   let assessmentUrl: string | undefined;
+
+  //   if (req.body.assessmentUrlInput) {
+  //     assessmentUrl = req.body.assessmentUrlInput;
+  //   } else if (req.body.assessment) {
+  //     assessmentUrl = req.body.assessment;
+  //   }
+
+  //   if (req.file) {
+  //     try {
+  //       const fileData: FileData = {
+  //         originalname: req.file.originalname,
+  //         buffer: req.file.buffer,
+  //       };
+  //       const dataUri = getDataUri(fileData);
+  //       const result = await cloudinary.uploader.upload(dataUri.content, {
+  //         folder: "job_assessments",
+  //         resource_type: "auto",
+  //       });
+  //       assessmentUrl = result.secure_url;
+  //     } catch (uploadErr) {
+  //       // res.status(500).json({ error: "Failed to upload file to Cloudinary" });
+  //       new CustomResponse(
+  //         500,
+  //         true,
+  //         "Failed to upload file to Cloudinary",
+  //         res,
+  //         uploadErr
+  //       );
+  //       return;
+  //     }
+  //   } else {
+  //     assessmentUrl = req.body.assessmen;
+  //   }
+
+  //   const data: Partial<UpdateJobPostingDTO> = {
+  //     jobTitle: req.body.jobTitle,
+  //     department: req.body.department,
+  //     companyLocation: req.body.companyLocation,
+  //     workLocation: req.body.workLocation,
+  //     industry: req.body.industry,
+  //     companyFunction: req.body.companyFunction,
+  //     employmentType: req.body.employmentType,
+  //     experienceLevel: req.body.experienceLevel,
+  //     education: req.body.education,
+  //     monthlySalaryMin: req.body.monthlySalaryMin
+  //       ? parseFloat(req.body.monthlySalaryMin)
+  //       : undefined,
+  //     monthlySalaryMax: req.body.monthlySalaryMax
+  //       ? parseFloat(req.body.monthlySalaryMax)
+  //       : undefined,
+  //     jobDescription: req.body.jobDescription,
+  //     requirements: req.body.requirements,
+  //     assessment: assessmentUrl,
+  //     status: req.body.status,
+  //   };
+
+  //   // Filter out undefined values to ensure only provided fields are updated
+  //   const updateData = Object.fromEntries(
+  //     Object.entries(data).filter(([_, value]) => value !== undefined)
+  //   );
+
+  //   try {
+  //     const jobPosting = await jobPostingService.updateJobPosting(
+  //       req.params.id,
+  //       updateData
+  //     );
+  //     res.status(200).json(jobPosting);
+  //   } catch (err: any) {
+  //     res.status(400).json({ error: err.message });
+  //   }
+  // }
+
   async updateJobPosting(req: Request, res: Response) {
-    //  if (!req.file && !req.body.assessment && !req.body.assessmentUrlInput) {
-    //   res.status(400).json({ error: "Assessment is required (URL or file)" });
-    //   return;
-    // }
+  const { error } = updateJobPostingSchema.validate(req.body);
+  if (error) {
+    res.status(400).json({ error: error.details[0].message });
+    return;
+  }
 
-    const { error } = updateJobPostingSchema.validate(req.body);
+  let assessmentUrl: string | undefined;
 
-    if (error) {
-      res.status(400).json({ error: error.details[0].message });
-      return;
-    }
-
-    let assessmentUrl: string | undefined;
-
+  try {
     if (req.body.assessmentUrlInput) {
       assessmentUrl = req.body.assessmentUrlInput;
+    } else if (req.file) {
+      const fileData: FileData = {
+        originalname: req.file.originalname,
+        buffer: req.file.buffer,
+      };
+      const dataUri = getDataUri(fileData);
+      const result = await cloudinary.uploader.upload(dataUri.content, {
+        folder: "job_assessments",
+        resource_type: "auto",
+      });
+      assessmentUrl = result.secure_url;
     } else if (req.body.assessment) {
       assessmentUrl = req.body.assessment;
     }
-
-    if (req.file) {
-      try {
-        const fileData: FileData = {
-          originalname: req.file.originalname,
-          buffer: req.file.buffer,
-        };
-        const dataUri = getDataUri(fileData);
-        const result = await cloudinary.uploader.upload(dataUri.content, {
-          folder: "job_assessments",
-          resource_type: "auto",
-        });
-        assessmentUrl = result.secure_url;
-      } catch (uploadErr) {
-        // res.status(500).json({ error: "Failed to upload file to Cloudinary" });
-        new CustomResponse(
-          500,
-          true,
-          "Failed to upload file to Cloudinary",
-          res,
-          uploadErr
-        );
-        return;
-      }
-    } else {
-      assessmentUrl = req.body.assessmen;
-    }
-
-    const data: Partial<UpdateJobPostingDTO> = {
-      jobTitle: req.body.jobTitle,
-      department: req.body.department,
-      companyLocation: req.body.companyLocation,
-      workLocation: req.body.workLocation,
-      industry: req.body.industry,
-      companyFunction: req.body.companyFunction,
-      employmentType: req.body.employmentType,
-      experienceLevel: req.body.experienceLevel,
-      education: req.body.education,
-      monthlySalaryMin: req.body.monthlySalaryMin
-        ? parseFloat(req.body.monthlySalaryMin)
-        : undefined,
-      monthlySalaryMax: req.body.monthlySalaryMax
-        ? parseFloat(req.body.monthlySalaryMax)
-        : undefined,
-      jobDescription: req.body.jobDescription,
-      requirements: req.body.requirements,
-      assessmentUrl,
-      status: req.body.status,
-    };
-
-    // Filter out undefined values to ensure only provided fields are updated
-    const updateData = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => value !== undefined)
+  } catch (uploadErr) {
+     new CustomResponse(
+      500,
+      true,
+      "Failed to upload file to Cloudinary",
+      res,
+      uploadErr
     );
-
-    try {
-      const jobPosting = await jobPostingService.updateJobPosting(
-        req.params.id,
-        updateData
-      );
-      res.status(200).json(jobPosting);
-    } catch (err: any) {
-      res.status(400).json({ error: err.message });
-    }
   }
+
+  const data: Partial<UpdateJobPostingDTO> = {
+    jobTitle: req.body.jobTitle,
+    department: req.body.department,
+    companyLocation: req.body.companyLocation,
+    workLocation: req.body.workLocation,
+    industry: req.body.industry,
+    companyFunction: req.body.companyFunction,
+    employmentType: req.body.employmentType,
+    experienceLevel: req.body.experienceLevel,
+    education: req.body.education,
+    monthlySalaryMin: req.body.monthlySalaryMin
+      ? parseFloat(req.body.monthlySalaryMin)
+      : undefined,
+    monthlySalaryMax: req.body.monthlySalaryMax
+      ? parseFloat(req.body.monthlySalaryMax)
+      : undefined,
+    jobDescription: req.body.jobDescription,
+    requirements: req.body.requirements,
+    assessment: assessmentUrl,
+    status: req.body.status,
+    currency: req.body.currency,
+  };
+
+  const updateData = Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined)
+  );
+
+  try {
+    const jobPosting = await jobPostingService.updateJobPosting(
+      req.params.id,
+      updateData
+    );
+    res.status(200).json(jobPosting);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+}
+
+
+
 
   async deleteJobPosting(req: Request, res: Response) {
     try {

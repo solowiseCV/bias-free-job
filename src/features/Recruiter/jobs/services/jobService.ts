@@ -156,28 +156,48 @@ export class JobPostingService {
     };
   }
 
+
   async getJobPostingById(id: string) {
-    const jobPosting = await prisma.jobPosting.findUnique({
-      where: { id },
-      include: { companyProfile: { select: { companyName: true } } },
-    });
-    if (!jobPosting) throw new Error("Job posting not found");
-    return {
-      id: jobPosting.id,
-      jobTitle: jobPosting.jobTitle,
-      companyName: jobPosting.companyProfile.companyName,
-      companyLocation: jobPosting.companyLocation,
-      workLocation: jobPosting.workLocation,
-      industry: jobPosting.industry,
-      employmentType: jobPosting.employmentType,
-      monthlySalaryMin: jobPosting.monthlySalaryMin,
-      monthlySalaryMax: jobPosting.monthlySalaryMax,
-      status: jobPosting.status,
-      jobDescription: jobPosting.jobDescription,
-      requirements: jobPosting.requirements,
-      assessmentUrl: jobPosting.assessment,
-    };
-  }
+  const jobPosting = await prisma.jobPosting.findUnique({
+    where: { id },
+    include: {
+      companyProfile: { select: { companyName: true } },
+      applications: true,
+      interviews: true,
+    },
+  });
+
+  if (!jobPosting) throw new Error("Job posting not found");
+
+  return {
+    id: jobPosting.id,
+    jobTitle: jobPosting.jobTitle,
+    companyName: jobPosting.companyProfile.companyName,
+    companyLocation: jobPosting.companyLocation,
+    workLocation: jobPosting.workLocation,
+    industry: jobPosting.industry,
+    employmentType: jobPosting.employmentType,
+    monthlySalaryMin: jobPosting.monthlySalaryMin,
+    monthlySalaryMax: jobPosting.monthlySalaryMax,
+    status: jobPosting.status,
+    deadline: jobPosting.deadline,
+    experienceLevel: jobPosting.experienceLevel,
+    education: jobPosting.education,
+    department: jobPosting.department,
+    companyFunction: jobPosting.companyFunction,
+    currency: jobPosting.currency,
+    jobDescription: jobPosting.jobDescription,
+    requirements: jobPosting.requirements,
+    assessmentUrl: jobPosting.assessment,
+    totalApplications: jobPosting.applications?.length || 0,
+    peopleInterviewed: jobPosting.interviews?.length || 0,
+    applications: jobPosting.applications || [],
+    interviews: jobPosting.interviews || [],
+  };
+}
+
+
+
   async updateJobPosting(id: string, data: Partial<UpdateJobPostingDTO>) {
     const jobPosting = await prisma.jobPosting.findUnique({ where: { id } });
     if (!jobPosting) throw new Error("Job posting not found");
@@ -187,6 +207,7 @@ export class JobPostingService {
       data,
     });
   }
+
 
   async deleteJobPosting(userId: string, id: string) {
     const companyProfile = await prisma.companyProfile.findFirst({
