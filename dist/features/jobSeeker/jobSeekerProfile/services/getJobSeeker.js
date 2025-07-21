@@ -17,9 +17,6 @@ class GetJobSeekerService {
         return __awaiter(this, void 0, void 0, function* () {
             return yield prisma.jobSeeker.findUnique({
                 where: { userId },
-                include: {
-                    user: true,
-                },
             });
         });
     }
@@ -27,9 +24,6 @@ class GetJobSeekerService {
         return __awaiter(this, void 0, void 0, function* () {
             return yield prisma.jobSeeker.findUnique({
                 where: { id },
-                include: {
-                    user: true,
-                },
             });
         });
     }
