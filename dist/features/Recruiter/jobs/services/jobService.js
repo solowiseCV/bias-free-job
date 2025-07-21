@@ -136,7 +136,10 @@ class JobPostingService {
         return __awaiter(this, void 0, void 0, function* () {
             const jobPosting = yield prisma.jobPosting.findUnique({
                 where: { id },
-                include: { companyProfile: { select: { companyName: true } } },
+                include: {
+                    companyProfile: { select: { companyName: true } },
+                    _count: { select: { applications: true } },
+                },
             });
             if (!jobPosting)
                 throw new Error("Job posting not found");
@@ -154,6 +157,7 @@ class JobPostingService {
                 jobDescription: jobPosting.jobDescription,
                 requirements: jobPosting.requirements,
                 assessmentUrl: jobPosting.assessment,
+                applicationCount: jobPosting._count.applications,
             };
         });
     }

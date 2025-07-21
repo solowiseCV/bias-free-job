@@ -88,8 +88,6 @@ export class JobPostingService {
       whereClause.status = "active";
     }
 
-    
-
     const take = limit ? parseInt(limit as any) : 10;
     const skip = page ? (parseInt(page as any) - 1) * take : 0;
 
@@ -141,7 +139,7 @@ export class JobPostingService {
             monthlySalaryMax: job.monthlySalaryMax,
             status: job.status,
             postedOn: job.createdAt,
-            
+
             totalApplications: job.applications ? job.applications.length : 0,
             peopleInterviewed: job.interviews ? job.interviews.length : 0,
             applications: job.applications || [],
@@ -159,7 +157,10 @@ export class JobPostingService {
   async getJobPostingById(id: string) {
     const jobPosting = await prisma.jobPosting.findUnique({
       where: { id },
-      include: { companyProfile: { select: { companyName: true } } },
+      include: {
+        companyProfile: { select: { companyName: true } },
+        _count: { select: { applications: true } },
+      },
     });
     if (!jobPosting) throw new Error("Job posting not found");
     return {
@@ -176,8 +177,10 @@ export class JobPostingService {
       jobDescription: jobPosting.jobDescription,
       requirements: jobPosting.requirements,
       assessmentUrl: jobPosting.assessment,
+      applicationCount: jobPosting._count.applications,
     };
   }
+
   async updateJobPosting(id: string, data: Partial<UpdateJobPostingDTO>) {
     const jobPosting = await prisma.jobPosting.findUnique({ where: { id } });
     if (!jobPosting) throw new Error("Job posting not found");
