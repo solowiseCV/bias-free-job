@@ -13,7 +13,7 @@ applicationRoutes.post(
 
 applicationRoutes.get(
   "/job-applications/:id",
-  // authMiddleware,
+  authMiddleware,
   controller.getJobApplications
 );
 

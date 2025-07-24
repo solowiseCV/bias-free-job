@@ -132,28 +132,6 @@ class JobPostingService {
             };
         });
     }
-    // async getJobPostingById(id: string) {
-    //   const jobPosting = await prisma.jobPosting.findUnique({
-    //     where: { id },
-    //     include: { companyProfile: { select: { companyName: true } } },
-    //   });
-    //   if (!jobPosting) throw new Error("Job posting not found");
-    //   return {
-    //     id: jobPosting.id,
-    //     jobTitle: jobPosting.jobTitle,
-    //     companyName: jobPosting.companyProfile.companyName,
-    //     companyLocation: jobPosting.companyLocation,
-    //     workLocation: jobPosting.workLocation,
-    //     industry: jobPosting.industry,
-    //     employmentType: jobPosting.employmentType,
-    //     monthlySalaryMin: jobPosting.monthlySalaryMin,
-    //     monthlySalaryMax: jobPosting.monthlySalaryMax,
-    //     status: jobPosting.status,
-    //     jobDescription: jobPosting.jobDescription,
-    //     requirements: jobPosting.requirements,
-    //     assessmentUrl: jobPosting.assessment,
-    //   };
-    // }
     getJobPostingById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -180,6 +158,9 @@ class JobPostingService {
                 status: jobPosting.status,
                 deadline: jobPosting.deadline,
                 experienceLevel: jobPosting.experienceLevel,
+                education: jobPosting.education,
+                department: jobPosting.department,
+                companyFunction: jobPosting.companyFunction,
                 currency: jobPosting.currency,
                 jobDescription: jobPosting.jobDescription,
                 requirements: jobPosting.requirements,
