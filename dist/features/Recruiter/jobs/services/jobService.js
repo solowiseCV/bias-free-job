@@ -134,11 +134,13 @@ class JobPostingService {
     }
     getJobPostingById(id) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
             const jobPosting = yield prisma.jobPosting.findUnique({
                 where: { id },
                 include: {
                     companyProfile: { select: { companyName: true } },
-                    _count: { select: { applications: true } },
+                    applications: true,
+                    interviews: true,
                 },
             });
             if (!jobPosting)
@@ -154,10 +156,19 @@ class JobPostingService {
                 monthlySalaryMin: jobPosting.monthlySalaryMin,
                 monthlySalaryMax: jobPosting.monthlySalaryMax,
                 status: jobPosting.status,
+                deadline: jobPosting.deadline,
+                experienceLevel: jobPosting.experienceLevel,
+                education: jobPosting.education,
+                department: jobPosting.department,
+                companyFunction: jobPosting.companyFunction,
+                currency: jobPosting.currency,
                 jobDescription: jobPosting.jobDescription,
                 requirements: jobPosting.requirements,
                 assessmentUrl: jobPosting.assessment,
-                applicationCount: jobPosting._count.applications,
+                totalApplications: ((_a = jobPosting.applications) === null || _a === void 0 ? void 0 : _a.length) || 0,
+                peopleInterviewed: ((_b = jobPosting.interviews) === null || _b === void 0 ? void 0 : _b.length) || 0,
+                applications: jobPosting.applications || [],
+                interviews: jobPosting.interviews || [],
             };
         });
     }

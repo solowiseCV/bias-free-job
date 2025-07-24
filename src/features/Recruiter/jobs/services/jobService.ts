@@ -159,10 +159,13 @@ export class JobPostingService {
       where: { id },
       include: {
         companyProfile: { select: { companyName: true } },
-        _count: { select: { applications: true } },
+        applications: true,
+        interviews: true,
       },
     });
+
     if (!jobPosting) throw new Error("Job posting not found");
+
     return {
       id: jobPosting.id,
       jobTitle: jobPosting.jobTitle,
@@ -174,10 +177,19 @@ export class JobPostingService {
       monthlySalaryMin: jobPosting.monthlySalaryMin,
       monthlySalaryMax: jobPosting.monthlySalaryMax,
       status: jobPosting.status,
+      deadline: jobPosting.deadline,
+      experienceLevel: jobPosting.experienceLevel,
+      education: jobPosting.education,
+      department: jobPosting.department,
+      companyFunction: jobPosting.companyFunction,
+      currency: jobPosting.currency,
       jobDescription: jobPosting.jobDescription,
       requirements: jobPosting.requirements,
       assessmentUrl: jobPosting.assessment,
-      applicationCount: jobPosting._count.applications,
+      totalApplications: jobPosting.applications?.length || 0,
+      peopleInterviewed: jobPosting.interviews?.length || 0,
+      applications: jobPosting.applications || [],
+      interviews: jobPosting.interviews || [],
     };
   }
 
