@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { JobSeekerDto } from "../dtos/createJobSeekerDto";
+import { JobSeekerDto } from "../dtos/jobSeekerDto";
 import { JobSeekerService } from "../services/createJobSeeker";
 import { FileData, getDataUri } from "../../../../middlewares/multer";
 import configureCloudinary from "../../../../configs/cloudinary";

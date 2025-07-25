@@ -15,4 +15,5 @@ appRouter.use("/job-seeker", jobSeeker_route_1.default);
 appRouter.use("/company-profile", company_1.default);
 appRouter.use("/jobs", job_route_1.default);
 appRouter.use("/application", jobApplication_route_1.default);
+appRouter.use("/settings", jobApplication_route_1.default);
 exports.default = appRouter;
