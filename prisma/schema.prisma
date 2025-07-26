@@ -72,6 +72,8 @@ model User {
   applicants      Applicant[]       @relation("UserApplicant")
   interviewsAsApplicant Interview[] @relation("UserInterviewsAsApplicant")
   jobSeeker                JobSeeker?
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
 }
 
 model JobSeeker {
