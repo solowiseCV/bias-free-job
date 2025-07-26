@@ -97,12 +97,14 @@ model JobSeeker {
   portfolio           PortfolioEntry[]
   resume              String?
   interests           String[]
+  profileCompletion   Float
 
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
   applications        Application[]    @relation("ApplicantApplications")
   interviews          Interview[]      @relation("ApplicantInterviews")
+  notificationSetting   NotificationSetting?
 }
 
 model CompanyProfile {
@@ -236,6 +238,26 @@ model Interview {
   @@index([dateTime])
   @@index([companyProfileId])
 }
+
+model NotificationSetting {
+  id                        String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId                    String      @unique @db.ObjectId
+  user                      JobSeeker   @relation(fields: [userId], references: [id])
+
+  platformUpdates           Boolean     @default(false)
+
+  jobExpiry                 Boolean     @default(false)
+  jobReviewOrFlag           Boolean     @default(false)
+
+  interviewScheduleUpdate   Boolean     @default(false)
+
+  recruiterResponse         Boolean     @default(false)
+  recruiterViewedAssessment Boolean     @default(false)
+
+  createdAt                 DateTime    @default(now())
+  updatedAt                 DateTime    @updatedAt
+}
+
 
 type ExperienceEntry {
   title        String

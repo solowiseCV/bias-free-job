@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const notification_1 = require("../controllers/notification");
+const securityPrivacy_1 = require("../controllers/securityPrivacy");
+const authMiddleware_1 = require("../../../middlewares/authMiddleware");
+const account_1 = require("../controllers/account");
+const profile_1 = require("../controllers/profile");
+const settingRoutes = express_1.default.Router();
+settingRoutes.get("/profile", authMiddleware_1.authMiddleware, profile_1.ProfileController.getProfile);
+settingRoutes.get("/account", authMiddleware_1.authMiddleware, account_1.AccountSettingController.getAccount);
+settingRoutes.get("/notification", authMiddleware_1.authMiddleware, notification_1.NotificationController.getNotificationSettings);
+settingRoutes.get("/privacy", authMiddleware_1.authMiddleware, securityPrivacy_1.SecurityAndPrivacyController.getSecAndPrivacySet);
+settingRoutes.patch("/profile", authMiddleware_1.authMiddleware, profile_1.ProfileController.updateProfile);
+settingRoutes.patch("/account", authMiddleware_1.authMiddleware, account_1.AccountSettingController.updateAccount);
+settingRoutes.patch("/notification", authMiddleware_1.authMiddleware, notification_1.NotificationController.updateNotificationSettings);
+settingRoutes.patch("/privacy", authMiddleware_1.authMiddleware, securityPrivacy_1.SecurityAndPrivacyController.updateSecAndPrivacySet);
+exports.default = settingRoutes;

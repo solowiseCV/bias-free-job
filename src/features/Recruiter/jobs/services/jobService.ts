@@ -88,8 +88,6 @@ export class JobPostingService {
       whereClause.status = "active";
     }
 
-    
-
     const take = limit ? parseInt(limit as any) : 10;
     const skip = page ? (parseInt(page as any) - 1) * take : 0;
 
@@ -141,7 +139,7 @@ export class JobPostingService {
             monthlySalaryMax: job.monthlySalaryMax,
             status: job.status,
             postedOn: job.createdAt,
-            
+
             totalApplications: job.applications ? job.applications.length : 0,
             peopleInterviewed: job.interviews ? job.interviews.length : 0,
             applications: job.applications || [],
@@ -156,47 +154,44 @@ export class JobPostingService {
     };
   }
 
-
   async getJobPostingById(id: string) {
-  const jobPosting = await prisma.jobPosting.findUnique({
-    where: { id },
-    include: {
-      companyProfile: { select: { companyName: true } },
-      applications: true,
-      interviews: true,
-    },
-  });
+    const jobPosting = await prisma.jobPosting.findUnique({
+      where: { id },
+      include: {
+        companyProfile: { select: { companyName: true } },
+        applications: true,
+        interviews: true,
+      },
+    });
 
-  if (!jobPosting) throw new Error("Job posting not found");
+    if (!jobPosting) throw new Error("Job posting not found");
 
-  return {
-    id: jobPosting.id,
-    jobTitle: jobPosting.jobTitle,
-    companyName: jobPosting.companyProfile.companyName,
-    companyLocation: jobPosting.companyLocation,
-    workLocation: jobPosting.workLocation,
-    industry: jobPosting.industry,
-    employmentType: jobPosting.employmentType,
-    monthlySalaryMin: jobPosting.monthlySalaryMin,
-    monthlySalaryMax: jobPosting.monthlySalaryMax,
-    status: jobPosting.status,
-    deadline: jobPosting.deadline,
-    experienceLevel: jobPosting.experienceLevel,
-    education: jobPosting.education,
-    department: jobPosting.department,
-    companyFunction: jobPosting.companyFunction,
-    currency: jobPosting.currency,
-    jobDescription: jobPosting.jobDescription,
-    requirements: jobPosting.requirements,
-    assessmentUrl: jobPosting.assessment,
-    totalApplications: jobPosting.applications?.length || 0,
-    peopleInterviewed: jobPosting.interviews?.length || 0,
-    applications: jobPosting.applications || [],
-    interviews: jobPosting.interviews || [],
-  };
-}
-
-
+    return {
+      id: jobPosting.id,
+      jobTitle: jobPosting.jobTitle,
+      companyName: jobPosting.companyProfile.companyName,
+      companyLocation: jobPosting.companyLocation,
+      workLocation: jobPosting.workLocation,
+      industry: jobPosting.industry,
+      employmentType: jobPosting.employmentType,
+      monthlySalaryMin: jobPosting.monthlySalaryMin,
+      monthlySalaryMax: jobPosting.monthlySalaryMax,
+      status: jobPosting.status,
+      deadline: jobPosting.deadline,
+      experienceLevel: jobPosting.experienceLevel,
+      education: jobPosting.education,
+      department: jobPosting.department,
+      companyFunction: jobPosting.companyFunction,
+      currency: jobPosting.currency,
+      jobDescription: jobPosting.jobDescription,
+      requirements: jobPosting.requirements,
+      assessmentUrl: jobPosting.assessment,
+      totalApplications: jobPosting.applications?.length || 0,
+      peopleInterviewed: jobPosting.interviews?.length || 0,
+      applications: jobPosting.applications || [],
+      interviews: jobPosting.interviews || [],
+    };
+  }
 
   async updateJobPosting(id: string, data: Partial<UpdateJobPostingDTO>) {
     const jobPosting = await prisma.jobPosting.findUnique({ where: { id } });
@@ -207,7 +202,6 @@ export class JobPostingService {
       data,
     });
   }
-
 
   async deleteJobPosting(userId: string, id: string) {
     const companyProfile = await prisma.companyProfile.findFirst({

@@ -76,7 +76,32 @@ export class JobApplicationService {
         take,
         orderBy: { appliedAt: "desc" },
         include: {
-          applicant: true,
+          applicant: {
+            select: {
+              bio: true,
+              interestedRoles: true,
+              experience: {
+                select: {
+                  location: true,
+                  description: true,
+                },
+              },
+              education: {
+                select: {
+                  degree: true,
+                  field: true,
+                  grade: true,
+                  description: true,
+                  startDate: true,
+                  endDate: true,
+                },
+              },
+              skills: true,
+              workMode: true,
+              location: true,
+              portfolio: true,
+            },
+          },
         },
       }),
       prisma.application.count({

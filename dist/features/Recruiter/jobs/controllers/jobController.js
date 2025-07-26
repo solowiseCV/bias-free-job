@@ -19,8 +19,10 @@ const multer_1 = require("../../../../middlewares/multer");
 const cloudinary_1 = __importDefault(require("../../../../configs/cloudinary"));
 const appError_1 = require("../../../../lib/appError");
 const response_util_1 = __importDefault(require("../../../../utils/helpers/response.util"));
+const client_1 = require("@prisma/client");
 const jobPostingService = new jobService_1.JobPostingService();
 const cloudinary = (0, cloudinary_1.default)();
+const prisma = new client_1.PrismaClient;
 class JobPostingController {
     createJobPosting(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -124,26 +126,92 @@ class JobPostingController {
             }
         });
     }
+    // async updateJobPosting(req: Request, res: Response) {
+    //   const { error } = updateJobPostingSchema.validate(req.body);
+    //   if (error) {
+    //     res.status(400).json({ error: error.details[0].message });
+    //     return;
+    //   }
+    //   let assessmentUrl: string | undefined;
+    //   if (req.body.assessmentUrlInput) {
+    //     assessmentUrl = req.body.assessmentUrlInput;
+    //   } else if (req.body.assessment) {
+    //     assessmentUrl = req.body.assessment;
+    //   }
+    //   if (req.file) {
+    //     try {
+    //       const fileData: FileData = {
+    //         originalname: req.file.originalname,
+    //         buffer: req.file.buffer,
+    //       };
+    //       const dataUri = getDataUri(fileData);
+    //       const result = await cloudinary.uploader.upload(dataUri.content, {
+    //         folder: "job_assessments",
+    //         resource_type: "auto",
+    //       });
+    //       assessmentUrl = result.secure_url;
+    //     } catch (uploadErr) {
+    //       // res.status(500).json({ error: "Failed to upload file to Cloudinary" });
+    //       new CustomResponse(
+    //         500,
+    //         true,
+    //         "Failed to upload file to Cloudinary",
+    //         res,
+    //         uploadErr
+    //       );
+    //       return;
+    //     }
+    //   } else {
+    //     assessmentUrl = req.body.assessmen;
+    //   }
+    //   const data: Partial<UpdateJobPostingDTO> = {
+    //     jobTitle: req.body.jobTitle,
+    //     department: req.body.department,
+    //     companyLocation: req.body.companyLocation,
+    //     workLocation: req.body.workLocation,
+    //     industry: req.body.industry,
+    //     companyFunction: req.body.companyFunction,
+    //     employmentType: req.body.employmentType,
+    //     experienceLevel: req.body.experienceLevel,
+    //     education: req.body.education,
+    //     monthlySalaryMin: req.body.monthlySalaryMin
+    //       ? parseFloat(req.body.monthlySalaryMin)
+    //       : undefined,
+    //     monthlySalaryMax: req.body.monthlySalaryMax
+    //       ? parseFloat(req.body.monthlySalaryMax)
+    //       : undefined,
+    //     jobDescription: req.body.jobDescription,
+    //     requirements: req.body.requirements,
+    //     assessment: assessmentUrl,
+    //     status: req.body.status,
+    //   };
+    //   // Filter out undefined values to ensure only provided fields are updated
+    //   const updateData = Object.fromEntries(
+    //     Object.entries(data).filter(([_, value]) => value !== undefined)
+    //   );
+    //   try {
+    //     const jobPosting = await jobPostingService.updateJobPosting(
+    //       req.params.id,
+    //       updateData
+    //     );
+    //     res.status(200).json(jobPosting);
+    //   } catch (err: any) {
+    //     res.status(400).json({ error: err.message });
+    //   }
+    // }
     updateJobPosting(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            //  if (!req.file && !req.body.assessment && !req.body.assessmentUrlInput) {
-            //   res.status(400).json({ error: "Assessment is required (URL or file)" });
-            //   return;
-            // }
             const { error } = job_validation_1.updateJobPostingSchema.validate(req.body);
             if (error) {
                 res.status(400).json({ error: error.details[0].message });
                 return;
             }
             let assessmentUrl;
-            if (req.body.assessmentUrlInput) {
-                assessmentUrl = req.body.assessmentUrlInput;
-            }
-            else if (req.body.assessment) {
-                assessmentUrl = req.body.assessment;
-            }
-            if (req.file) {
-                try {
+            try {
+                if (req.body.assessmentUrlInput) {
+                    assessmentUrl = req.body.assessmentUrlInput;
+                }
+                else if (req.file) {
                     const fileData = {
                         originalname: req.file.originalname,
                         buffer: req.file.buffer,
@@ -155,14 +223,12 @@ class JobPostingController {
                     });
                     assessmentUrl = result.secure_url;
                 }
-                catch (uploadErr) {
-                    // res.status(500).json({ error: "Failed to upload file to Cloudinary" });
-                    new response_util_1.default(500, true, "Failed to upload file to Cloudinary", res, uploadErr);
-                    return;
+                else if (req.body.assessment) {
+                    assessmentUrl = req.body.assessment;
                 }
             }
-            else {
-                assessmentUrl = req.body.assessmen;
+            catch (uploadErr) {
+                new response_util_1.default(500, true, "Failed to upload file to Cloudinary", res, uploadErr);
             }
             const data = {
                 jobTitle: req.body.jobTitle,
@@ -182,10 +248,10 @@ class JobPostingController {
                     : undefined,
                 jobDescription: req.body.jobDescription,
                 requirements: req.body.requirements,
-                assessmentUrl,
+                assessment: assessmentUrl,
                 status: req.body.status,
+                currency: req.body.currency,
             };
-            // Filter out undefined values to ensure only provided fields are updated
             const updateData = Object.fromEntries(Object.entries(data).filter(([_, value]) => value !== undefined));
             try {
                 const jobPosting = yield jobPostingService.updateJobPosting(req.params.id, updateData);
