@@ -29,6 +29,7 @@ class LoginController {
                 const { email, password } = req.body;
                 let profile = null;
                 const user = yield registerUser_1.AuthService.getUserByEmail(email);
+                console.log(user);
                 if (!user) {
                     res.status(404).json({
                         success: false,
@@ -61,8 +62,8 @@ class LoginController {
                 const userData = {
                     id: user.id,
                     email: user.email,
-                    lastname: user.lastName,
-                    firstname: user.firstName,
+                    lastname: user.lastname,
+                    firstname: user.firstname,
                     avatar: user.avatar,
                     userType: user.userType,
                 };
