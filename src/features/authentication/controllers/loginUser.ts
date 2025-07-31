@@ -20,7 +20,6 @@ export class LoginController {
       let profile = null;
 
       const user = await AuthService.getUserByEmail(email);
-      console.log(user);
 
       if (!user) {
         res.status(404).json({
@@ -68,7 +67,7 @@ export class LoginController {
       res.status(200).json({
         success: true,
         message: "Login successful!",
-        data: { userData, profile },
+        data: { userData, profile, newUser: false },
         token,
       });
       return;

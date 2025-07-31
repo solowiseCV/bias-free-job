@@ -24,6 +24,7 @@ class GoogleAuthController {
             try {
                 const { email, userType } = req.body;
                 let profile = null;
+                let newUser;
                 const existingUserByEmail = yield googleAuth_1.default.getUserByEmail(email);
                 let user;
                 if (!existingUserByEmail) {
@@ -44,9 +45,11 @@ class GoogleAuthController {
                         userType,
                     };
                     user = yield googleAuth_1.default.registerUser(userData);
+                    newUser = true;
                 }
                 else {
                     user = existingUserByEmail;
+                    newUser = false;
                     if (existingUserByEmail.userType === "job_seeker") {
                         profile = yield getJobSeeker_1.GetJobSeekerService.getJobSeekerByUserId(existingUserByEmail.id);
                     }
@@ -66,7 +69,7 @@ class GoogleAuthController {
                 res.status(200).json({
                     success: true,
                     message: "Successful!",
-                    data: { user: data, profile },
+                    data: { user: data, profile, newUser },
                     token,
                 });
                 return;
