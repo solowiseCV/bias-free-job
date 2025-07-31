@@ -63,6 +63,7 @@ export class AuthController {
         message: "Registration successful!",
         data,
         token,
+        newUser: true,
       });
       return;
     } catch (err: any) {

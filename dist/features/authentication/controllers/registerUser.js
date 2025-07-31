@@ -59,6 +59,7 @@ class AuthController {
                     message: "Registration successful!",
                     data,
                     token,
+                    newUser: true,
                 });
                 return;
             }
