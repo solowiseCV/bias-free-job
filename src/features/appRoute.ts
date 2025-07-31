@@ -7,6 +7,7 @@ import jobsRoutes from "./Recruiter/jobs/routes/job.route";
 import jobSeekerRoute from "./jobSeeker/jobSeekerProfile/routes/jobSeeker.route";
 import applicationRoutes from "./jobSeeker/application/routes/jobApplication.route";
 import twofaRoutes from "./authentication/routes/twoFactorAuth.route";
+import userRoutes from "./users/routes";
 
 appRouter.use("/auth", authRoutes);
 appRouter.use("/2FaAuth", twofaRoutes);
@@ -15,5 +16,6 @@ appRouter.use("/company-profile", CompanyRoutes);
 appRouter.use("/jobs", jobsRoutes);
 appRouter.use("/application", applicationRoutes);
 appRouter.use("/settings", applicationRoutes);
+appRouter.use("/users", userRoutes);
 
 export default appRouter;

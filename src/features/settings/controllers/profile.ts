@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 // import { AuthService } from "../services/authService";
-
 import { comparePassword } from "../../../utils/hash";
 import { ChangePasswordService } from "../services/changePassword";
 import { GetJobSeekerService } from "../../jobSeeker/jobSeekerProfile/services/getJobSeeker";
@@ -21,7 +20,7 @@ export class ProfileController {
       const userId = req.user.id;
       const { currentPassword, newPassword } = req.body;
 
-      const user = await ChangePasswordService.getUserById(userId);
+      const user = await ChangePasswordService.getUserById(userId); 
       if (!user) {
         res.status(404).json({ success: false, message: "User not found" });
         return;

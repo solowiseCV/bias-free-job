@@ -54,9 +54,8 @@ enum JobType {
 
 enum TeamRole {
   recruiter
-  admin
+  Admin
   third_party
-  superadmin
 }
 
 model User {
@@ -117,7 +116,6 @@ model JobSeeker {
   notificationSetting NotificationSetting?
 }
 
-
 model CompanyProfile {
   id                String       @id @default(auto()) @map("_id") @db.ObjectId
   userId            String       @unique @db.ObjectId
@@ -131,19 +129,21 @@ model CompanyProfile {
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
   jobPostings       JobPosting[] @relation("CompanyJobPostings")
-  hiringTeam        HiringTeam?  @relation("CompanyHiringTeam") 
+  hiringTeams       HiringTeam[] @relation("CompanyHiringTeams")
   interviews        Interview[]  @relation("CompanyInterviews")
 }
 
 model HiringTeam {
   id               String         @id @default(auto()) @map("_id") @db.ObjectId
-  companyProfileId String         @unique @db.ObjectId 
-  companyProfile   CompanyProfile @relation("CompanyHiringTeam", fields: [companyProfileId], references: [id], onDelete: Cascade)
+  companyProfileId String         @db.ObjectId
+  companyProfile   CompanyProfile @relation("CompanyHiringTeams", fields: [companyProfileId], references: [id], onDelete: Cascade)
   teamMembers      TeamMember[]   @relation("HiringTeamMembers")
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
+  @@index([companyProfileId])
 }
+
 model TeamMember {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   hiringTeamId String     @db.ObjectId
