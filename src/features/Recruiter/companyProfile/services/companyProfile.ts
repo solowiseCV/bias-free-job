@@ -218,6 +218,62 @@ async getCompanyTeam(userId: string, companyName?: string) {
   }
 }
 
+async getAllCompanies() {
+  try {
+    const companies = await prisma.companyProfile.findMany({
+      include: {
+        hiringTeam: {
+          include: {
+            teamMembers: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    email: true,
+                    firstname: true,
+                    lastname: true,
+                    avatar: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!companies.length) {
+      return {
+        message: "No companies found on the platform.",
+        companies: [],
+      };
+    }
+
+    return {
+      totalCompanies: companies.length,
+      companies: companies.map((company) => ({
+        companyProfileId: company.id,
+        companyName: company.companyName || "",
+        description: company.description || "",
+        industry: company.industry || "",
+        website: company.website || "",
+        location: company.location || "",
+        numberOfEmployees: company.numberOfEmployees || "",
+        hiringTeam: company.hiringTeam
+          ? {
+              ...company.hiringTeam,
+              companyProfile: undefined, 
+            }
+          : null,
+      })),
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch companies: ${error.message}`);
+    }
+    throw new Error("Unexpected error while fetching companies.");
+  }
+}
 async updateCompanyTeam(userId: string, data: UpdateCompanyTeamDTO) {
   try {
     const result = await prisma.$transaction(
