@@ -12,12 +12,10 @@ router.get("/userDetails/:userId",authMiddleware, UserController.getCurrentUser)
 
 router.get("/allUsers",authMiddleware, UserController.getAllUsers);
 
-router.patch("/updateUser/:userId",authMiddleware, UserController.updateUser);
+router.patch("/updateUser/:userId", authMiddleware, singleupload, UserController.updateUser);
 
 router.delete("/deleteUser/:userId",authMiddleware, UserController.deleteUser);
 
-
-router.patch("/updateAvatar/:userId", authMiddleware, singleupload, UserController.updateAvatar);
 
 // Team membership routes
 router.get("/team-memberships", TeamMembershipController.getUserTeamMemberships);

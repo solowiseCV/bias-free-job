@@ -91,15 +91,13 @@ export class UserController {
   static async updateUser(req: Request, res: Response): Promise<void> {
     try {
       const userIdValidation = userIdSchema.safeParse(req.params);
-
+      
       if (!userIdValidation.success) {
-        new CustomResponse(
-          400,
-          false,
-          "Invalid user ID",
-          res,
-          userIdValidation.error
-        );
+        res.status(400).json({
+          success: false,
+          message: "Invalid user ID",
+          errors: userIdValidation.error,
+        });
         return;
       }
 
@@ -107,54 +105,57 @@ export class UserController {
 
       // Validate request body
       const validationResult = updateUserSchema.safeParse(req.body);
-
+      
       if (!validationResult.success) {
-        new CustomResponse(
-          400,
-          false,
-          "Invalid update data",
-          res,
-          validationResult.error
-        );
+        res.status(400).json({
+          success: false,
+          message: "Invalid request data",
+          errors: validationResult.error,
+        });
         return;
       }
 
       const updateData = validationResult.data;
 
-      // Check if at least one field is provided for update
-      if (Object.keys(updateData).length === 0) {
-        new CustomResponse(400, false, "No fields provided for update", res);
+      // Check if at least one field is provided for update or if a file is uploaded
+      if (Object.keys(updateData).length === 0 && !req.file) {
+        res.status(400).json({
+          success: false,
+          message: "At least one field must be provided for update or a file must be uploaded",
+        });
         return;
       }
 
-      const updatedUser = await UserService.updateUser(userId, updateData);
+      const updatedUser = await UserService.updateUser(userId, updateData, req.file);
 
-      new CustomResponse(
-        200,
-        true,
-        "User updated successfully",
-        res,
-        updatedUser
-      );
+      res.status(200).json({
+        success: true,
+        message: "User updated successfully",
+        data: updatedUser,
+      });
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === "User not found") {
-          new CustomResponse(404, false, error.message, res);
+          res.status(404).json({
+            success: false,
+            message: error.message,
+          });
           return;
         }
         if (error.message === "Email already exists") {
-          new CustomResponse(409, false, error.message, res);
+          res.status(409).json({
+            success: false,
+            message: error.message,
+          });
           return;
         }
       }
 
-      new CustomResponse(
-        500,
-        false,
-        "Internal server error",
-        res,
-        error instanceof Error ? error.message : "Unknown error"
-      );
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   }
 
@@ -223,33 +224,6 @@ export class UserController {
         500,
         false,
         "Internal server error",
-        res,
-        error instanceof Error ? error.message : "Unknown error"
-      );
-    }
-  }
-
-  static async updateAvatar(req: Request, res: Response): Promise<void> {
-    try {
-      const { userId } = req.params;
-      if (!req.file) {
-        new CustomResponse(400, false, "No file uploaded", res);
-        return;
-      }
-      const updatedUser = await UserService.updateAvatar(userId, req.file);
-
-      new CustomResponse(
-        200,
-        true,
-        "Avatar updated successfully",
-        res,
-        updatedUser
-      );
-    } catch (error) {
-      new CustomResponse(
-        500,
-        false,
-        "Failed to update avatar",
         res,
         error instanceof Error ? error.message : "Unknown error"
       );

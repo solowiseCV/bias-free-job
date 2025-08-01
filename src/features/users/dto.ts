@@ -19,6 +19,7 @@ export const UpdateUserDTO = z.object({
   lastname: z.string().min(1, "Last name is required").optional(),
   avatar: z.string().url("Invalid avatar URL").optional(),
   email: z.string().email("Invalid email format").optional(),
+  phone_number: z.string().optional(),
 });
 
 export type UpdateUserRequest = z.infer<typeof UpdateUserDTO>;

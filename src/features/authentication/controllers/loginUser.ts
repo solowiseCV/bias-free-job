@@ -6,6 +6,7 @@ import { GetJobSeekerService } from "../../jobSeeker/jobSeekerProfile/services/g
 import { loginSchema } from "../../../validations/login.validation";
 import { CompanyTeamService } from "../../Recruiter/companyProfile/services/companyProfile";
 import { TwoFactorAuthService } from '../services/twoFactorAuth';
+import { TeamMembershipService } from "../../users/teamMembership.service";
 
 const companyTeamService = new CompanyTeamService();
 const twoFAService = new TwoFactorAuthService();
@@ -20,6 +21,7 @@ export class LoginController {
       }
       const { email, password } = req.body;
       let profile = null;
+      let hiringTeams : any = [] ;
 
       const user = await AuthService.getUserByEmail(email);
 
@@ -42,32 +44,18 @@ export class LoginController {
         return;
       }
 
-      // 2FA logic
-      if (user.twoFactorEnabled) {
-        const { twoFactorCode } = req.body;
-        if (!twoFactorCode) {
-          res.status(206).json({
-            success: false,
-            message: "Two-factor authentication code required.",
-            twoFactorRequired: true,
-          });
-          return;
-        }
-        const valid2FA = await twoFAService.verifyCode(user.id, twoFactorCode);
-        if (!valid2FA) {
-          res.status(401).json({
-            success: false,
-            message: "Invalid two-factor authentication code.",
-            twoFactorRequired: true,
-          });
-          return;
-        }
-      }
-
       if (user.userType === "job_seeker") {
         profile = await GetJobSeekerService.getJobSeekerByUserId(user.id);
       } else {
         profile = await companyTeamService.getCompanyTeam(user.id);
+      }
+
+      // Get all hiring team memberships for the user
+      try {
+        hiringTeams = await TeamMembershipService.getUserTeamMemberships(user.id);
+      } catch (error) {
+        console.warn("Failed to get hiring team memberships:", error);
+        hiringTeams = [];
       }
 
       const token = tokenService.generateToken(user.id, user.userType);
@@ -91,7 +79,7 @@ export class LoginController {
       res.status(200).json({
         success: true,
         message: "Login successful!",
-        data: { userData, profile, newUser: false },
+        data: { userData, profile, hiringTeams, newUser: false },
         token,
       });
       return;

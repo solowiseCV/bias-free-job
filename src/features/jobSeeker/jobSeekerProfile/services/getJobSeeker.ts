@@ -7,6 +7,11 @@ export class GetJobSeekerService {
       where: { userId },
     });
 
+    // Return null if no job seeker profile exists
+    if (!jobSeeker) {
+      return null;
+    }
+
     const fields = [
       { value: jobSeeker.bio, weight: 1 },
       { value: jobSeeker.location, weight: 1 },
@@ -49,6 +54,11 @@ export class GetJobSeekerService {
     const jobSeeker = await prisma.jobSeeker.findUnique({
       where: { id },
     });
+
+    // Return null if no job seeker profile exists
+    if (!jobSeeker) {
+      return null;
+    }
 
     const fields = [
       { value: jobSeeker.bio, weight: 1 },

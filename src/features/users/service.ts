@@ -72,7 +72,7 @@ export class UserService {
   }
 
   // Update user details
-  static async updateUser(userId: string, updateData: UpdateUserRequest): Promise<GetUserDetailsDTO> {
+  static async updateUser(userId: string, updateData: UpdateUserRequest, file?: Express.Multer.File): Promise<GetUserDetailsDTO> {
     try {
       // Check if user exists
       const existingUser = await prisma.user.findUnique({
@@ -92,6 +92,32 @@ export class UserService {
         if (emailExists) {
           throw new Error("Email already exists");
         }
+      }
+
+      // Handle avatar upload if file is provided
+      if (file) {
+        const fileData = { originalname: file.originalname, buffer: file.buffer };
+        const dataUri = getDataUri(fileData);
+        const uploadResult = await cloudinary.uploader.upload(dataUri.content, {
+          folder: "avatars",
+          resource_type: "image",
+        });
+
+        // Delete old avatar from Cloudinary if it exists and is a Cloudinary URL
+        if (existingUser.avatar && existingUser.avatar.includes("cloudinary.com")) {
+          const matches = existingUser.avatar.match(/\/v\d+\/([^\.\/]+)\./);
+          if (matches && matches[1]) {
+            const publicId = `avatars/${matches[1]}`;
+            try {
+              await cloudinary.uploader.destroy(publicId);
+            } catch (e) {
+              console.warn("Failed to delete old avatar from Cloudinary:", e);
+            }
+          }
+        }
+
+        // Add avatar URL to update data
+        updateData.avatar = uploadResult.secure_url;
       }
 
       const updatedUser = await prisma.user.update({
@@ -159,45 +185,6 @@ export class UserService {
     } catch (error) {
       throw new Error(`Failed to get user by email: ${error}`);
     }
-  }
-
-  static async updateAvatar(userId: string, file: Express.Multer.File) {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new Error("User not found");
-    const fileData = { originalname: file.originalname, buffer: file.buffer };
-    const dataUri = getDataUri(fileData);
-    const uploadResult = await cloudinary.uploader.upload(dataUri.content, {
-      folder: "avatars",
-      resource_type: "image",
-    });
-    if (user.avatar && user.avatar.includes("cloudinary.com")) {
-      // Extract public_id from the URL
-      const matches = user.avatar.match(/\/v\d+\/([^\.\/]+)\./);
-      if (matches && matches[1]) {
-        const publicId = `avatars/${matches[1]}`;
-        try {
-          await cloudinary.uploader.destroy(publicId);
-        } catch (e) {
-          console.warn("Failed to delete old avatar from Cloudinary:", e);
-        }
-      }
-    }
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: { avatar: uploadResult.secure_url },
-      select: {
-        id: true,
-        email: true,
-        firstname: true,
-        lastname: true,
-        avatar: true,
-        userType: true,
-        createdAt: true,
-        updatedAt: true,
-        twoFactorEnabled: true,
-      },
-    });
-    return updatedUser;
   }
 }
 

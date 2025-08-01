@@ -67,6 +67,7 @@ model User {
   password          String?
   avatar            String?        @default("https://media.istockphoto.com/id/588348500/vector/male-avatar-profile-picture-vector.jpg?s=612x612&w=0&k=20&c=tPPah8S9tmcyOXCft1Ct0tCAdpfSaUNhGzJK7kQiQCg=")
   authId            String?
+  phone_number       String?
   userType          UserType
   resetToken        String?
   resetTokenExpires DateTime?
@@ -182,7 +183,7 @@ model JobPosting {
   monthlySalaryMin Float?
   monthlySalaryMax Float?
   currency         String?
-  deadline         String?
+  deadline         DateTime?
   jobDescription   String
   requirements     String?
   assessment       String?
@@ -197,7 +198,7 @@ model JobPosting {
   @@index([companyProfileId])
 }
 
-model Applicant {
+ model Applicant {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String?  @db.ObjectId
   user      User?    @relation("UserApplicant", fields: [userId], references: [id], onDelete: SetNull)
