@@ -4,6 +4,7 @@ export const updateUserSchema = z.object({
   firstname: z.string().min(1, "First name is required").max(50, "First name too long").optional(),
   lastname: z.string().min(1, "Last name is required").max(50, "Last name too long").optional(),
   email: z.string().email("Invalid email format").optional(),
+  phone_number: z.string().optional(),
 });
 
 export const paginationSchema = z.object({
