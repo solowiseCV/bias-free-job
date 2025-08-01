@@ -30,3 +30,21 @@ export const authMiddleware = (
   }
 };
 
+
+export const recruiterOnlyMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (!req.user) {
+    res.status(401).json({ success: false, message: "Unauthorized: User not found in request" });
+    return;
+  }
+
+  if (req.user.userType !== "recruiter") {
+    res.status(403).json({ success: false, message: "Forbidden: Only recruiters are allowed" });
+    return;
+  }
+
+  next();
+};

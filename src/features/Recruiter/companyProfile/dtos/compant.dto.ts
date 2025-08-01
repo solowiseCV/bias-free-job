@@ -1,3 +1,5 @@
+import { $Enums } from '@prisma/client';
+
 export interface CompanyTeamDTO {
   companyName: string;
   description: string;
@@ -5,12 +7,12 @@ export interface CompanyTeamDTO {
   website?: string;
   location?: string;
   numberOfEmployees?: string;
-  teamMembers: { email: string; role: string }[];
+  teamMembers?: { email: string; role: $Enums.TeamRole }[];
 }
 
 export interface TeamMember {
   email: string;
-  role: string;
+  role: $Enums.TeamRole;
 }
 
 export interface UpdateCompanyTeamDTO {
@@ -22,3 +24,4 @@ export interface UpdateCompanyTeamDTO {
   numberOfEmployees?: string;
   teamMembers?: TeamMember[];
 }
+

@@ -5,8 +5,10 @@ import { comparePassword } from "../../../utils/hash";
 import { GetJobSeekerService } from "../../jobSeeker/jobSeekerProfile/services/getJobSeeker";
 import { loginSchema } from "../../../validations/login.validation";
 import { CompanyTeamService } from "../../Recruiter/companyProfile/services/companyProfile";
+import { TwoFactorAuthService } from '../services/twoFactorAuth';
 
 const companyTeamService = new CompanyTeamService();
+const twoFAService = new TwoFactorAuthService();
 
 export class LoginController {
   static async login(req: Request, res: Response): Promise<void> {
@@ -38,6 +40,28 @@ export class LoginController {
           message: "User Email or Password incorrect!",
         });
         return;
+      }
+
+      // 2FA logic
+      if (user.twoFactorEnabled) {
+        const { twoFactorCode } = req.body;
+        if (!twoFactorCode) {
+          res.status(206).json({
+            success: false,
+            message: "Two-factor authentication code required.",
+            twoFactorRequired: true,
+          });
+          return;
+        }
+        const valid2FA = await twoFAService.verifyCode(user.id, twoFactorCode);
+        if (!valid2FA) {
+          res.status(401).json({
+            success: false,
+            message: "Invalid two-factor authentication code.",
+            twoFactorRequired: true,
+          });
+          return;
+        }
       }
 
       if (user.userType === "job_seeker") {
