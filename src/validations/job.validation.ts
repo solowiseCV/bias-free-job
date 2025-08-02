@@ -14,7 +14,9 @@ export const jobPostingSchema = Joi.object({
   monthlySalaryMin: Joi.number().min(0).optional(),
   monthlySalaryMax: Joi.number().min(Joi.ref('monthlySalaryMin')).optional(),
   currency : Joi.string().optional(),
-  deadline : Joi.string().optional(),
+  deadline : Joi.date().iso().optional(),
+  country: Joi.string().optional(),
+  state: Joi.string().optional(),
   jobDescription: Joi.string().required(),
   requirements: Joi.string().optional(),
    assessment: Joi.alternatives().try(
@@ -38,6 +40,8 @@ export const draftJobPostingSchema = Joi.object({
   monthlySalaryMin: Joi.number().min(0).optional(),
   monthlySalaryMax: Joi.number().min(Joi.ref('monthlySalaryMin')).optional(),
   currency: Joi.string().optional(),
+  country: Joi.string().optional(),
+  state: Joi.string().optional(),
   deadline: Joi.string().isoDate().optional(),
   jobDescription: Joi.string().optional(),
   requirements: Joi.string().optional(),
@@ -46,8 +50,7 @@ export const draftJobPostingSchema = Joi.object({
     Joi.string().optional() 
   ),
   assessmentUrlInput: Joi.string().optional(),
-  country: Joi.string().optional(),
-  state: Joi.string().optional()
+  
 });
 
 
