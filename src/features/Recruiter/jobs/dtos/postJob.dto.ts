@@ -13,7 +13,7 @@ export interface JobPostingDTO {
   currency?: string;
   country?: string;
   state?: string;
-  deadline?: Date;
+  deadline?: string | Date | null;
   jobDescription: string;
   requirements?: string;
   assessmentUrl?: string;
