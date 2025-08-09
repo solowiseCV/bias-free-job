@@ -13,6 +13,16 @@ export class AuthService {
   static getUserByEmail = async (email: string) => {
     const existingUser = await prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        lastname: true,
+        firstname: true,
+        password: true,
+        userType: true,
+        twoFactorEnabled: true,
+        twoFactorSecret: true,
+      },
     });
     return existingUser;
   };

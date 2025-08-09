@@ -31,35 +31,47 @@ class JobSeekerService {
             }
             const take = limit ? parseInt(limit) : 10;
             const skip = page ? (parseInt(page) - 1) * take : 0;
-            // const orderBy: Prisma.JobPostingOrderByWithRelationInput[] = bestMatches === 'true'
-            //   ? [{ createdAt: 'desc' }, { monthlySalaryMax: 'desc' }] 
-            //   : [{ createdAt: 'desc' }]; 
-            const [jobs, total] = yield prisma.$transaction([
-                prisma.jobPosting.findMany({
-                    where: whereClause,
-                    take,
-                    skip,
-                    include: { companyProfile: { select: { companyName: true } } },
-                }),
-                prisma.jobPosting.count({ where: whereClause }),
-            ]);
-            return {
-                jobs: jobs.map((job) => ({
-                    id: job.id,
-                    jobTitle: job.jobTitle,
-                    companyName: job.companyProfile.companyName,
-                    companyLocation: job.companyLocation,
-                    workLocation: job.workLocation,
-                    industry: job.industry,
-                    employmentType: job.employmentType,
-                    monthlySalaryMin: job.monthlySalaryMin,
-                    monthlySalaryMax: job.monthlySalaryMax,
-                    status: job.status,
-                })),
-                total,
-                page: page || 1,
-                limit: take,
-            };
+            const orderBy = bestMatches === 'true'
+                ? [{ createdAt: 'desc' }, { monthlySalaryMax: 'desc' }]
+                : [{ createdAt: 'desc' }];
+            try {
+                const [jobs, total] = yield prisma.$transaction([
+                    prisma.jobPosting.findMany({
+                        where: whereClause,
+                        take,
+                        skip,
+                        orderBy,
+                        include: { companyProfile: { select: { companyName: true } } },
+                    }),
+                    prisma.jobPosting.count({ where: whereClause }),
+                ]);
+                // Filter out jobs with invalid deadline values
+                const validJobs = jobs.filter(job => {
+                    return job.deadline === null || (job.deadline instanceof Date && !isNaN(job.deadline.getTime()));
+                });
+                return {
+                    jobs: validJobs.map((job) => ({
+                        id: job.id,
+                        jobTitle: job.jobTitle,
+                        companyName: job.companyProfile.companyName,
+                        companyLocation: job.companyLocation,
+                        workLocation: job.workLocation,
+                        industry: job.industry,
+                        employmentType: job.employmentType,
+                        monthlySalaryMin: job.monthlySalaryMin,
+                        monthlySalaryMax: job.monthlySalaryMax,
+                        status: job.status,
+                        deadline: job.deadline, // Return as Date or null
+                    })),
+                    total: validJobs.length, // Update total to reflect filtered jobs
+                    page: page || 1,
+                    limit: take,
+                };
+            }
+            catch (error) {
+                console.error('Error fetching jobs:', error);
+                throw new Error('Failed to fetch job postings due to data inconsistency. Please contact support.');
+            }
         });
     }
 }

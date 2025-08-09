@@ -14,12 +14,122 @@ const jobPostingService = new JobPostingService();
 const cloudinary = configureCloudinary();
 const prisma = new PrismaClient();
 export class JobPostingController {
+  //   async createJobPosting(req: Request, res: Response) {
+  //     // Validate required assessment input
+  //     if (!req.file && !req.body.assessmentUrlInput && !req.body.assessment) {
+  //       res.status(400).json({ error: "Assessment is required (URL or file)" });
+  //       return;
+  //     }
+
+  //     // Validate request body against schema
+  //     const { error } = jobPostingSchema.validate(req.body);
+  //     if (error) {
+  //       res.status(400).json({ error: error.details[0].message });
+  //       return;
+  //     }
+
+  //     let assessmentUrl: string | undefined;
+
+  //     // Determine assessment URL from input or file upload
+  //     if (req.body.assessmentUrlInput) {
+  //       assessmentUrl = req.body.assessmentUrlInput;
+  //     } else if (req.body.assessment) {
+  //       assessmentUrl = req.body.assessment;
+  //     }
+
+  //     // Handle file upload if present
+  //     if (req.file) {
+  //       try {
+  //         if (!req.file.buffer || !req.file.originalname) {
+  //           throw new Error("Invalid file data");
+  //         }
+  //         const fileUri = getDataUri(req.file);
+
+  //         //   folder: "job_assessments", // Changed to match assessment context
+  //         //   resource_type: "auto", // Allow auto-detection of file type
+  //         //   // Removed image-specific transformations to support various file types
+  //         // });
+  //         const uploadResult = await new Promise((resolve, reject) => {
+  //   const stream = cloudinary.uploader.upload_stream(
+  //     {
+  //       folder: "job_assessments",
+  //       resource_type: "auto",
+  //     },
+  //     (err, result) => {
+  //       if (err) return reject(err);
+  //       resolve(result);
+  //     }
+  //   );
+  //   stream.end(req.file?.buffer);
+  // });
+  // assessmentUrl = (uploadResult as any).secure_url;
+
+  //       } catch (uploadError) {
+  //         console.error("Cloudinary upload error:", uploadError);
+  //         //  res.status(400).json({ error: "Failed to upload assessment to Cloudinary" });
+  //         new CustomResponse(
+  //           400,
+  //           true,
+  //           "Failed to upload assessment to Cloudinary",
+  //           res,
+  //           uploadError
+  //         );
+  //         return;
+  //       }
+  //     }
+
+  //     // Prepare data for service
+  //     const data: JobPostingDTO = {
+  //       jobTitle: req.body.jobTitle,
+  //       department: req.body.department,
+  //       companyLocation: req.body.companyLocation,
+  //       workLocation: req.body.workLocation,
+  //       industry: req.body.industry,
+  //       companyFunction: req.body.companyFunction,
+  //       employmentType: req.body.employmentType,
+  //       experienceLevel: req.body.experienceLevel,
+  //       education: req.body.education,
+  //       monthlySalaryMin: req.body.monthlySalaryMin
+  //         ? parseFloat(req.body.monthlySalaryMin)
+  //         : undefined,
+  //       monthlySalaryMax: req.body.monthlySalaryMax
+  //         ? parseFloat(req.body.monthlySalaryMax)
+  //         : undefined,
+  //       jobDescription: req.body.jobDescription,
+  //       requirements: req.body.requirements,
+  //       assessmentUrl,
+  //       status: req.body.status,
+  //     };
+
+  //     // Create job posting
+  //     try {
+  //       const jobPosting = await jobPostingService.createJobPosting(
+  //         req.user.userId,
+  //         data
+  //       );
+  //       new CustomResponse(
+  //         201,
+  //         true,
+  //         "Job created successfully",
+  //         res,
+  //         jobPosting
+  //       );
+  //     } catch (err: any) {
+  //       const status = err.statusCode || 500;
+  //       // res.status(status).json({ error: err.message });
+  //       new CustomResponse(status, true, err.message, res, err);
+  //     }
+  //   }
+
   async createJobPosting(req: Request, res: Response) {
     // Validate required assessment input
     if (!req.file && !req.body.assessmentUrlInput && !req.body.assessment) {
       res.status(400).json({ error: "Assessment is required (URL or file)" });
       return;
     }
+
+    // Log raw request body for debugging
+    console.log("Raw request body:", req.body);
 
     // Validate request body against schema
     const { error } = jobPostingSchema.validate(req.body);
@@ -44,15 +154,19 @@ export class JobPostingController {
           throw new Error("Invalid file data");
         }
         const fileUri = getDataUri(req.file);
-        const uploadResult = await cloudinary.uploader.upload(fileUri.content, {
-          folder: "job_assessments", // Changed to match assessment context
-          resource_type: "auto", // Allow auto-detection of file type
-          // Removed image-specific transformations to support various file types
+        const uploadResult = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "job_assessments", resource_type: "auto" },
+            (err, result) => {
+              if (err) return reject(err);
+              resolve(result);
+            }
+          );
+          stream.end(req.file?.buffer);
         });
-        assessmentUrl = uploadResult.secure_url;
+        assessmentUrl = (uploadResult as any).secure_url;
       } catch (uploadError) {
         console.error("Cloudinary upload error:", uploadError);
-        //  res.status(400).json({ error: "Failed to upload assessment to Cloudinary" });
         new CustomResponse(
           400,
           true,
@@ -85,12 +199,15 @@ export class JobPostingController {
       requirements: req.body.requirements,
       assessmentUrl,
       status: req.body.status,
+      deadline: req.body.deadline, // Add deadline to the data object
     };
+
+    console.log("Controller data:", data); // Debug log
 
     // Create job posting
     try {
       const jobPosting = await jobPostingService.createJobPosting(
-        req.user.id,
+        req.user.userId,
         data
       );
       new CustomResponse(
@@ -102,7 +219,6 @@ export class JobPostingController {
       );
     } catch (err: any) {
       const status = err.statusCode || 500;
-      // res.status(status).json({ error: err.message });
       new CustomResponse(status, true, err.message, res, err);
     }
   }
@@ -330,6 +446,206 @@ export class JobPostingController {
       res.status(200).json(jobPosting);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
+    }
+  }
+
+  async saveJobPostingAsDraft(req: Request, res: Response) {
+    try {
+      let assessmentUrl: string | undefined;
+
+      // Handle file upload if present
+      if (req.file) {
+        try {
+          if (!req.file.buffer || !req.file.originalname) {
+            throw new Error("Invalid file data");
+          }
+          const fileUri = getDataUri(req.file);
+
+          const uploadResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              {
+                folder: "job_assessments",
+                resource_type: "auto",
+              },
+              (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+              }
+            );
+            stream.end(req.file?.buffer);
+          });
+          assessmentUrl = (uploadResult as any).secure_url;
+        } catch (uploadError) {
+          console.error("Cloudinary upload error:", uploadError);
+          new CustomResponse(
+            400,
+            false,
+            "Failed to upload assessment to Cloudinary",
+            res,
+            uploadError
+          );
+          return;
+        }
+      } else if (req.body.assessmentUrlInput) {
+        assessmentUrl = req.body.assessmentUrlInput;
+      } else if (req.body.assessment) {
+        assessmentUrl = req.body.assessment;
+      }
+
+      // Prepare data for service - all fields are optional for drafts
+      const data: Partial<JobPostingDTO> = {
+        jobTitle: req.body.jobTitle,
+        department: req.body.department,
+        companyLocation: req.body.companyLocation,
+        workLocation: req.body.workLocation,
+        industry: req.body.industry,
+        companyFunction: req.body.companyFunction,
+        employmentType: req.body.employmentType,
+        experienceLevel: req.body.experienceLevel,
+        education: req.body.education,
+        monthlySalaryMin: req.body.monthlySalaryMin
+          ? parseFloat(req.body.monthlySalaryMin)
+          : undefined,
+        monthlySalaryMax: req.body.monthlySalaryMax
+          ? parseFloat(req.body.monthlySalaryMax)
+          : undefined,
+        jobDescription: req.body.jobDescription,
+        requirements: req.body.requirements,
+        assessmentUrl,
+        country: req.body.country,
+        state: req.body.state,
+        currency: req.body.currency,
+        deadline: req.body.deadline ? new Date(req.body.deadline) : undefined,
+      };
+
+      const jobPosting = await jobPostingService.saveJobPostingAsDraft(
+        req.user.id,
+        data
+      );
+
+      new CustomResponse(
+        201,
+        true,
+        "Job draft saved successfully",
+        res,
+        jobPosting
+      );
+    } catch (err: any) {
+      const status = err.statusCode || 500;
+      new CustomResponse(status, false, err.message, res, err);
+    }
+  }
+
+  async updateJobPostingToDraft(req: Request, res: Response) {
+    try {
+      const jobId = req.params.id;
+
+      let assessmentUrl: string | undefined;
+
+      // Handle file upload if present
+      if (req.file) {
+        try {
+          if (!req.file.buffer || !req.file.originalname) {
+            throw new Error("Invalid file data");
+          }
+          const fileUri = getDataUri(req.file);
+
+          const uploadResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              {
+                folder: "job_assessments",
+                resource_type: "auto",
+              },
+              (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+              }
+            );
+            stream.end(req.file?.buffer);
+          });
+          assessmentUrl = (uploadResult as any).secure_url;
+        } catch (uploadError) {
+          console.error("Cloudinary upload error:", uploadError);
+          new CustomResponse(
+            400,
+            false,
+            "Failed to upload assessment to Cloudinary",
+            res,
+            uploadError
+          );
+          return;
+        }
+      } else if (req.body.assessmentUrlInput) {
+        assessmentUrl = req.body.assessmentUrlInput;
+      } else if (req.body.assessment) {
+        assessmentUrl = req.body.assessment;
+      }
+
+      // Prepare data for service
+      const data: Partial<UpdateJobPostingDTO> = {
+        jobTitle: req.body.jobTitle,
+        department: req.body.department,
+        companyLocation: req.body.companyLocation,
+        workLocation: req.body.workLocation,
+        industry: req.body.industry,
+        companyFunction: req.body.companyFunction,
+        employmentType: req.body.employmentType,
+        experienceLevel: req.body.experienceLevel,
+        education: req.body.education,
+        monthlySalaryMin: req.body.monthlySalaryMin
+          ? parseFloat(req.body.monthlySalaryMin)
+          : undefined,
+        monthlySalaryMax: req.body.monthlySalaryMax
+          ? parseFloat(req.body.monthlySalaryMax)
+          : undefined,
+        jobDescription: req.body.jobDescription,
+        requirements: req.body.requirements,
+        assessmentUrl,
+        country: req.body.country,
+        state: req.body.state,
+        currency: req.body.currency,
+        deadline: req.body.deadline ? new Date(req.body.deadline) : undefined,
+      };
+
+      const jobPosting = await jobPostingService.updateJobPostingToDraft(
+        req.user.id,
+        jobId,
+        data
+      );
+
+      new CustomResponse(
+        200,
+        true,
+        "Job updated to draft successfully",
+        res,
+        jobPosting
+      );
+    } catch (err: any) {
+      const status = err.statusCode || 500;
+      new CustomResponse(status, false, err.message, res, err);
+    }
+  }
+
+  async getDraftJobPostings(req: Request, res: Response) {
+    try {
+      const { page = 1, limit = 10 } = req.query;
+
+      const result = await jobPostingService.getDraftJobPostings(
+        req.user.id,
+        parseInt(page as string),
+        parseInt(limit as string)
+      );
+
+      new CustomResponse(
+        200,
+        true,
+        "Draft job postings retrieved successfully",
+        res,
+        result
+      );
+    } catch (err: any) {
+      const status = err.statusCode || 500;
+      new CustomResponse(status, false, err.message, res, err);
     }
   }
 

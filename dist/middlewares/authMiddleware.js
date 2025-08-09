@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authMiddleware = void 0;
+exports.recruiterOnlyMiddleware = exports.authMiddleware = void 0;
 const jwt_1 = require("../utils/jwt");
 const authMiddleware = (req, res, next) => {
     var _a;
@@ -19,3 +19,15 @@ const authMiddleware = (req, res, next) => {
     }
 };
 exports.authMiddleware = authMiddleware;
+const recruiterOnlyMiddleware = (req, res, next) => {
+    if (!req.user) {
+        res.status(401).json({ success: false, message: "Unauthorized: User not found in request" });
+        return;
+    }
+    if (req.user.userType !== "recruiter") {
+        res.status(403).json({ success: false, message: "Forbidden: Only recruiters are allowed" });
+        return;
+    }
+    next();
+};
+exports.recruiterOnlyMiddleware = recruiterOnlyMiddleware;

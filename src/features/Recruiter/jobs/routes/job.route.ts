@@ -14,7 +14,14 @@ jobsRoutes.post(
   singleupload,
   controller.createJobPosting
 );
+jobsRoutes.post(
+  "/saveDraft",
+  authMiddleware,
+  singleupload,
+  controller.saveJobPostingAsDraft
+);
 jobsRoutes.get("/alljobs", authMiddleware, controller.getJobPostings);
+jobsRoutes.get("/drafts", authMiddleware, controller.getDraftJobPostings);
 jobsRoutes.get("/getalljobs", authMiddleware, controller.getAllJobs);
 jobsRoutes.get("/job/:id", authMiddleware, controller.getJobPostingById);
 jobsRoutes.get("/seekersjobs", jobSeekerController.getAllJobs);
@@ -23,6 +30,12 @@ jobsRoutes.patch(
   authMiddleware,
   singleupload,
   controller.updateJobPosting
+);
+jobsRoutes.patch(
+  "/updateToDraft/:id",
+  authMiddleware,
+  singleupload,
+  controller.updateJobPostingToDraft
 );
 jobsRoutes.delete(
   "/delete/:id",

@@ -6,4 +6,8 @@ const authMiddleware_1 = require("../../../../middlewares/authMiddleware");
 const CompanyRoutes = (0, express_1.Router)();
 const controller = new companyProfile_1.CompanyTeamController();
 CompanyRoutes.post('/', authMiddleware_1.authMiddleware, controller.createCompanyTeam);
+CompanyRoutes.get('/companyDetails', authMiddleware_1.authMiddleware, controller.getCompanyTeam);
+CompanyRoutes.get('/allCompanies', authMiddleware_1.authMiddleware, controller.getAllCompanies);
+CompanyRoutes.patch('/companyUpdate', authMiddleware_1.authMiddleware, controller.updateCompanyTeam);
+CompanyRoutes.delete('/DeleteCompanyProfile', authMiddleware_1.authMiddleware, controller.deleteCompanyTeam);
 exports.default = CompanyRoutes;

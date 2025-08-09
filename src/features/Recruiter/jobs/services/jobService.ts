@@ -5,13 +5,86 @@ const prisma = new PrismaClient();
 // @ts-nocheck
 
 export class JobPostingService {
+  // async createJobPosting(userId: string, data: JobPostingDTO) {
+  //   const companyProfile = await prisma.companyProfile.findFirst({
+  //     where: { userId },
+  //   });
+
+  //   if (!companyProfile)
+  //     throw new Error("No company profile found for this user");
+
+  //   const existingJob = await prisma.jobPosting.findFirst({
+  //     where: {
+  //       companyProfileId: companyProfile?.id,
+  //       jobTitle: data.jobTitle,
+  //       companyLocation: data.companyLocation,
+  //       industry: data.industry,
+  //     },
+  //   });
+
+  //   if (existingJob) {
+  //     throw new Error(
+  //       "A job with the same title, location, and industry already exists for this company"
+  //     );
+  //   }
+
+  //   return prisma.jobPosting.create({
+  //     data: {
+  //       companyProfileId: companyProfile?.id,
+  //       jobTitle: data.jobTitle,
+  //       department: data.department,
+  //       companyLocation: data.companyLocation,
+  //       workLocation: data.workLocation,
+  //       industry: data.industry,
+  //       country: data.country || "Nigeria",
+  //       state: data.state || "Lagos",
+  //       companyFunction: data.companyFunction,
+  //       currency: data.currency || "NGN",
+  //       deadline: data.deadline || null,
+  //       employmentType: data.employmentType,
+  //       experienceLevel: data.experienceLevel,
+  //       education: data.education,
+  //       monthlySalaryMin: data.monthlySalaryMin,
+  //       monthlySalaryMax: data.monthlySalaryMax,
+  //       jobDescription: data.jobDescription,
+  //       requirements: data.requirements,
+  //       assessment: data.assessmentUrl,
+  //       status: data.status || "active",
+  //     },
+  //   });
+  // }
+
   async createJobPosting(userId: string, data: JobPostingDTO) {
-    const companyProfile = await prisma.companyProfile.findFirst({
+    // Validate userId
+    if (!userId) {
+      throw new Error("Invalid user ID provided");
+    }
+
+    console.log("Received data:", data);
+
+    // Check if the user has a company profile
+    let companyProfile = await prisma.companyProfile.findFirst({
       where: { userId },
     });
 
-    if (!companyProfile)
-      throw new Error("No company profile found for this user");
+    // Create a default company profile if none exists
+    if (!companyProfile) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (!user) throw new Error("User not found");
+
+      companyProfile = await prisma.companyProfile.create({
+        data: {
+          userId,
+          companyName: `${user.firstname || "User"}'s Company`,
+          description: "A company profile created for job posting.",
+          industry: data.industry || "Unknown",
+          location: data.companyLocation || "Unknown",
+          numberOfEmployees: "1-10",
+        },
+      });
+    }
 
     const existingJob = await prisma.jobPosting.findFirst({
       where: {
@@ -28,6 +101,19 @@ export class JobPostingService {
       );
     }
 
+    // Debug deadline conversion
+    let deadlineValue: Date | null = null;
+    if (data.deadline) {
+      const date = new Date(data.deadline);
+      console.log(
+        "Converted deadline:",
+        date,
+        "Is valid:",
+        !isNaN(date.getTime())
+      );
+      deadlineValue = !isNaN(date.getTime()) ? date : null;
+    }
+
     return prisma.jobPosting.create({
       data: {
         companyProfileId: companyProfile.id,
@@ -36,9 +122,11 @@ export class JobPostingService {
         companyLocation: data.companyLocation,
         workLocation: data.workLocation,
         industry: data.industry,
+        country: data.country || "Nigeria",
+        state: data.state || "Lagos",
         companyFunction: data.companyFunction,
         currency: data.currency || "NGN",
-        deadline: data.deadline || new Date().toISOString(),
+        deadline: deadlineValue, // Use the validated deadline
         employmentType: data.employmentType,
         experienceLevel: data.experienceLevel,
         education: data.education,
@@ -62,10 +150,18 @@ export class JobPostingService {
     status?: string,
     bestMatches?: string
   ) {
+    // Verify the user has a valid company profile
     const companyProfile = await prisma.companyProfile.findFirst({
       where: { userId },
+      include: { jobPostings: true },
     });
-    if (!companyProfile) return { jobs: [], total: 0 };
+    if (!companyProfile)
+      return {
+        jobs: [],
+        total: 0,
+        page: page || 1,
+        limit: limit ? parseInt(limit as any) : 10,
+      };
 
     const whereClause: Prisma.JobPostingWhereInput = {
       companyProfileId: companyProfile.id,
@@ -120,7 +216,6 @@ export class JobPostingService {
             interviews: any[];
           }
         ) => {
-          // Calculate best matches as applications with status 'accepted' or 'hired'
           const bestMatches = job.applications
             ? job.applications.filter(
                 (app: any) =>
@@ -139,7 +234,6 @@ export class JobPostingService {
             monthlySalaryMax: job.monthlySalaryMax,
             status: job.status,
             postedOn: job.createdAt,
-
             totalApplications: job.applications ? job.applications.length : 0,
             peopleInterviewed: job.interviews ? job.interviews.length : 0,
             applications: job.applications || [],
@@ -242,5 +336,109 @@ export class JobPostingService {
     // }
 
     // return { message: "Deadline fields updated successfully" };
+  }
+
+  async saveJobPostingAsDraft(userId: string, data: Partial<JobPostingDTO>) {
+    const companyProfile = await prisma.companyProfile.findFirst({
+      where: { userId },
+    });
+
+    if (!companyProfile)
+      throw new Error("No company profile found for this user");
+
+    // For drafts, we don't check for existing jobs with same title/location/industry
+    // since drafts are meant to be works in progress
+
+    return prisma.jobPosting.create({
+      data: {
+        companyProfileId: companyProfile.id,
+        jobTitle: data.jobTitle || "Draft Job Title",
+        department: data.department,
+        companyLocation: data.companyLocation || "Draft Location",
+        workLocation: data.workLocation || "office",
+        industry: data.industry || "Draft Industry",
+        country: data.country || "Nigeria",
+        state: data.state || "Lagos",
+        companyFunction: data.companyFunction,
+        currency: data.currency || "NGN",
+        deadline: data.deadline || null,
+        employmentType: data.employmentType || "full_time",
+        experienceLevel: data.experienceLevel,
+        education: data.education,
+        monthlySalaryMin: data.monthlySalaryMin,
+        monthlySalaryMax: data.monthlySalaryMax,
+        jobDescription: data.jobDescription || "Draft description",
+        requirements: data.requirements,
+        assessment: data.assessmentUrl,
+        status: "draft",
+      },
+    });
+  }
+
+  async updateJobPostingToDraft(
+    userId: string,
+    jobId: string,
+    data: Partial<UpdateJobPostingDTO>
+  ) {
+    const companyProfile = await prisma.companyProfile.findFirst({
+      where: { userId },
+    });
+
+    if (!companyProfile)
+      throw new Error("No company profile found for this user");
+
+    // Check if the job posting belongs to this user's company
+    const existingJob = await prisma.jobPosting.findFirst({
+      where: {
+        id: jobId,
+        companyProfileId: companyProfile.id,
+      },
+    });
+
+    if (!existingJob) {
+      throw new Error(
+        "Job posting not found or you don't have permission to update it"
+      );
+    }
+
+    return prisma.jobPosting.update({
+      where: { id: jobId },
+      data: {
+        ...data,
+        status: "draft", // Always set status to draft
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  async getDraftJobPostings(userId: string, page?: number, limit?: number) {
+    const companyProfile = await prisma.companyProfile.findFirst({
+      where: { userId },
+    });
+
+    if (!companyProfile) return { jobs: [], total: 0 };
+
+    const take = limit ? parseInt(limit as any) : 10;
+    const skip = page ? (parseInt(page as any) - 1) * take : 0;
+
+    const [jobs, total] = await Promise.all([
+      prisma.jobPosting.findMany({
+        where: {
+          companyProfileId: companyProfile.id,
+          status: "draft",
+        },
+        skip,
+        take,
+        orderBy: { updatedAt: "desc" },
+      }),
+      prisma.jobPosting.count({
+        where: {
+          companyProfileId: companyProfile.id,
+          status: "draft",
+        },
+      }),
+    ]);
+
+    return { jobs, total };
   }
 }

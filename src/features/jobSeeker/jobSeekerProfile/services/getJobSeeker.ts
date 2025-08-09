@@ -7,6 +7,7 @@ export class GetJobSeekerService {
       where: { userId },
     });
 
+
     if (!jobSeeker) {
       throw new Error(`Job seeker with userId ${userId} not found`);
     }
@@ -52,6 +53,7 @@ export class GetJobSeekerService {
     const jobSeeker = await prisma.jobSeeker.findUnique({
       where: { id },
     });
+
 
     if (!jobSeeker) {
       throw new Error(`Job seeker with id ${id} not found`);
