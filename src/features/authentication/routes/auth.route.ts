@@ -6,6 +6,7 @@ import { authMiddleware } from "../../../middlewares/authMiddleware";
 import { PasswordResetController } from "../controllers/resetUserPassword";
 import { ForgotPasswordController } from "../controllers/forgetPassword";
 import { ChangePasswordController } from "../controllers/changePassword";
+import twoFARoute from './twoFactorAuth.route';
 
 const router = express.Router();
 
@@ -26,5 +27,7 @@ router.post(
 );
 
 router.patch("/reset-password", PasswordResetController.resetPassword);
+
+router.use('/2fa', twoFARoute);
 
 export default router;
