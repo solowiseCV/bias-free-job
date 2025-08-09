@@ -14,6 +14,7 @@ export class JobSeekerService {
       create: {
         userId,
         ...data,
+        profileCompletion: 0,
       },
     });
 

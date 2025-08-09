@@ -95,7 +95,7 @@ model JobSeeker {
   portfolio           PortfolioEntry[]
   resume              String?
   interests           String[]
-  profileCompletion   Float
+  profileCompletion   Float            @default(0)
 
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt

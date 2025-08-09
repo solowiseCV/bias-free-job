@@ -22,6 +22,7 @@ class UpdateJobSeekerController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const profileId = req.params.id;
+                yield updateJobSeeker_1.UpdateJobSeekerService.updateTable();
                 const data = req.body;
                 if (req.file) {
                     const fileData = {

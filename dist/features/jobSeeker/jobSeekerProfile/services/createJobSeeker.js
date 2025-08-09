@@ -19,7 +19,7 @@ class JobSeekerService {
             const jobSeeker = yield prisma.jobSeeker.upsert({
                 where: { userId },
                 update: Object.assign(Object.assign({}, data), { updatedAt: new Date() }),
-                create: Object.assign({ userId }, data),
+                create: Object.assign(Object.assign({ userId }, data), { profileCompletion: 0 }),
             });
             const fields = [
                 { value: jobSeeker.bio, weight: 1 },
