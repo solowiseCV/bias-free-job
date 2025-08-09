@@ -22,6 +22,7 @@ jobsRoutes.post(
 );
 jobsRoutes.get("/alljobs", authMiddleware, controller.getJobPostings);
 jobsRoutes.get("/drafts", authMiddleware, controller.getDraftJobPostings);
+jobsRoutes.get("/getalljobs", authMiddleware, controller.getAllJobs);
 jobsRoutes.get("/job/:id", authMiddleware, controller.getJobPostingById);
 jobsRoutes.get("/seekersjobs", jobSeekerController.getAllJobs);
 jobsRoutes.patch(

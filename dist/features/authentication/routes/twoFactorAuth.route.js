@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const twoFactorAuth_1 = require("../controllers/twoFactorAuth");
+const authMiddleware_1 = require("../../../middlewares/authMiddleware");
+const twofaRoutes = (0, express_1.Router)();
+twofaRoutes.get('/generate', authMiddleware_1.authMiddleware, twoFactorAuth_1.generate2FA);
+twofaRoutes.post('/verify', authMiddleware_1.authMiddleware, twoFactorAuth_1.verify2FA);
+twofaRoutes.post('/enable', authMiddleware_1.authMiddleware, twoFactorAuth_1.enable2FA);
+twofaRoutes.post('/disable', authMiddleware_1.authMiddleware, twoFactorAuth_1.disable2FA);
+exports.default = twofaRoutes;

@@ -54,14 +54,13 @@ export class JobPostingService {
   //   });
   // }
 
-
   async createJobPosting(userId: string, data: JobPostingDTO) {
     // Validate userId
     if (!userId) {
       throw new Error("Invalid user ID provided");
     }
 
-    console.log('Received data:', data); 
+    console.log("Received data:", data);
 
     // Check if the user has a company profile
     let companyProfile = await prisma.companyProfile.findFirst({
@@ -78,7 +77,7 @@ export class JobPostingService {
       companyProfile = await prisma.companyProfile.create({
         data: {
           userId,
-          companyName: `${user.firstname || 'User'}'s Company`,
+          companyName: `${user.firstname || "User"}'s Company`,
           description: "A company profile created for job posting.",
           industry: data.industry || "Unknown",
           location: data.companyLocation || "Unknown",
@@ -106,7 +105,12 @@ export class JobPostingService {
     let deadlineValue: Date | null = null;
     if (data.deadline) {
       const date = new Date(data.deadline);
-      console.log('Converted deadline:', date, 'Is valid:', !isNaN(date.getTime()));
+      console.log(
+        "Converted deadline:",
+        date,
+        "Is valid:",
+        !isNaN(date.getTime())
+      );
       deadlineValue = !isNaN(date.getTime()) ? date : null;
     }
 
@@ -135,7 +139,6 @@ export class JobPostingService {
       },
     });
   }
-
 
   async getJobPostings(
     userId: string,
@@ -245,7 +248,7 @@ export class JobPostingService {
     };
   }
 
- async getJobPostingById(id: string) {
+  async getJobPostingById(id: string) {
     const jobPosting = await prisma.jobPosting.findUnique({
       where: { id },
       include: {
@@ -312,7 +315,27 @@ export class JobPostingService {
   }
 
   async getJobs() {
-    return await prisma.jobPosting.findRaw();
+    return await prisma.jobPosting.findMany();
+  }
+
+  async fixDeadlines() {
+    const jobs = await prisma.jobPosting.findMany();
+    console.log(jobs);
+
+    // for (const job of jobs) {
+    //   // if (typeof job.deadline === "string") {
+    //   const parsedDate = new Date(job.deadline);
+
+    //   await prisma.jobPosting.update({
+    //     where: { id: job.id },
+    //     data: {
+    //       deadline: isNaN(parsedDate.getTime()) ? null : parsedDate,
+    //     },
+    //   });
+    //   // }
+    // }
+
+    // return { message: "Deadline fields updated successfully" };
   }
 
   async saveJobPostingAsDraft(userId: string, data: Partial<JobPostingDTO>) {

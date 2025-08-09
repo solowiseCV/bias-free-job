@@ -16,7 +16,12 @@ const hash_1 = require("../../../utils/hash");
 const getJobSeeker_1 = require("../../jobSeeker/jobSeekerProfile/services/getJobSeeker");
 const login_validation_1 = require("../../../validations/login.validation");
 const companyProfile_1 = require("../../Recruiter/companyProfile/services/companyProfile");
+const twoFactorAuth_1 = require("../services/twoFactorAuth");
+const teamMembership_service_1 = require("../../users/teamMembership.service");
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
 const companyTeamService = new companyProfile_1.CompanyTeamService();
+const twoFAService = new twoFactorAuth_1.TwoFactorAuthService();
 class LoginController {
     static login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -28,6 +33,7 @@ class LoginController {
                 }
                 const { email, password } = req.body;
                 let profile = null;
+                let hiringTeams = [];
                 const user = yield registerUser_1.AuthService.getUserByEmail(email);
                 if (!user) {
                     res.status(404).json({
@@ -48,7 +54,31 @@ class LoginController {
                     profile = yield getJobSeeker_1.GetJobSeekerService.getJobSeekerByUserId(user.id);
                 }
                 else {
-                    profile = yield companyTeamService.getCompanyTeam(user.id);
+                    // Attempt to get company team, but handle absence gracefully
+                    const companyProfile = yield prisma.companyProfile.findFirst({
+                        where: { userId: user.id },
+                        include: { hiringTeam: { include: { teamMembers: true } } },
+                    });
+                    profile = companyProfile
+                        ? {
+                            companyProfileId: companyProfile.id,
+                            companyName: companyProfile.companyName || "",
+                            description: companyProfile.description || "",
+                            industry: companyProfile.industry || "",
+                            website: companyProfile.website || "",
+                            location: companyProfile.location || "",
+                            numberOfEmployees: companyProfile.numberOfEmployees || "",
+                            hiringTeam: companyProfile.hiringTeam || null,
+                        }
+                        : null;
+                }
+                // Get all hiring team memberships for the user
+                try {
+                    hiringTeams = yield teamMembership_service_1.TeamMembershipService.getUserTeamMemberships(user.id);
+                }
+                catch (error) {
+                    console.warn("Failed to get hiring team memberships:", error);
+                    hiringTeams = [];
                 }
                 const token = jwt_1.tokenService.generateToken(user.id, user.userType);
                 res.cookie("userType", user.userType, {
@@ -69,7 +99,7 @@ class LoginController {
                 res.status(200).json({
                     success: true,
                     message: "Login successful!",
-                    data: { userData, profile, newUser: false },
+                    data: { userData, profile, hiringTeams, newUser: false },
                     token,
                 });
                 return;
