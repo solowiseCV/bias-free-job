@@ -10,6 +10,7 @@ const controller = new jobController_1.JobPostingController();
 const jobSeekerController = new fetchJobs_1.JobSeekerController();
 jobsRoutes.post("/postJob", authMiddleware_1.authMiddleware, multer_1.singleupload, controller.createJobPosting);
 jobsRoutes.get("/alljobs", authMiddleware_1.authMiddleware, controller.getJobPostings);
+jobsRoutes.get("/getalljobs", authMiddleware_1.authMiddleware, controller.getAllJobs);
 jobsRoutes.get("/job/:id", authMiddleware_1.authMiddleware, controller.getJobPostingById);
 jobsRoutes.get("/seekersjobs", jobSeekerController.getAllJobs);
 jobsRoutes.patch("/update/:id", authMiddleware_1.authMiddleware, multer_1.singleupload, controller.updateJobPosting);

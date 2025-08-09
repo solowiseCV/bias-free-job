@@ -22,7 +22,7 @@ const response_util_1 = __importDefault(require("../../../../utils/helpers/respo
 const client_1 = require("@prisma/client");
 const jobPostingService = new jobService_1.JobPostingService();
 const cloudinary = (0, cloudinary_1.default)();
-const prisma = new client_1.PrismaClient;
+const prisma = new client_1.PrismaClient();
 class JobPostingController {
     createJobPosting(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -105,6 +105,18 @@ class JobPostingController {
             const { page = 1, limit = 10, search, industry, location, status, bestMatches, } = req.query;
             try {
                 const jobPostings = yield jobPostingService.getJobPostings(req.user.id, parseInt(page), parseInt(limit), search, industry, location, status, bestMatches);
+                new response_util_1.default(200, true, "Job postings retrieved successfully", res, jobPostings);
+            }
+            catch (err) {
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
+    getAllJobs(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const jobPostings = yield jobPostingService.getJobs();
+                console.log(jobPostings);
                 new response_util_1.default(200, true, "Job postings retrieved successfully", res, jobPostings);
             }
             catch (err) {

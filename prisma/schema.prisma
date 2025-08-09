@@ -162,7 +162,7 @@ model JobPosting {
   monthlySalaryMin Float?
   monthlySalaryMax Float?
   currency          String?
-  deadline           String?
+  deadline        DateTime?
   jobDescription  String
   requirements    String?
   assessment      String?

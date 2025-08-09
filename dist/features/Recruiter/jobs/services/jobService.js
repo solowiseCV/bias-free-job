@@ -202,7 +202,25 @@ class JobPostingService {
     }
     getJobs() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma.jobPosting.findRaw();
+            return yield prisma.jobPosting.findMany();
+        });
+    }
+    fixDeadlines() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const jobs = yield prisma.jobPosting.findMany();
+            console.log(jobs);
+            // for (const job of jobs) {
+            //   // if (typeof job.deadline === "string") {
+            //   const parsedDate = new Date(job.deadline);
+            //   await prisma.jobPosting.update({
+            //     where: { id: job.id },
+            //     data: {
+            //       deadline: isNaN(parsedDate.getTime()) ? null : parsedDate,
+            //     },
+            //   });
+            //   // }
+            // }
+            // return { message: "Deadline fields updated successfully" };
         });
     }
 }
