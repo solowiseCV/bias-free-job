@@ -47,4 +47,15 @@ export class UpdateJobSeekerService {
       data: { profileCompletion: percentage },
     });
   }
+
+  static async updateTable() {
+    await prisma.jobSeeker.updateMany({
+      where: {
+        NOT: {
+          profileCompletion: { gte: 0 },
+        },
+      },
+      data: { profileCompletion: 0 },
+    });
+  }
 }

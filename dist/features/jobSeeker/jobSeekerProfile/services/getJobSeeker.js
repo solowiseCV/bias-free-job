@@ -19,6 +19,9 @@ class GetJobSeekerService {
             const jobSeeker = yield prisma.jobSeeker.findUnique({
                 where: { userId },
             });
+            if (!jobSeeker) {
+                throw new Error(`Job seeker with userId ${userId} not found`);
+            }
             const fields = [
                 { value: jobSeeker.bio, weight: 1 },
                 { value: jobSeeker.location, weight: 1 },
@@ -54,6 +57,9 @@ class GetJobSeekerService {
             const jobSeeker = yield prisma.jobSeeker.findUnique({
                 where: { id },
             });
+            if (!jobSeeker) {
+                throw new Error(`Job seeker with id ${id} not found`);
+            }
             const fields = [
                 { value: jobSeeker.bio, weight: 1 },
                 { value: jobSeeker.location, weight: 1 },

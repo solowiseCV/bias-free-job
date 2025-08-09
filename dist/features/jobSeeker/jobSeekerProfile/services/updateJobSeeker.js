@@ -46,5 +46,17 @@ class UpdateJobSeekerService {
             });
         });
     }
+    static updateTable() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield prisma.jobSeeker.updateMany({
+                where: {
+                    NOT: {
+                        profileCompletion: { gte: 0 },
+                    },
+                },
+                data: { profileCompletion: 0 },
+            });
+        });
+    }
 }
 exports.UpdateJobSeekerService = UpdateJobSeekerService;

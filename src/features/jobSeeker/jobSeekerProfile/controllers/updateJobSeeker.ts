@@ -10,6 +10,7 @@ export class UpdateJobSeekerController {
   static async updateSeeker(req: Request, res: Response) {
     try {
       const profileId = req.params.id;
+      await UpdateJobSeekerService.updateTable();
       const data: JobSeekerDto = req.body;
 
       if (req.file) {
