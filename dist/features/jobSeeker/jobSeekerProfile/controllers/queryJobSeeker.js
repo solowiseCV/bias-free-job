@@ -23,5 +23,16 @@ class QueryJobSeekerController {
             }
         });
     }
+    static searchTalent(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield queryJobSeeker_1.SearchJobSeekerService.searchTalent(req.query);
+                res.status(200).json(result);
+            }
+            catch (err) {
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
 }
 exports.QueryJobSeekerController = QueryJobSeekerController;

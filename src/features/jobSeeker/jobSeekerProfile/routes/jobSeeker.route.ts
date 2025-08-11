@@ -44,4 +44,6 @@ router.delete(
 
 router.get("/search", QueryJobSeekerController.querySeeker);
 
+router.get("/talents", QueryJobSeekerController.searchTalent);
+
 export default router;
