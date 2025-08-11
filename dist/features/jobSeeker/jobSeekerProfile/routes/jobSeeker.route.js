@@ -18,4 +18,5 @@ router.get("/user/:userId", authMiddleware_1.authMiddleware, getJobSeeker_1.GetJ
 router.patch("/profile/:id", multer_1.singleupload, authMiddleware_1.authMiddleware, updateJobSeeker_1.UpdateJobSeekerController.updateSeeker);
 router.delete("/profile/:id", authMiddleware_1.authMiddleware, deleteJobSeeker_1.DeleteJobSeekerController.deleteSeeker);
 router.get("/search", queryJobSeeker_1.QueryJobSeekerController.querySeeker);
+router.get("/talents", queryJobSeeker_1.QueryJobSeekerController.searchTalent);
 exports.default = router;

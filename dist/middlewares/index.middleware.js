@@ -14,15 +14,15 @@ const appRoute_1 = __importDefault(require("../features/appRoute"));
 exports.default = (app) => {
     // Logging middleware
     app.use((0, morgan_1.default)("combined"));
-    // CORS middleware 
+    // CORS middleware
     app.use((0, cors_1.default)({
         origin: "*",
         methods: ["GET", "POST", "PUT", "PATCH"],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
     }));
     // Configuration setup (dotenv)
-    if (process.env.NODE_ENV !== 'production')
+    if (process.env.NODE_ENV !== "production")
         (0, dotenv_1.configDotenv)();
     // Body parsing middleware
     app.use((0, express_1.json)());
