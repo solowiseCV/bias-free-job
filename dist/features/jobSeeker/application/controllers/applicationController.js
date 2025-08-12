@@ -53,7 +53,28 @@ class ApplicationController {
         });
     }
     // Get job applications
-    getJobApplications(req, res) {
+    getJobApplicationsWithMaskedApplicants(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { page = 1, limit = 10 } = req.query;
+                const data = {
+                    jobPostingId: req.params.id,
+                    page: typeof page === "string" ? parseInt(page, 10) : Number(page),
+                    limit: typeof limit === "string" ? parseInt(limit, 10) : Number(limit),
+                };
+                const jobPosting = yield jobApplicationService.getMaskedApplicationsByJobPosting(data);
+                if (!jobPosting) {
+                    throw new appError_1.BadRequestError("Job posting not found");
+                }
+                new response_util_1.default(200, true, "Job posting retrieved successfully", res, jobPosting);
+            }
+            catch (err) {
+                console.log("Failed to get application: ", err);
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
+    getJobApplicationsWithUnmaskedApplicants(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { page = 1, limit = 10 } = req.query;

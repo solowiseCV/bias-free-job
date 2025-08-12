@@ -7,7 +7,6 @@ export class GetJobSeekerService {
       where: { userId },
     });
 
-
     if (!jobSeeker) {
       throw new Error(`Job seeker with userId ${userId} not found`);
     }
@@ -54,7 +53,6 @@ export class GetJobSeekerService {
       where: { id },
     });
 
-
     if (!jobSeeker) {
       throw new Error(`Job seeker with id ${id} not found`);
     }
@@ -94,6 +92,10 @@ export class GetJobSeekerService {
       });
     }
     return jobSeeker;
+  }
+
+  static async getAllJobSeeker() {
+    return await prisma.jobSeeker.findMany();
   }
 
   // static async getJobSeekerByUserId(userId: string) {

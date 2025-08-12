@@ -36,5 +36,16 @@ class GetJobSeekerController {
             }
         });
     }
+    static getAllJobSeeker(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield getJobSeeker_1.GetJobSeekerService.getAllJobSeeker();
+                res.status(200).json(result);
+            }
+            catch (err) {
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
 }
 exports.GetJobSeekerController = GetJobSeekerController;
