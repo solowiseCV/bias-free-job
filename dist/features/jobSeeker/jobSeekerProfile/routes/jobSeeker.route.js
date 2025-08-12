@@ -14,6 +14,7 @@ const multer_1 = require("../../../../middlewares/multer");
 const router = express_1.default.Router();
 router.post("/create/:userId", authMiddleware_1.authMiddleware, multer_1.singleupload, createJobSeeker_1.CreateJobSeekerController.create);
 router.get("/profile/:id", authMiddleware_1.authMiddleware, getJobSeeker_1.GetJobSeekerController.getSeekerById);
+router.get("/", authMiddleware_1.authMiddleware, getJobSeeker_1.GetJobSeekerController.getAllJobSeeker);
 router.get("/user/:userId", authMiddleware_1.authMiddleware, getJobSeeker_1.GetJobSeekerController.getSeekerByUSerId);
 router.patch("/profile/:id", multer_1.singleupload, authMiddleware_1.authMiddleware, updateJobSeeker_1.UpdateJobSeekerController.updateSeeker);
 router.delete("/profile/:id", authMiddleware_1.authMiddleware, deleteJobSeeker_1.DeleteJobSeekerController.deleteSeeker);

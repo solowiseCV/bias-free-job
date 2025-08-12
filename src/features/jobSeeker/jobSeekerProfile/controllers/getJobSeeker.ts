@@ -21,4 +21,13 @@ export class GetJobSeekerController {
       res.status(400).json({ error: err.message });
     }
   }
+
+  static async getAllJobSeeker(req: Request, res: Response) {
+    try {
+      const result = await GetJobSeekerService.getAllJobSeeker();
+      res.status(200).json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  }
 }

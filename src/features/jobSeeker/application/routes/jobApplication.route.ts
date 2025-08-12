@@ -12,9 +12,15 @@ applicationRoutes.post(
 );
 
 applicationRoutes.get(
-  "/job-applications/:id",
+  "/job-applications/masked/:id",
   authMiddleware,
-  controller.getJobApplications
+  controller.getJobApplicationsWithMaskedApplicants
+);
+
+applicationRoutes.get(
+  "/job-applications/unmasked/:id",
+  authMiddleware,
+  controller.getJobApplicationsWithUnmaskedApplicants
 );
 
 applicationRoutes.get(

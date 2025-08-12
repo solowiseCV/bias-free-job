@@ -60,7 +60,35 @@ export class ApplicationController {
   }
 
   // Get job applications
-  async getJobApplications(req: Request, res: Response) {
+  async getJobApplicationsWithMaskedApplicants(req: Request, res: Response) {
+    try {
+      const { page = 1, limit = 10 } = req.query;
+
+      const data: GetJobApplicationsDTO = {
+        jobPostingId: req.params.id,
+        page: typeof page === "string" ? parseInt(page, 10) : Number(page),
+        limit: typeof limit === "string" ? parseInt(limit, 10) : Number(limit),
+      };
+
+      const jobPosting =
+        await jobApplicationService.getMaskedApplicationsByJobPosting(data);
+      if (!jobPosting) {
+        throw new BadRequestError("Job posting not found");
+      }
+      new CustomResponse(
+        200,
+        true,
+        "Job posting retrieved successfully",
+        res,
+        jobPosting
+      );
+    } catch (err: any) {
+      console.log("Failed to get application: ", err);
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  async getJobApplicationsWithUnmaskedApplicants(req: Request, res: Response) {
     try {
       const { page = 1, limit = 10 } = req.query;
 

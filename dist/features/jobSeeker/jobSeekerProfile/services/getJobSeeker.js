@@ -89,5 +89,10 @@ class GetJobSeekerService {
             return jobSeeker;
         });
     }
+    static getAllJobSeeker() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield prisma.jobSeeker.findMany();
+        });
+    }
 }
 exports.GetJobSeekerService = GetJobSeekerService;
