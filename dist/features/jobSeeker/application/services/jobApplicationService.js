@@ -28,6 +28,192 @@ class JobApplicationService {
             });
         });
     }
+    getCompanyJobsPosting(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ userId, companyProfileId, page = 1, limit = 10, }) {
+            var _b, _c;
+            const skip = (page - 1) * limit;
+            const pipeline = [
+                {
+                    $match: {},
+                },
+                {
+                    $lookup: {
+                        from: "CompanyProfile",
+                        localField: "companyProfileId",
+                        foreignField: "_id",
+                        as: "companyProfile",
+                    },
+                },
+                { $unwind: "$companyProfile" },
+                {
+                    $lookup: {
+                        from: "HiringTeam",
+                        localField: "companyProfileId",
+                        foreignField: "companyProfileId",
+                        as: "hiringTeam",
+                    },
+                },
+                { $unwind: "$hiringTeam" },
+                {
+                    $lookup: {
+                        from: "TeamMember",
+                        localField: "hiringTeam._id",
+                        foreignField: "hiringTeamId",
+                        as: "teamMembers",
+                    },
+                },
+                {
+                    $addFields: {
+                        isOwner: { $eq: ["$companyProfile.userId", { $toObjectId: userId }] },
+                        isTeamMember: {
+                            $in: [{ $toObjectId: userId }, "$teamMembers.userId"],
+                        },
+                    },
+                },
+                {
+                    $match: {
+                        $or: [
+                            { "companyProfile.userId": { $eq: { $toObjectId: userId } } },
+                            { isTeamMember: true },
+                            { companyProfileId: { $eq: { $toObjectId: companyProfileId } } },
+                        ],
+                    },
+                },
+                {
+                    $project: {
+                        companyProfile: 0,
+                        hiringTeam: 0,
+                        teamMembers: 0,
+                        isOwner: 0,
+                        isTeamMember: 0,
+                    },
+                },
+                {
+                    $sort: { createdAt: -1 }, // Single sort stage for newest to oldest
+                },
+                {
+                    $facet: {
+                        jobPostings: [{ $skip: skip }, { $limit: limit }],
+                        totalCount: [{ $count: "count" }],
+                    },
+                },
+                {
+                    $project: {
+                        jobPostings: 1,
+                        total: { $ifNull: [{ $arrayElemAt: ["$totalCount.count", 0] }, 0] },
+                    },
+                },
+            ];
+            const results = yield prisma.jobPosting.aggregateRaw({ pipeline });
+            const jobPostings = Array.isArray(results) && ((_b = results[0]) === null || _b === void 0 ? void 0 : _b.jobPostings)
+                ? results[0].jobPostings
+                : [];
+            const total = Array.isArray(results) && ((_c = results[0]) === null || _c === void 0 ? void 0 : _c.total) ? results[0].total : 0;
+            return {
+                jobPostings,
+                total,
+                page,
+                totalPages: Math.ceil(total / limit),
+            };
+        });
+    }
+    getJobPostingsWithApplications(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ userId, companyProfileId, page = 1, limit = 20, }) {
+            var _b, _c;
+            const skip = (page - 1) * limit;
+            const pipeline = [
+                {
+                    $match: {},
+                },
+                {
+                    $lookup: {
+                        from: "CompanyProfile",
+                        localField: "companyProfileId",
+                        foreignField: "_id",
+                        as: "companyProfile",
+                    },
+                },
+                { $unwind: "$companyProfile" },
+                {
+                    $lookup: {
+                        from: "HiringTeam",
+                        localField: "companyProfileId",
+                        foreignField: "companyProfileId",
+                        as: "hiringTeam",
+                    },
+                },
+                { $unwind: "$hiringTeam" },
+                {
+                    $lookup: {
+                        from: "TeamMember",
+                        localField: "hiringTeam._id",
+                        foreignField: "hiringTeamId",
+                        as: "teamMembers",
+                    },
+                },
+                {
+                    $addFields: {
+                        isOwner: { $eq: ["$companyProfile.userId", { $toObjectId: userId }] },
+                        isTeamMember: {
+                            $in: [{ $toObjectId: userId }, "$teamMembers.userId"],
+                        },
+                    },
+                },
+                {
+                    $match: {
+                        $or: [
+                            { "companyProfile.userId": { $eq: { $toObjectId: userId } } },
+                            { isTeamMember: true },
+                            { companyProfileId: { $eq: { $toObjectId: companyProfileId } } },
+                        ],
+                    },
+                },
+                {
+                    $project: {
+                        companyProfile: 0,
+                        hiringTeam: 0,
+                        teamMembers: 0,
+                        isOwner: 0,
+                        isTeamMember: 0,
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "Application",
+                        localField: "_id",
+                        foreignField: "jobPostingId",
+                        as: "applications",
+                    },
+                },
+                {
+                    $sort: { createdAt: -1 },
+                },
+                {
+                    $facet: {
+                        jobPostings: [{ $skip: skip }, { $limit: limit }],
+                        totalCount: [{ $count: "count" }],
+                    },
+                },
+                {
+                    $project: {
+                        jobPostings: 1,
+                        total: { $ifNull: [{ $arrayElemAt: ["$totalCount.count", 0] }, 0] },
+                    },
+                },
+            ];
+            const results = yield prisma.jobPosting.aggregateRaw({ pipeline });
+            const jobPostings = Array.isArray(results) && ((_b = results[0]) === null || _b === void 0 ? void 0 : _b.jobPostings)
+                ? results[0].jobPostings
+                : [];
+            const total = Array.isArray(results) && ((_c = results[0]) === null || _c === void 0 ? void 0 : _c.total) ? results[0].total : 0;
+            return {
+                jobPostings,
+                total,
+                page,
+                totalPages: Math.ceil(total / limit),
+            };
+        });
+    }
     getApplicationsByApplicant(_a) {
         return __awaiter(this, arguments, void 0, function* ({ userId, page = 1, limit = 10, }) {
             const applicantProfile = yield prisma.jobSeeker.findFirst({
@@ -254,139 +440,6 @@ class JobApplicationService {
             };
         });
     }
-    // async getApplicationsByJobPosting({
-    //   jobPostingId,
-    //   page = 1,
-    //   limit = 10,
-    // }: GetJobApplicationsDTO) {
-    //   const skip = (page - 1) * limit;
-    //   const pipeline = [
-    //     {
-    //       $match: { jobPostingId: { $oid: jobPostingId } },
-    //     },
-    //     {
-    //       $sort: { appliedAt: -1 },
-    //     },
-    //     {
-    //       $facet: {
-    //         applications: [
-    //           { $skip: skip },
-    //           { $limit: limit },
-    //           {
-    //             $lookup: {
-    //               from: "JobSeeker", // collection name
-    //               localField: "applicantId",
-    //               foreignField: "_id",
-    //               as: "applicant",
-    //             },
-    //           },
-    //           { $unwind: "$applicant" },
-    //         ],
-    //         totalCount: [{ $count: "count" }],
-    //       },
-    //     },
-    //     {
-    //       $project: {
-    //         applications: 1,
-    //         total: { $ifNull: [{ $arrayElemAt: ["$totalCount.count", 0] }, 0] },
-    //       },
-    //     },
-    //   ];
-    //   const results = await prisma.application.aggregateRaw({ pipeline });
-    //   const applications =
-    //     Array.isArray(results) && results[0]?.applications
-    //       ? results[0].applications
-    //       : [];
-    //   const total =
-    //     Array.isArray(results) && results[0]?.total ? results[0].total : 0;
-    //   return {
-    //     applications,
-    //     total,
-    //     page,
-    //     totalPages: Math.ceil(total / limit),
-    //   };
-    // }
-    // async getMaskedApplicationsByJobPosting({
-    //   jobPostingId,
-    //   page = 1,
-    //   limit = 10,
-    // }: GetJobApplicationsDTO) {
-    //   const take = limit;
-    //   const skip = (page - 1) * take;
-    //   const [applications, total] = await Promise.all([
-    //     prisma.application.findMany({
-    //       where: { jobPostingId },
-    //       skip,
-    //       take,
-    //       orderBy: { appliedAt: "desc" },
-    //       include: {
-    //         applicant: {
-    //           select: {
-    //             bio: true,
-    //             interestedRoles: true,
-    //             experience: {
-    //               select: {
-    //                 location: true,
-    //                 description: true,
-    //               },
-    //             },
-    //             education: {
-    //               select: {
-    //                 degree: true,
-    //                 field: true,
-    //                 grade: true,
-    //                 description: true,
-    //                 startDate: true,
-    //                 endDate: true,
-    //               },
-    //             },
-    //             skills: true,
-    //             workMode: true,
-    //             location: true,
-    //             portfolio: true,
-    //           },
-    //         },
-    //       },
-    //     }),
-    //     prisma.application.count({
-    //       where: { jobPostingId },
-    //     }),
-    //   ]);
-    //   return {
-    //     applications,
-    //     total,
-    //     page,
-    //     totalPages: Math.ceil(total / take),
-    //   };
-    // }
-    // async getApplicationsByJobPosting({
-    //   jobPostingId,
-    //   page = 1,
-    //   limit = 10,
-    // }: GetJobApplicationsDTO) {
-    //   const take = limit;
-    //   const skip = (page - 1) * take;
-    //   const [applications, total] = await Promise.all([
-    //     prisma.application.findMany({
-    //       where: { jobPostingId },
-    //       skip,
-    //       take,
-    //       orderBy: { appliedAt: "desc" },
-    //       include: {
-    //         applicant: true,
-    //       },
-    //     }),
-    //     prisma.application.count({
-    //       where: { jobPostingId },
-    //     }),
-    //   ]);
-    //   return {
-    //     applications,
-    //     total,
-    //     page,
-    //     totalPages: Math.ceil(total / take),
-    //   };
-    // }
     updateApplication(updatData) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, data } = updatData;

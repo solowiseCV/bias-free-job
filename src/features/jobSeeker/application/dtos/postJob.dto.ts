@@ -21,3 +21,10 @@ export interface UpdateApplicationDTO {
     coverLetter: string;
   }>;
 }
+
+export interface GetJobPostingsDTO {
+  userId: string;
+  companyProfileId?: string; // Optional if the user might not own a company
+  page?: number;
+  limit?: number;
+}
