@@ -206,9 +206,9 @@ class JobPostingController {
     }
     getJobPostings(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { page = 1, limit = 10, search, industry, location, status, bestMatches, } = req.query;
+            const { page = 1, limit = 20, search, industry, location, status, bestMatches, } = req.query;
             try {
-                const jobPostings = yield jobPostingService.getJobPostings(req.user.id, parseInt(page), parseInt(limit), search, industry, location, status, bestMatches);
+                const jobPostings = yield jobPostingService.getJobPostings(req.user.userId, parseInt(page), parseInt(limit), search, industry, location, status, bestMatches);
                 new response_util_1.default(200, true, "Job postings retrieved successfully", res, jobPostings);
             }
             catch (err) {
@@ -220,7 +220,6 @@ class JobPostingController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const jobPostings = yield jobPostingService.getJobs();
-                console.log(jobPostings);
                 new response_util_1.default(200, true, "Job postings retrieved successfully", res, jobPostings);
             }
             catch (err) {
@@ -440,7 +439,7 @@ class JobPostingController {
                     currency: req.body.currency,
                     deadline: req.body.deadline ? new Date(req.body.deadline) : undefined,
                 };
-                const jobPosting = yield jobPostingService.saveJobPostingAsDraft(req.user.id, data);
+                const jobPosting = yield jobPostingService.saveJobPostingAsDraft(req.user.userId, data);
                 new response_util_1.default(201, true, "Job draft saved successfully", res, jobPosting);
             }
             catch (err) {
@@ -512,7 +511,7 @@ class JobPostingController {
                     currency: req.body.currency,
                     deadline: req.body.deadline ? new Date(req.body.deadline) : undefined,
                 };
-                const jobPosting = yield jobPostingService.updateJobPostingToDraft(req.user.id, jobId, data);
+                const jobPosting = yield jobPostingService.updateJobPostingToDraft(req.user.userId, jobId, data);
                 new response_util_1.default(200, true, "Job updated to draft successfully", res, jobPosting);
             }
             catch (err) {
@@ -525,7 +524,7 @@ class JobPostingController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { page = 1, limit = 10 } = req.query;
-                const result = yield jobPostingService.getDraftJobPostings(req.user.id, parseInt(page), parseInt(limit));
+                const result = yield jobPostingService.getDraftJobPostings(req.user.userId, parseInt(page), parseInt(limit));
                 new response_util_1.default(200, true, "Draft job postings retrieved successfully", res, result);
             }
             catch (err) {
@@ -537,7 +536,7 @@ class JobPostingController {
     deleteJobPosting(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const jobPosting = yield jobPostingService.deleteJobPosting(req.user.id, req.params.id);
+                const jobPosting = yield jobPostingService.deleteJobPosting(req.user.userId, req.params.id);
                 // res
                 // .status(200)
                 // .json({ message: "Job posting deleted successfully", jobPosting });

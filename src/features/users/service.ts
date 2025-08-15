@@ -1,5 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { GetUserDetailsDTO, UpdateUserRequest, UserResponseDTO, UserListResponseDTO } from "./dto";
+import {
+  GetUserDetailsDTO,
+  UpdateUserRequest,
+  UserResponseDTO,
+  UserListResponseDTO,
+} from "./dto";
 import configureCloudinary from "../../configs/cloudinary";
 import { getDataUri, FileData } from "../../middlewares/multer";
 
@@ -8,7 +13,9 @@ const cloudinary = configureCloudinary();
 
 export class UserService {
   // Get user details by ID
-  static async getUserDetails(userId: string): Promise<GetUserDetailsDTO | null> {
+  static async getUserDetails(
+    userId: string
+  ): Promise<GetUserDetailsDTO | null> {
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -19,6 +26,7 @@ export class UserService {
           lastname: true,
           avatar: true,
           userType: true,
+          phone_number: true,
           createdAt: true,
           updatedAt: true,
           twoFactorEnabled: true,
@@ -32,10 +40,13 @@ export class UserService {
   }
 
   // Get all users with pagination
-  static async getAllUsers(page: number = 1, limit: number = 10): Promise<UserListResponseDTO> {
+  static async getAllUsers(
+    page: number = 1,
+    limit: number = 10
+  ): Promise<UserListResponseDTO> {
     try {
       const skip = (page - 1) * limit;
-      
+
       const [users, total] = await Promise.all([
         prisma.user.findMany({
           skip,
@@ -51,7 +62,7 @@ export class UserService {
             updatedAt: true,
             twoFactorEnabled: true,
           },
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
         }),
         prisma.user.count(),
       ]);
@@ -72,7 +83,11 @@ export class UserService {
   }
 
   // Update user details
-  static async updateUser(userId: string, updateData: UpdateUserRequest, file?: Express.Multer.File): Promise<GetUserDetailsDTO> {
+  static async updateUser(
+    userId: string,
+    updateData: UpdateUserRequest,
+    file?: Express.Multer.File
+  ): Promise<GetUserDetailsDTO> {
     try {
       // Check if user exists
       const existingUser = await prisma.user.findUnique({
@@ -96,7 +111,10 @@ export class UserService {
 
       // Handle avatar upload if file is provided
       if (file) {
-        const fileData = { originalname: file.originalname, buffer: file.buffer };
+        const fileData = {
+          originalname: file.originalname,
+          buffer: file.buffer,
+        };
         const dataUri = getDataUri(fileData);
         const uploadResult = await cloudinary.uploader.upload(dataUri.content, {
           folder: "avatars",
@@ -104,7 +122,10 @@ export class UserService {
         });
 
         // Delete old avatar from Cloudinary if it exists and is a Cloudinary URL
-        if (existingUser.avatar && existingUser.avatar.includes("cloudinary.com")) {
+        if (
+          existingUser.avatar &&
+          existingUser.avatar.includes("cloudinary.com")
+        ) {
           const matches = existingUser.avatar.match(/\/v\d+\/([^\.\/]+)\./);
           if (matches && matches[1]) {
             const publicId = `avatars/${matches[1]}`;
@@ -164,7 +185,9 @@ export class UserService {
   }
 
   // Get user by email
-  static async getUserByEmail(email: string): Promise<GetUserDetailsDTO | null> {
+  static async getUserByEmail(
+    email: string
+  ): Promise<GetUserDetailsDTO | null> {
     try {
       const user = await prisma.user.findUnique({
         where: { email },
@@ -187,6 +210,3 @@ export class UserService {
     }
   }
 }
-
-
-

@@ -32,6 +32,7 @@ class UserService {
                         lastname: true,
                         avatar: true,
                         userType: true,
+                        phone_number: true,
                         createdAt: true,
                         updatedAt: true,
                         twoFactorEnabled: true,
@@ -64,7 +65,7 @@ class UserService {
                             updatedAt: true,
                             twoFactorEnabled: true,
                         },
-                        orderBy: { createdAt: 'desc' },
+                        orderBy: { createdAt: "desc" },
                     }),
                     prisma.user.count(),
                 ]);
@@ -106,14 +107,18 @@ class UserService {
                 }
                 // Handle avatar upload if file is provided
                 if (file) {
-                    const fileData = { originalname: file.originalname, buffer: file.buffer };
+                    const fileData = {
+                        originalname: file.originalname,
+                        buffer: file.buffer,
+                    };
                     const dataUri = (0, multer_1.getDataUri)(fileData);
                     const uploadResult = yield cloudinary.uploader.upload(dataUri.content, {
                         folder: "avatars",
                         resource_type: "image",
                     });
                     // Delete old avatar from Cloudinary if it exists and is a Cloudinary URL
-                    if (existingUser.avatar && existingUser.avatar.includes("cloudinary.com")) {
+                    if (existingUser.avatar &&
+                        existingUser.avatar.includes("cloudinary.com")) {
                         const matches = existingUser.avatar.match(/\/v\d+\/([^\.\/]+)\./);
                         if (matches && matches[1]) {
                             const publicId = `avatars/${matches[1]}`;

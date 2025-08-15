@@ -51,3 +51,15 @@ export interface JobSeekerDto {
 
   interests?: string[];
 }
+
+export interface Filters {
+  role?: string | string[];
+  skill?: string | string[];
+  experienceLevel?: string;
+  workMode?: string;
+  jobType?: string;
+  industry?: string;
+  hasDisability?: "true" | "false" | boolean | undefined;
+  page: number;
+  pageSize: number;
+}

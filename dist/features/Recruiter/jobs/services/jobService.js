@@ -133,7 +133,6 @@ class JobPostingService {
     }
     getJobPostings(userId, page, limit, search, industry, location, status, bestMatches) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Verify the user has a valid company profile
             const companyProfile = yield prisma.companyProfile.findFirst({
                 where: { userId },
                 include: { jobPostings: true },
@@ -148,7 +147,6 @@ class JobPostingService {
             const whereClause = {
                 companyProfileId: companyProfile.id,
             };
-            // Apply filters
             if (search) {
                 whereClause.jobTitle = { contains: search, mode: "insensitive" };
             }

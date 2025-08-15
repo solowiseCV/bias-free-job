@@ -26,7 +26,8 @@ class QueryJobSeekerController {
     static searchTalent(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield queryJobSeeker_1.SearchJobSeekerService.searchTalent(req.query);
+                const filters = Object.assign(Object.assign({}, req.query), { page: Number(req.query.page) || 1, pageSize: Number(req.query.pageSize) || 20 });
+                const result = yield queryJobSeeker_1.SearchJobSeekerService.searchTalent(filters);
                 res.status(200).json(result);
             }
             catch (err) {

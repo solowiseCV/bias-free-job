@@ -35,8 +35,13 @@ class SearchJobSeekerService {
         });
     }
     static searchTalent() {
-        return __awaiter(this, arguments, void 0, function* (filters = {}, page = 1, pageSize = 20) {
+        return __awaiter(this, arguments, void 0, function* (filters = {
+            page: 1,
+            pageSize: 20,
+        }) {
             var _a, _b, _c;
+            const page = filters.page || 1;
+            const pageSize = filters.pageSize || 20;
             const normalize = (v) => {
                 if (v === undefined || v === null)
                     return null;
