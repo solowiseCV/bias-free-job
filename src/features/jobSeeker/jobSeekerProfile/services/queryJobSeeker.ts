@@ -1,15 +1,7 @@
+import { Filters } from "../dtos/jobSeekerDto";
+
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
-type Filters = {
-  role?: string | string[]; // interestedRoles
-  skill?: string | string[]; // skills
-  experienceLevel?: string;
-  workMode?: string;
-  jobType?: string;
-  industry?: string;
-  hasDisability?: "true" | "false" | boolean | undefined;
-};
 
 export class SearchJobSeekerService {
   static async searchJobSeekers(filters: any) {
@@ -49,7 +41,14 @@ export class SearchJobSeekerService {
     });
   }
 
-  static async searchTalent(filters: Filters = {}, page = 1, pageSize = 20) {
+  static async searchTalent(
+    filters: Filters = {
+      page: 1,
+      pageSize: 20,
+    }
+  ) {
+    const page = filters.page || 1;
+    const pageSize = filters.pageSize || 20;
     const normalize = (v: any) => {
       if (v === undefined || v === null) return null;
       if (Array.isArray(v))

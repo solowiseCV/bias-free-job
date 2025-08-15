@@ -150,7 +150,6 @@ export class JobPostingService {
     status?: string,
     bestMatches?: string
   ) {
-    // Verify the user has a valid company profile
     const companyProfile = await prisma.companyProfile.findFirst({
       where: { userId },
       include: { jobPostings: true },
@@ -167,7 +166,6 @@ export class JobPostingService {
       companyProfileId: companyProfile.id,
     };
 
-    // Apply filters
     if (search) {
       whereClause.jobTitle = { contains: search, mode: "insensitive" };
     }

@@ -6,7 +6,7 @@ const authMiddleware_1 = require("../../../../middlewares/authMiddleware");
 const applicationRoutes = (0, express_1.Router)();
 const controller = new applicationController_1.ApplicationController();
 applicationRoutes.post("/apply/:jobPostingId", authMiddleware_1.authMiddleware, controller.createAplication);
-applicationRoutes.get("/job-applications/masked/:id", authMiddleware_1.authMiddleware, controller.getJobApplicationsWithMaskedApplicants);
+applicationRoutes.get("/job-applications/:id", authMiddleware_1.authMiddleware, controller.getJobApplicationsWithMaskedApplicants);
 applicationRoutes.get("/job-applications/unmasked/:id", authMiddleware_1.authMiddleware, controller.getJobApplicationsWithUnmaskedApplicants);
 applicationRoutes.get("/user-applications/", authMiddleware_1.authMiddleware, controller.getUserApplications);
 applicationRoutes.patch("/update/:id", authMiddleware_1.authMiddleware, controller.updateApplication);

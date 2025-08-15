@@ -226,7 +226,7 @@ export class JobPostingController {
   async getJobPostings(req: Request, res: Response) {
     const {
       page = 1,
-      limit = 10,
+      limit = 20,
       search,
       industry,
       location,
@@ -236,7 +236,7 @@ export class JobPostingController {
 
     try {
       const jobPostings = await jobPostingService.getJobPostings(
-        req.user.id,
+        req.user.userId,
         parseInt(page as string),
         parseInt(limit as string),
         search as string,
@@ -260,7 +260,7 @@ export class JobPostingController {
   async getAllJobs(req: Request, res: Response) {
     try {
       const jobPostings = await jobPostingService.getJobs();
-      console.log(jobPostings);
+
       new CustomResponse(
         200,
         true,
@@ -519,7 +519,7 @@ export class JobPostingController {
       };
 
       const jobPosting = await jobPostingService.saveJobPostingAsDraft(
-        req.user.id,
+        req.user.userId,
         data
       );
 
@@ -608,7 +608,7 @@ export class JobPostingController {
       };
 
       const jobPosting = await jobPostingService.updateJobPostingToDraft(
-        req.user.id,
+        req.user.userId,
         jobId,
         data
       );
@@ -631,7 +631,7 @@ export class JobPostingController {
       const { page = 1, limit = 10 } = req.query;
 
       const result = await jobPostingService.getDraftJobPostings(
-        req.user.id,
+        req.user.userId,
         parseInt(page as string),
         parseInt(limit as string)
       );
@@ -652,7 +652,7 @@ export class JobPostingController {
   async deleteJobPosting(req: Request, res: Response) {
     try {
       const jobPosting = await jobPostingService.deleteJobPosting(
-        req.user.id,
+        req.user.userId,
         req.params.id
       );
       // res

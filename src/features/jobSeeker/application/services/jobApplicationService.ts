@@ -164,13 +164,85 @@ export class JobApplicationService {
             { $limit: limit },
             {
               $lookup: {
-                from: "JobSeeker", // collection name
+                from: "JobSeeker",
                 localField: "applicantId",
                 foreignField: "_id",
                 as: "applicant",
               },
             },
             { $unwind: "$applicant" },
+            {
+              $lookup: {
+                from: "Interview",
+                let: { appId: "$applicantId", jobId: "$jobPostingId" },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: {
+                        $and: [
+                          { $eq: ["$applicantId", "$$appId"] },
+                          { $eq: ["$jobPostingId", "$$jobId"] },
+                        ],
+                      },
+                    },
+                  },
+                ],
+                as: "interviews",
+              },
+            },
+            {
+              $addFields: {
+                hasInterview: { $gt: [{ $size: "$interviews" }, 0] },
+              },
+            },
+            {
+              $set: {
+                applicant: {
+                  $cond: {
+                    if: "$hasInterview",
+                    then: "$applicant",
+                    else: {
+                      bio: "$applicant.bio",
+                      interestedRoles: "$applicant.interestedRoles",
+                      experience: {
+                        $map: {
+                          input: "$applicant.experience",
+                          as: "exp",
+                          in: {
+                            location: "$$exp.location",
+                            description: "$$exp.description",
+                          },
+                        },
+                      },
+                      education: {
+                        $map: {
+                          input: "$applicant.education",
+                          as: "edu",
+                          in: {
+                            degree: "$$edu.degree",
+                            field: "$$edu.field",
+                            grade: "$$edu.grade",
+                            description: "$$edu.description",
+                            startDate: "$$edu.startDate",
+                            endDate: "$$edu.endDate",
+                          },
+                        },
+                      },
+                      skills: "$applicant.skills",
+                      workMode: "$applicant.workMode",
+                      location: "$applicant.location",
+                      portfolio: "$applicant.portfolio",
+                    },
+                  },
+                },
+              },
+            },
+            {
+              $project: {
+                interviews: 0,
+                hasInterview: 0,
+              },
+            },
           ],
           totalCount: [{ $count: "count" }],
         },
@@ -200,6 +272,64 @@ export class JobApplicationService {
       totalPages: Math.ceil(total / limit),
     };
   }
+
+  // async getApplicationsByJobPosting({
+  //   jobPostingId,
+  //   page = 1,
+  //   limit = 10,
+  // }: GetJobApplicationsDTO) {
+  //   const skip = (page - 1) * limit;
+
+  //   const pipeline = [
+  //     {
+  //       $match: { jobPostingId: { $oid: jobPostingId } },
+  //     },
+  //     {
+  //       $sort: { appliedAt: -1 },
+  //     },
+  //     {
+  //       $facet: {
+  //         applications: [
+  //           { $skip: skip },
+  //           { $limit: limit },
+  //           {
+  //             $lookup: {
+  //               from: "JobSeeker", // collection name
+  //               localField: "applicantId",
+  //               foreignField: "_id",
+  //               as: "applicant",
+  //             },
+  //           },
+  //           { $unwind: "$applicant" },
+  //         ],
+  //         totalCount: [{ $count: "count" }],
+  //       },
+  //     },
+  //     {
+  //       $project: {
+  //         applications: 1,
+  //         total: { $ifNull: [{ $arrayElemAt: ["$totalCount.count", 0] }, 0] },
+  //       },
+  //     },
+  //   ];
+
+  //   const results = await prisma.application.aggregateRaw({ pipeline });
+
+  //   const applications =
+  //     Array.isArray(results) && results[0]?.applications
+  //       ? results[0].applications
+  //       : [];
+
+  //   const total =
+  //     Array.isArray(results) && results[0]?.total ? results[0].total : 0;
+
+  //   return {
+  //     applications,
+  //     total,
+  //     page,
+  //     totalPages: Math.ceil(total / limit),
+  //   };
+  // }
 
   // async getMaskedApplicationsByJobPosting({
   //   jobPostingId,
