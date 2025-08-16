@@ -48,4 +48,14 @@ router.get("/search", QueryJobSeekerController.querySeeker);
 
 router.get("/talents", QueryJobSeekerController.searchTalent);
 
+router.post("/filter", authMiddleware, QueryJobSeekerController.saveFilter);
+
+router.get("/filter/:id", authMiddleware, QueryJobSeekerController.getFilter);
+
+router.patch(
+  "/filter/:id",
+  authMiddleware,
+  QueryJobSeekerController.updateFilter
+);
+
 export default router;

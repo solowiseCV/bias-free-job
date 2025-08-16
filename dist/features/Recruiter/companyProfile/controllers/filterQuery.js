@@ -9,37 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryJobSeekerController = void 0;
-const queryJobSeeker_1 = require("../services/queryJobSeeker");
-class QueryJobSeekerController {
-    static querySeeker(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const result = yield queryJobSeeker_1.SearchJobSeekerService.searchJobSeekers(req.query);
-                res.status(200).json(result);
-            }
-            catch (err) {
-                res.status(400).json({ error: err.message });
-            }
-        });
-    }
-    static searchTalent(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const filters = Object.assign(Object.assign({}, req.query), { page: Number(req.query.page) || 1, pageSize: Number(req.query.pageSize) || 20 });
-                const result = yield queryJobSeeker_1.SearchJobSeekerService.searchTalent(filters);
-                res.status(200).json(result);
-            }
-            catch (err) {
-                res.status(400).json({ error: err.message });
-            }
-        });
-    }
-    static getFilter(req, res) {
+exports.CompanyFilterController = void 0;
+const companyProfile_1 = require("../services/companyProfile");
+const filterService_1 = require("../services/filterService");
+const companyTeamService = new companyProfile_1.CompanyTeamService();
+class CompanyFilterController {
+    getFilter(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const result = yield queryJobSeeker_1.SearchJobSeekerService.getFilter(id);
+                const result = yield filterService_1.FilterService.getFilter(id);
                 res.status(200).json(result);
             }
             catch (err) {
@@ -47,12 +26,12 @@ class QueryJobSeekerController {
             }
         });
     }
-    static saveFilter(req, res) {
+    saveFilter(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const filters = req.body;
                 const userId = req.user.userId;
-                const result = yield queryJobSeeker_1.SearchJobSeekerService.saveFilter(filters, userId);
+                const result = yield filterService_1.FilterService.saveFilter(filters, userId);
                 res.status(200).json(result);
             }
             catch (err) {
@@ -60,12 +39,12 @@ class QueryJobSeekerController {
             }
         });
     }
-    static updateFilter(req, res) {
+    updateFilter(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
                 const filters = Object.assign(Object.assign({}, req.query), { page: Number(req.query.page) || 1, pageSize: Number(req.query.pageSize) || 20 });
-                const result = yield queryJobSeeker_1.SearchJobSeekerService.updateFilter(id, filters);
+                const result = yield filterService_1.FilterService.updateFilter(id, filters);
                 res.status(200).json(result);
             }
             catch (err) {
@@ -74,4 +53,4 @@ class QueryJobSeekerController {
         });
     }
 }
-exports.QueryJobSeekerController = QueryJobSeekerController;
+exports.CompanyFilterController = CompanyFilterController;

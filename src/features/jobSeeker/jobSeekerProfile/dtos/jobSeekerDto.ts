@@ -62,4 +62,33 @@ export interface Filters {
   hasDisability?: "true" | "false" | boolean | undefined;
   page: number;
   pageSize: number;
+  salaryRange?: SalaryRange[];
+}
+
+export interface SalaryRange {
+  min: number;
+  max: number;
+  currency: string;
+}
+
+export type WorkLocation = "office" | "hybrid" | "remote";
+
+export type EmploymentType =
+  | "full_time"
+  | "part_time"
+  | "contract"
+  | "internship";
+
+export type ExperienceLevel = "entry_level" | "mid_level" | "senior_level";
+
+export interface FilterDTO {
+  industry?: string[];
+  companyProfileId?: string;
+  role?: string[];
+  jobType?: EmploymentType[];
+  experienceLevel?: ExperienceLevel[];
+  skill?: string[];
+  workMode?: WorkLocation[];
+  salaryRange?: SalaryRange[];
+  hasDisability?: boolean;
 }
