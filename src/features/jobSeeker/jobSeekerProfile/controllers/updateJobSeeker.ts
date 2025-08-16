@@ -9,9 +9,7 @@ const cloudinary = configureCloudinary();
 export class UpdateJobSeekerController {
   static async updateSeeker(req: Request, res: Response) {
     try {
-      console.log("1");
       const profileId = req.params.id;
-      await UpdateJobSeekerService.updateTable();
       const data: JobSeekerDto = req.body;
 
       if (req.file) {

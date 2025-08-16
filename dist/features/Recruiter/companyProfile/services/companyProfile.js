@@ -149,7 +149,8 @@ class CompanyTeamService {
                         };
                     }
                     const filteredTeamMember = teamMembers.find((tm) => { var _a, _b; return ((_b = (_a = tm.hiringTeam) === null || _a === void 0 ? void 0 : _a.companyProfile) === null || _b === void 0 ? void 0 : _b.companyName) === companyName; });
-                    if (!filteredTeamMember || !((_a = filteredTeamMember.hiringTeam) === null || _a === void 0 ? void 0 : _a.companyProfile)) {
+                    if (!filteredTeamMember ||
+                        !((_a = filteredTeamMember.hiringTeam) === null || _a === void 0 ? void 0 : _a.companyProfile)) {
                         throw new Error("Selected company not found.");
                     }
                     const companyProfile = filteredTeamMember.hiringTeam.companyProfile;

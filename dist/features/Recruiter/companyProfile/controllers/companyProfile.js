@@ -33,14 +33,14 @@ class CompanyTeamController {
             catch (error) {
                 console.log(error);
                 if (error instanceof Error) {
-                    if (error.message.includes('already exists')) {
+                    if (error.message.includes("already exists")) {
                         new response_util_1.default(409, false, "Company profile already exists", res);
                         return;
                     }
                     new response_util_1.default(500, false, "An unexpected server error occurred", res);
                     return;
                 }
-                res.status(500).json({ error: 'An unexpected server error occurred.' });
+                res.status(500).json({ error: "An unexpected server error occurred." });
                 return;
             }
         });
@@ -53,7 +53,7 @@ class CompanyTeamController {
                 return;
             }
             catch (error) {
-                console.error('Error in getCompanyTeam:', error);
+                console.error("Error in getCompanyTeam:", error);
                 if (error instanceof Error) {
                     new response_util_1.default(404, false, "Company profile not found", res, error.message);
                     return;
@@ -71,7 +71,7 @@ class CompanyTeamController {
                 return;
             }
             catch (error) {
-                console.error('Error in getAllCompanies:', error);
+                console.error("Error in getAllCompanies:", error);
                 if (error instanceof Error) {
                     new response_util_1.default(500, false, "Failed to retrieve companies", res, error.message);
                     return;
@@ -95,7 +95,7 @@ class CompanyTeamController {
                 return;
             }
             catch (error) {
-                console.error('Error in updateCompanyTeam:', error);
+                console.error("Error in updateCompanyTeam:", error);
                 if (error instanceof Error) {
                     new response_util_1.default(404, false, "Company profile not found", res, error.message);
                     return;
@@ -113,7 +113,7 @@ class CompanyTeamController {
                 return;
             }
             catch (error) {
-                console.error('Error in deleteCompanyTeam:', error);
+                console.error("Error in deleteCompanyTeam:", error);
                 if (error instanceof Error) {
                     new response_util_1.default(404, false, "Company profile not found", res, error.message);
                     return;
