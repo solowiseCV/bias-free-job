@@ -17,8 +17,11 @@ class InterviewService {
         return __awaiter(this, void 0, void 0, function* () {
             if (!interview)
                 throw new Error("Interview not found or unauthorized access");
-            const companyProfile = yield prisma.companyProfile.findFirst({ where: { userId } });
-            if (!companyProfile || interview.jobPosting.companyProfileId !== companyProfile.id) {
+            const companyProfile = yield prisma.companyProfile.findFirst({
+                where: { userId },
+            });
+            if (!companyProfile ||
+                interview.jobPosting.companyProfileId !== companyProfile.id) {
                 throw new Error("Unauthorized access to this interview");
             }
         });
@@ -27,7 +30,9 @@ class InterviewService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.authorizeInterview(userId);
-                const jobPosting = yield prisma.jobPosting.findUnique({ where: { id: data.jobPostingId } });
+                const jobPosting = yield prisma.jobPosting.findUnique({
+                    where: { id: data.jobPostingId },
+                });
                 if (!jobPosting)
                     throw new Error("Invalid job posting");
                 const interview = yield prisma.interview.create({
@@ -40,7 +45,7 @@ class InterviewService {
                         location: data.location,
                         interviewType: data.interviewType,
                         duration: data.duration,
-                        userId: data.userId,
+                        userId,
                     },
                 });
                 return {
@@ -72,7 +77,9 @@ class InterviewService {
     getInterviews(userId, jobPostingId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const companyProfile = yield prisma.companyProfile.findFirst({ where: { userId } });
+                const companyProfile = yield prisma.companyProfile.findFirst({
+                    where: { userId },
+                });
                 if (!companyProfile)
                     return { interviews: [], total: 0 };
                 const whereClause = {
@@ -84,11 +91,11 @@ class InterviewService {
                     prisma.interview.findMany({
                         where: whereClause,
                         orderBy: { dateTime: "asc" },
-                        include: { jobPosting: true },
+                        include: { jobPosting: true, applicant: true },
                     }),
                     prisma.interview.count({ where: whereClause }),
                 ]);
-                yield Promise.all(interviews.map(interview => this.authorizeInterview(userId, interview)));
+                yield Promise.all(interviews.map((interview) => this.authorizeInterview(userId, interview)));
                 return {
                     interviews: interviews.map((interview) => ({
                         id: interview.id,
@@ -115,7 +122,10 @@ class InterviewService {
     updateInterview(userId, id, data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const interview = yield prisma.interview.findUnique({ where: { id }, include: { jobPosting: true } });
+                const interview = yield prisma.interview.findUnique({
+                    where: { id },
+                    include: { jobPosting: true },
+                });
                 yield this.authorizeInterview(userId, interview);
                 const updatedInterview = yield prisma.interview.update({
                     where: { id },
@@ -157,7 +167,10 @@ class InterviewService {
     deleteInterview(userId, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const interview = yield prisma.interview.findUnique({ where: { id }, include: { jobPosting: true } });
+                const interview = yield prisma.interview.findUnique({
+                    where: { id },
+                    include: { jobPosting: true },
+                });
                 yield this.authorizeInterview(userId, interview);
                 yield prisma.interview.delete({ where: { id } });
                 return { message: "Interview deleted successfully" };

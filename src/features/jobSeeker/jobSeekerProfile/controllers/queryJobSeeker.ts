@@ -17,7 +17,7 @@ export class QueryJobSeekerController {
       const filters: Filters = {
         ...req.query,
         page: Number(req.query.page) || 1,
-        pageSize: Number(req.query.pageSize) || 20,
+        pageSize: Number(req.query.limit) || 20,
       };
       const result = await SearchJobSeekerService.searchTalent(filters);
       res.status(200).json(result);
