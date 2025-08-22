@@ -319,9 +319,8 @@ class SearchJobSeekerService {
                 });
                 return {
                     page: Math.max(1, page),
-                    pageSize,
+                    limit: pageSize,
                     total: transformedOther.length,
-                    totalPages: 1,
                     other: transformedOther,
                 };
             }

@@ -10,7 +10,7 @@ const controller = new jobController_1.JobPostingController();
 const jobSeekerController = new fetchJobs_1.JobSeekerController();
 jobsRoutes.post("/postJob", authMiddleware_1.authMiddleware, multer_1.singleupload, controller.createJobPosting);
 jobsRoutes.post("/saveDraft", authMiddleware_1.authMiddleware, multer_1.singleupload, controller.saveJobPostingAsDraft);
-jobsRoutes.get("/alljobs", controller.getJobPostings);
+jobsRoutes.get("/alljobs", authMiddleware_1.authMiddleware, controller.getJobPostings);
 jobsRoutes.get("/drafts", authMiddleware_1.authMiddleware, controller.getDraftJobPostings);
 jobsRoutes.get("/getalljobs", controller.getAllJobs);
 jobsRoutes.get("/job/:id", authMiddleware_1.authMiddleware, controller.getJobPostingById);

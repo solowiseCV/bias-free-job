@@ -20,7 +20,7 @@ jobsRoutes.post(
   singleupload,
   controller.saveJobPostingAsDraft
 );
-jobsRoutes.get("/alljobs", controller.getJobPostings);
+jobsRoutes.get("/alljobs", authMiddleware, controller.getJobPostings);
 jobsRoutes.get("/drafts", authMiddleware, controller.getDraftJobPostings);
 jobsRoutes.get("/getalljobs", controller.getAllJobs);
 jobsRoutes.get("/job/:id", authMiddleware, controller.getJobPostingById);
