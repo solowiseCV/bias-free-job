@@ -23,7 +23,9 @@ class InterviewController {
             }
             try {
                 const result = yield interviewService.createInterview(req.user.userId, req.body);
-                res.status(201).json(Object.assign({ message: "Interview created successfully" }, result));
+                res
+                    .status(201)
+                    .json(Object.assign({ message: "Interview created successfully" }, result));
             }
             catch (error) {
                 console.error("Error in createInterview:", error);
@@ -32,7 +34,9 @@ class InterviewController {
                         res.status(409).json({ error: error.message });
                         return;
                     }
-                    res.status(500).json({ error: "An unexpected error occurred. Please try again later." });
+                    res.status(500).json({
+                        error: "An unexpected error occurred. Please try again later.",
+                    });
                     return;
                 }
                 res.status(500).json({ error: "An unexpected server error occurred." });
@@ -42,7 +46,7 @@ class InterviewController {
     }
     getInterviews(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { jobPostingId } = req.query;
+            const jobPostingId = req.params.id;
             try {
                 const result = yield interviewService.getInterviews(req.user.userId, jobPostingId);
                 res.status(200).json(result);
@@ -67,7 +71,9 @@ class InterviewController {
             }
             try {
                 const result = yield interviewService.updateInterview(req.user.userId, req.params.id, req.body);
-                res.status(200).json(Object.assign({ message: "Interview updated successfully" }, result));
+                res
+                    .status(200)
+                    .json(Object.assign({ message: "Interview updated successfully" }, result));
             }
             catch (error) {
                 console.error("Error in updateInterview:", error);

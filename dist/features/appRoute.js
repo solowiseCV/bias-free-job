@@ -12,6 +12,7 @@ const jobSeeker_route_1 = __importDefault(require("./jobSeeker/jobSeekerProfile/
 const jobApplication_route_1 = __importDefault(require("./jobSeeker/application/routes/jobApplication.route"));
 const twoFactorAuth_route_1 = __importDefault(require("./authentication/routes/twoFactorAuth.route"));
 const routes_1 = __importDefault(require("./users/routes"));
+const interview_route_1 = __importDefault(require("./Recruiter/interview/routes/interview.route"));
 appRouter.use("/auth", auth_route_1.default);
 appRouter.use("/2FaAuth", twoFactorAuth_route_1.default);
 appRouter.use("/job-seeker", jobSeeker_route_1.default);
@@ -20,4 +21,5 @@ appRouter.use("/jobs", job_route_1.default);
 appRouter.use("/application", jobApplication_route_1.default);
 appRouter.use("/settings", jobApplication_route_1.default);
 appRouter.use("/users", routes_1.default);
+appRouter.use("/interview", interview_route_1.default);
 exports.default = appRouter;

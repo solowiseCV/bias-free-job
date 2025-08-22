@@ -279,8 +279,11 @@ model NotificationSetting {
 
 type ExperienceEntry {
   title            String
+  skill            String?
   company          String
   location         String?
+  workMode         WorkLocation?
+  employmentType   EmploymentType?    
   startDate        DateTime
   endDate          DateTime?
   currentlyWorking Boolean   @default(false)

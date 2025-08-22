@@ -7,9 +7,15 @@ exports.updateInterviewSchema = exports.interviewSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.interviewSchema = joi_1.default.object({
     jobPostingId: joi_1.default.string().required(),
-    candidateEmail: joi_1.default.string().email().required(),
-    scheduledTime: joi_1.default.date().required(),
-    status: joi_1.default.string().valid("scheduled", "completed", "cancelled").optional(),
+    applicantId: joi_1.default.string().required(),
+    companyProfileId: joi_1.default.string().optional(),
+    location: joi_1.default.string().required().optional(),
+    interviewType: joi_1.default.string().required().optional(),
+    duration: joi_1.default.string().required().optional(),
+    dateTime: joi_1.default.date().optional(),
+    status: joi_1.default.string()
+        .valid("pending", "reviewed", "accepted", "rejected", "interviewed", "hired")
+        .optional(),
     notes: joi_1.default.string().optional().allow(null),
 });
 exports.updateInterviewSchema = exports.interviewSchema.fork(Object.keys(exports.interviewSchema.describe().keys), (schema) => schema.optional());
