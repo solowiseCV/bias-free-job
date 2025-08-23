@@ -24,6 +24,7 @@ class CountryService {
         return __awaiter(this, void 0, void 0, function* () {
             return yield prisma.country.findMany({
                 select: {
+                    id: true,
                     country: true,
                     flag: true,
                 },

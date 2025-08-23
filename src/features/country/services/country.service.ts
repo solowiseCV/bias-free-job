@@ -13,6 +13,7 @@ export class CountryService {
   async getCountryList() {
     return await prisma.country.findMany({
       select: {
+        id: true,
         country: true,
         flag: true,
       },
