@@ -341,3 +341,14 @@ type SalaryRange {
   max      Int
   currency String
 }
+
+model Country {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  country       String?
+  capital       String?
+  abbreviation  String?
+  flag          String?
+  currency      String?
+
+  @@map("countries")
+}

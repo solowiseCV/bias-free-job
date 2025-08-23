@@ -9,6 +9,7 @@ import applicationRoutes from "./jobSeeker/application/routes/jobApplication.rou
 import twofaRoutes from "./authentication/routes/twoFactorAuth.route";
 import userRoutes from "./users/routes";
 import interviewRoutes from "./Recruiter/interview/routes/interview.route";
+import countryRoutes from "./country/routes/country.route";
 
 appRouter.use("/auth", authRoutes);
 appRouter.use("/2FaAuth", twofaRoutes);
@@ -19,5 +20,6 @@ appRouter.use("/application", applicationRoutes);
 appRouter.use("/settings", applicationRoutes);
 appRouter.use("/users", userRoutes);
 appRouter.use("/interview", interviewRoutes);
+appRouter.use("/country", countryRoutes);
 
 export default appRouter;
