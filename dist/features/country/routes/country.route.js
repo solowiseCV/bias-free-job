@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const authMiddleware_1 = require("../../../middlewares/authMiddleware");
+const country_1 = require("../controllers/country");
+const countryRoutes = (0, express_1.Router)();
+const country = new country_1.CountryController();
+countryRoutes.post("/", authMiddleware_1.authMiddleware, country.createCountry);
+countryRoutes.get("/", authMiddleware_1.authMiddleware, country.getCountryList);
+countryRoutes.patch("/:id", authMiddleware_1.authMiddleware, country.updateCounrtyList);
+countryRoutes.delete("/:id", authMiddleware_1.authMiddleware, country.deleteCountry);
+exports.default = countryRoutes;

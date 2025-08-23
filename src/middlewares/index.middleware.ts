@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import errorHandler from "./errors.middleware";
 import indexRoutes from "../features/appRoute";
 import { applyIndexes } from "../utils/schema_indexing";
+import { seedCountry } from "../utils/countryseed";
 
 export default (app: Application) => {
   // Logging middleware
