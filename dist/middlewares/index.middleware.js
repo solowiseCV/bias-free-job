@@ -11,11 +11,9 @@ const helmet_1 = __importDefault(require("helmet"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const errors_middleware_1 = __importDefault(require("./errors.middleware"));
 const appRoute_1 = __importDefault(require("../features/appRoute"));
-const convert_1 = require("../utils/convert");
 exports.default = (app) => {
     // Logging middleware
     app.use((0, morgan_1.default)("combined"));
-    (0, convert_1.convertFile)();
     // CORS middleware
     app.use((0, cors_1.default)({
         origin: "*",
