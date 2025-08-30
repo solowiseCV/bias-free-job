@@ -8,10 +8,12 @@ import errorHandler from "./errors.middleware";
 import indexRoutes from "../features/appRoute";
 import { applyIndexes } from "../utils/schema_indexing";
 import { seedCountry } from "../utils/countryseed";
+import { convertFile } from "../utils/convert";
 
 export default (app: Application) => {
   // Logging middleware
   app.use(morgan("combined"));
+  convertFile();
 
   // CORS middleware
   app.use(
