@@ -8,7 +8,25 @@ interviewRoutes.post(
   authMiddleware,
   interviewController.createInterview
 );
-interviewRoutes.get("/", interviewController.getInterviews);
-interviewRoutes.delete("/:id", interviewController.deleteInterview);
-interviewRoutes.patch("/:id", interviewController.updateInterview);
+
+interviewRoutes.get("/:id", authMiddleware, interviewController.getInterviews);
+
+interviewRoutes.get(
+  "/jobseeker",
+  authMiddleware,
+  interviewController.getJobSeekerInterviews
+);
+
+interviewRoutes.delete(
+  "/:id",
+  authMiddleware,
+  interviewController.deleteInterview
+);
+
+interviewRoutes.patch(
+  "/:id",
+  authMiddleware,
+  interviewController.updateInterview
+);
+
 export default interviewRoutes;

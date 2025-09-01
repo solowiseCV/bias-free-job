@@ -137,6 +137,45 @@ export class InterviewService {
     }
   }
 
+  async getJobSeekerInterviews(
+    applicantId: string
+  ): Promise<{ interviews: InterviewResponse[]; total: number }> {
+    try {
+      const [interviews, total] = await prisma.$transaction([
+        prisma.interview.findMany({
+          where: { applicantId },
+          orderBy: { dateTime: "asc" },
+          include: { jobPosting: true, applicant: true },
+        }),
+        prisma.interview.count({ where: { applicantId } }),
+      ]);
+
+      return {
+        interviews: interviews.map((interview) => ({
+          id: interview.id,
+          jobPostingId: interview.jobPostingId,
+          applicantId: interview.applicantId,
+          dateTime: interview.dateTime,
+          status: interview.status,
+          notes: interview.notes,
+          location: interview.location,
+          interviewType: interview.interviewType,
+          duration: interview.duration,
+          userId: interview.userId,
+          createdAt: interview.createdAt,
+          updatedAt: interview.updatedAt,
+        })),
+        total,
+      };
+    } catch (error) {
+      throw new Error(
+        `Failed to fetch interviews: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
+
   async updateInterview(
     userId: string,
     id: string,
