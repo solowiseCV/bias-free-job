@@ -137,6 +137,10 @@ export class InterviewService {
     }
   }
 
+  async getAllInterviews() {
+    return await prisma.interview.findMany({});
+  }
+
   async getJobSeekerInterviews(
     applicantId: string
   ): Promise<{ interviews: InterviewResponse[]; total: number }> {

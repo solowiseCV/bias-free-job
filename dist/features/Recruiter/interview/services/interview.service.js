@@ -119,6 +119,11 @@ class InterviewService {
             }
         });
     }
+    getAllInterviews() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield prisma.interview.findMany({});
+        });
+    }
     getJobSeekerInterviews(applicantId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
