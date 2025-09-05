@@ -366,10 +366,10 @@ class SearchJobSeekerService {
             };
         });
     }
-    static getFilter(id) {
+    static getFilter(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma.filter.findUnique({
-                where: { id },
+            return yield prisma.filter.findFirst({
+                where: { userId },
             });
         });
     }

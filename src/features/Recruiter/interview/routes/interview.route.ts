@@ -11,6 +11,8 @@ interviewRoutes.post(
 
 interviewRoutes.get("/:id", authMiddleware, interviewController.getInterviews);
 
+interviewRoutes.get("/", interviewController.getAllInterview);
+
 interviewRoutes.get(
   "/jobseeker",
   authMiddleware,

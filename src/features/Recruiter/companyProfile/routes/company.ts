@@ -9,6 +9,12 @@ const filter = new CompanyFilterController();
 
 CompanyRoutes.post("/", authMiddleware, controller.createCompanyTeam);
 CompanyRoutes.get("/companyDetails", authMiddleware, controller.getCompanyTeam);
+CompanyRoutes.get(
+  "/company/details",
+  authMiddleware,
+  controller.getCompanyDetails
+);
+
 CompanyRoutes.get("/allCompanies", authMiddleware, controller.getAllCompanies);
 CompanyRoutes.patch(
   "/companyUpdate",

@@ -50,7 +50,7 @@ router.get("/talents", QueryJobSeekerController.searchTalent);
 
 router.post("/filter", authMiddleware, QueryJobSeekerController.saveFilter);
 
-router.get("/filter/:id", authMiddleware, QueryJobSeekerController.getFilter);
+router.get("/filter", authMiddleware, QueryJobSeekerController.getFilter);
 
 router.patch(
   "/filter/:id",

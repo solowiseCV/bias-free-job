@@ -9,6 +9,7 @@ const controller = new companyProfile_1.CompanyTeamController();
 const filter = new filterQuery_1.CompanyFilterController();
 CompanyRoutes.post("/", authMiddleware_1.authMiddleware, controller.createCompanyTeam);
 CompanyRoutes.get("/companyDetails", authMiddleware_1.authMiddleware, controller.getCompanyTeam);
+CompanyRoutes.get("/company/details", authMiddleware_1.authMiddleware, controller.getCompanyDetails);
 CompanyRoutes.get("/allCompanies", authMiddleware_1.authMiddleware, controller.getAllCompanies);
 CompanyRoutes.patch("/companyUpdate", authMiddleware_1.authMiddleware, controller.updateCompanyTeam);
 CompanyRoutes.delete("/DeleteCompanyProfile", authMiddleware_1.authMiddleware, controller.deleteCompanyTeam);

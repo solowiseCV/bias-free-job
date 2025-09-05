@@ -86,6 +86,41 @@ export class CompanyTeamController {
     }
   }
 
+  async getCompanyDetails(req: Request, res: Response) {
+    try {
+      const result = await companyTeamService.getCompanyProfile(
+        req.user.userId
+      );
+      new CustomResponse(
+        200,
+        true,
+        "Company team details retrieved successfully",
+        res,
+        result
+      );
+      return;
+    } catch (error) {
+      console.error("Error in getCompanyTeam:", error);
+      if (error instanceof Error) {
+        new CustomResponse(
+          404,
+          false,
+          "Company profile not found",
+          res,
+          error.message
+        );
+        return;
+      }
+      new CustomResponse(
+        500,
+        false,
+        "An unexpected server error occurred",
+        res
+      );
+      return;
+    }
+  }
+
   async getAllCompanies(req: Request, res: Response) {
     try {
       const companies = await companyTeamService.getAllCompanies();

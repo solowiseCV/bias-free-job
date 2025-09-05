@@ -7,9 +7,9 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 export class FilterService {
-  static async getFilter(id: string) {
+  static async getFilter(companyProfileId: string) {
     return await prisma.filter.findUnique({
-      where: { id },
+      where: { companyProfileId },
     });
   }
 
@@ -37,9 +37,9 @@ export class FilterService {
     });
   }
 
-  static async updateFilter(id: string, filter: Filters) {
+  static async updateFilter(companyProfileId: string, filter: Filters) {
     return await prisma.filter.update({
-      where: { id },
+      where: { companyProfileId },
       data: filter,
     });
   }

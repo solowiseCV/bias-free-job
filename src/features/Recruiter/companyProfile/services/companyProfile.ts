@@ -1,6 +1,6 @@
 import { PrismaClient, Prisma, $Enums } from "@prisma/client";
 import { hiringTeamMailOptionSendEmail } from "../../../../utils/mail";
-import { CompanyTeamDTO, UpdateCompanyTeamDTO } from "../dtos/compant.dto";
+import { CompanyTeamDTO, UpdateCompanyTeamDTO } from "../dtos/company.dto";
 import { transporter } from "../../../../utils/nodemailer";
 import {
   BadRequestError,
@@ -128,6 +128,7 @@ export class CompanyTeamService {
   }
 
   async getCompanyTeam(userId: string, companyName?: string) {
+    console.log(userId);
     try {
       const teamMembers = await prisma.teamMember.findMany({
         where: { userId },
@@ -216,6 +217,31 @@ export class CompanyTeamService {
       }
       throw new Error("Unexpected error while fetching company team.");
     }
+  }
+
+  async getCompanyProfile(userId: string) {
+    return prisma.companyProfile.findFirst({
+      where: { userId },
+      include: {
+        hiringTeam: {
+          include: {
+            teamMembers: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    email: true,
+                    firstname: true,
+                    lastname: true,
+                    avatar: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async getAllCompanies() {
