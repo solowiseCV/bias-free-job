@@ -37,7 +37,7 @@ export class FilterService {
     });
   }
 
-  static async updateFilter(companyProfileId: string, filter: Filters) {
+  static async updateFilter(companyProfileId: string, filter: any) {
     return await prisma.filter.update({
       where: { companyProfileId },
       data: filter,

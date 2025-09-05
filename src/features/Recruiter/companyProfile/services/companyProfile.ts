@@ -128,7 +128,6 @@ export class CompanyTeamService {
   }
 
   async getCompanyTeam(userId: string, companyName?: string) {
-    console.log(userId);
     try {
       const teamMembers = await prisma.teamMember.findMany({
         where: { userId },
