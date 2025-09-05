@@ -38,8 +38,9 @@ class QueryJobSeekerController {
     static getFilter(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = req.params.id;
-                const result = yield queryJobSeeker_1.SearchJobSeekerService.getFilter(id);
+                const userId = req.user.userId;
+                console.log(userId);
+                const result = yield queryJobSeeker_1.SearchJobSeekerService.getFilter(userId);
                 res.status(200).json(result);
             }
             catch (err) {

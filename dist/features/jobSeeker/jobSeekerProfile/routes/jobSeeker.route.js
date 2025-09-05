@@ -21,6 +21,6 @@ router.delete("/profile/:id", authMiddleware_1.authMiddleware, deleteJobSeeker_1
 router.get("/search", queryJobSeeker_1.QueryJobSeekerController.querySeeker);
 router.get("/talents", queryJobSeeker_1.QueryJobSeekerController.searchTalent);
 router.post("/filter", authMiddleware_1.authMiddleware, queryJobSeeker_1.QueryJobSeekerController.saveFilter);
-router.get("/filter/:id", authMiddleware_1.authMiddleware, queryJobSeeker_1.QueryJobSeekerController.getFilter);
+router.get("/filter", authMiddleware_1.authMiddleware, queryJobSeeker_1.QueryJobSeekerController.getFilter);
 router.patch("/filter/:id", authMiddleware_1.authMiddleware, queryJobSeeker_1.QueryJobSeekerController.updateFilter);
 exports.default = router;

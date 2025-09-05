@@ -63,6 +63,24 @@ class CompanyTeamController {
             }
         });
     }
+    getCompanyDetails(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield companyTeamService.getCompanyProfile(req.user.userId);
+                new response_util_1.default(200, true, "Company team details retrieved successfully", res, result);
+                return;
+            }
+            catch (error) {
+                console.error("Error in getCompanyTeam:", error);
+                if (error instanceof Error) {
+                    new response_util_1.default(404, false, "Company profile not found", res, error.message);
+                    return;
+                }
+                new response_util_1.default(500, false, "An unexpected server error occurred", res);
+                return;
+            }
+        });
+    }
     getAllCompanies(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

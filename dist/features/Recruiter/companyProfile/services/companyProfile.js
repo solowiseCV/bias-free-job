@@ -113,6 +113,7 @@ class CompanyTeamService {
     getCompanyTeam(userId, companyName) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
+            console.log(userId);
             try {
                 const teamMembers = yield prisma.teamMember.findMany({
                     where: { userId },
@@ -186,6 +187,32 @@ class CompanyTeamService {
                 }
                 throw new Error("Unexpected error while fetching company team.");
             }
+        });
+    }
+    getCompanyProfile(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return prisma.companyProfile.findFirst({
+                where: { userId },
+                include: {
+                    hiringTeam: {
+                        include: {
+                            teamMembers: {
+                                include: {
+                                    user: {
+                                        select: {
+                                            id: true,
+                                            email: true,
+                                            firstname: true,
+                                            lastname: true,
+                                            avatar: true,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            });
         });
     }
     getAllCompanies() {

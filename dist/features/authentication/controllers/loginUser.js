@@ -38,7 +38,7 @@ class LoginController {
                 if (!user) {
                     res.status(404).json({
                         success: false,
-                        message: "User Email or Password incorrect!",
+                        message: "User Email incorrect!",
                     });
                     return;
                 }
@@ -46,7 +46,7 @@ class LoginController {
                     (user.password && !(yield (0, hash_1.comparePassword)(password, user.password)))) {
                     res.status(404).json({
                         success: false,
-                        message: "User Email or Password incorrect!",
+                        message: "User  Password incorrect!",
                     });
                     return;
                 }

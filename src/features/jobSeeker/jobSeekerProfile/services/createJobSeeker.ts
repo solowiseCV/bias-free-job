@@ -52,4 +52,34 @@ export class JobSeekerService {
       data: { profileCompletion: percentage },
     });
   }
+
+  static async updateJobSeekerRecords() {
+    try {
+      const defaultAvailability = {
+        Sun: { available: false, times: [] },
+        Mon: { available: false, times: [] },
+        Tue: { available: false, times: [] },
+        Wed: { available: false, times: [] },
+        Thu: { available: false, times: [] },
+        Fri: { available: false, times: [] },
+        Sat: { available: false, times: [] },
+      };
+
+      const jobSeekers = await prisma.jobSeeker.findMany();
+
+      for (const jobSeeker of jobSeekers) {
+        if (!jobSeeker.dailyAvailability) {
+          await prisma.jobSeeker.update({
+            where: { id: jobSeeker.id },
+            data: { dailyAvailability: defaultAvailability },
+          });
+          console.log(`Updated JobSeeker with id: ${jobSeeker.id}`);
+        }
+      }
+
+      console.log("All JobSeeker records updated successfully.");
+    } catch (error) {
+      console.error("Error updating JobSeeker records:", error);
+    }
+  }
 }

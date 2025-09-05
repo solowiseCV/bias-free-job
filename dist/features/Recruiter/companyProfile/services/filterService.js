@@ -13,10 +13,10 @@ exports.FilterService = void 0;
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 class FilterService {
-    static getFilter(id) {
+    static getFilter(companyProfileId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield prisma.filter.findUnique({
-                where: { id },
+                where: { companyProfileId },
             });
         });
     }
@@ -37,10 +37,10 @@ class FilterService {
             });
         });
     }
-    static updateFilter(id, filter) {
+    static updateFilter(companyProfileId, filter) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield prisma.filter.update({
-                where: { id },
+                where: { companyProfileId },
                 data: filter,
             });
         });

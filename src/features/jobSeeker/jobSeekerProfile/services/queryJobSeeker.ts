@@ -390,9 +390,9 @@ export class SearchJobSeekerService {
     };
   }
 
-  static async getFilter(id: string) {
-    return await prisma.filter.findUnique({
-      where: { id },
+  static async getFilter(userId: string) {
+    return await prisma.filter.findFirst({
+      where: { userId },
     });
   }
 

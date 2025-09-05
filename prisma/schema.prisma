@@ -91,34 +91,35 @@ model User {
 }
 
 model JobSeeker {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @unique @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id])
+  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId                String    @unique @db.ObjectId
+  user                  User      @relation(fields: [userId], references: [id])
 
-  bio             String?
-  location        LocationInfo?
-  hasDisability   Boolean?
-  interestedRoles String[]
-  experienceLevel ExperienceLevel?
-  workMode        WorkLocation?
-  jobType         EmploymentType?
-  skills          String[]
-  industry        String?
+  bio                   String?
+  location              LocationInfo?
+  hasDisability         Boolean?
+  interestedRoles       String[]
+  experienceLevel       ExperienceLevel?
+  workMode              WorkLocation?
+  jobType               EmploymentType?
+  skills                String[]
+  industry              String?
 
-  experience        ExperienceEntry[]
-  education         EducationEntry[]
-  certifications    Certification[]
-  portfolio         PortfolioEntry[]
-  resume            String?
-  interests         String[]
-  profileCompletion Float             @default(0)
+  experience            ExperienceEntry[]
+  education             EducationEntry[]
+  certifications        Certification[]
+  portfolio             PortfolioEntry[]
+  resume                String?
+  interests             String[]
+  profileCompletion     Float             @default(0)
+  dailyAvailability     Json              @default("{\"Sun\":{\"available\":false,\"times\":[]},\"Mon\":{\"available\":false,\"times\":[]},\"Tue\":{\"available\":false,\"times\":[]},\"Wed\":{\"available\":false,\"times\":[]},\"Thu\":{\"available\":false,\"times\":[]},\"Fri\":{\"available\":false,\"times\":[]},\"Sat\":{\"available\":false,\"times\":[]}}")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
-  applications        Application[]        @relation("ApplicantApplications")
-  interviews          Interview[]          @relation("ApplicantInterviews")
-  notificationSetting NotificationSetting?
+  applications          Application[]        @relation("ApplicantApplications")
+  interviews            Interview[]          @relation("ApplicantInterviews")
+  notificationSetting   NotificationSetting?
 }
 
 model CompanyProfile {

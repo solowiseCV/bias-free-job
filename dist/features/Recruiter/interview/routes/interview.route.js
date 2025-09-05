@@ -10,6 +10,7 @@ const interviewRoutes = express_1.default.Router();
 const interviewController = new interview_controller_1.InterviewController();
 interviewRoutes.post("/schedule", authMiddleware_1.authMiddleware, interviewController.createInterview);
 interviewRoutes.get("/:id", authMiddleware_1.authMiddleware, interviewController.getInterviews);
+interviewRoutes.get("/", interviewController.getAllInterview);
 interviewRoutes.get("/jobseeker", authMiddleware_1.authMiddleware, interviewController.getJobSeekerInterviews);
 interviewRoutes.delete("/:id", authMiddleware_1.authMiddleware, interviewController.deleteInterview);
 interviewRoutes.patch("/:id", authMiddleware_1.authMiddleware, interviewController.updateInterview);

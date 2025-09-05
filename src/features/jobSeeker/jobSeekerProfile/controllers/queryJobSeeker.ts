@@ -28,8 +28,9 @@ export class QueryJobSeekerController {
 
   static async getFilter(req: Request, res: Response) {
     try {
-      const id = req.params.id;
-      const result = await SearchJobSeekerService.getFilter(id);
+      const userId = req.user.userId;
+      console.log(userId);
+      const result = await SearchJobSeekerService.getFilter(userId);
       res.status(200).json(result);
     } catch (err: any) {
       res.status(400).json({ error: err.message });
