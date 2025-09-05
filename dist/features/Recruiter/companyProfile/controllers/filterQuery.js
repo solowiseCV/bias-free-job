@@ -43,7 +43,7 @@ class CompanyFilterController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const filters = Object.assign(Object.assign({}, req.query), { page: Number(req.query.page) || 1, pageSize: Number(req.query.pageSize) || 20 });
+                const filters = req.query;
                 const result = yield filterService_1.FilterService.updateFilter(id, filters);
                 res.status(200).json(result);
             }
