@@ -58,7 +58,6 @@ interface SearchTalentResponse {
   total: number;
   totalPages: number;
   data?: JobSeekerResponse[];
-  other?: JobSeekerResponse[];
 }
 
 export class TalentService {
@@ -484,7 +483,7 @@ export class TalentService {
         pageSize,
         total: randomResults.length,
         totalPages: Math.ceil(randomResults.length / pageSize),
-        other: transformedOther,
+        data: transformedOther,
       };
     }
 
