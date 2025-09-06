@@ -35,7 +35,7 @@ export class CompanyFilterController {
   async updateFilter(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const filters = req.query;
+      const filters = req.body;
 
       const result = await FilterService.updateFilter(id, filters);
       res.status(200).json(result);
