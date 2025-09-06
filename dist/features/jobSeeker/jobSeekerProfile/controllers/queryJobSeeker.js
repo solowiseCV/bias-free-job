@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QueryJobSeekerController = void 0;
 const queryJobSeeker_1 = require("../services/queryJobSeeker");
+const searchTalent_1 = require("../services/searchTalent");
 class QueryJobSeekerController {
     static querySeeker(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -27,7 +28,7 @@ class QueryJobSeekerController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const filters = Object.assign(Object.assign({}, req.query), { page: Number(req.query.page) || 1, pageSize: Number(req.query.limit) || 20 });
-                const result = yield queryJobSeeker_1.SearchJobSeekerService.searchTalent(filters);
+                const result = yield searchTalent_1.TalentService.searchTalent(filters);
                 res.status(200).json(result);
             }
             catch (err) {

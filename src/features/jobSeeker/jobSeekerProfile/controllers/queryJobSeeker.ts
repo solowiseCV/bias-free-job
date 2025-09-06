@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { SearchJobSeekerService } from "../services/queryJobSeeker";
 import { FilterDTO, Filters } from "../dtos/jobSeekerDto";
+import { TalentService } from "../services/searchTalent";
+import { TalentFilters } from "../dtos/talentDTO";
 
 export class QueryJobSeekerController {
   static async querySeeker(req: Request, res: Response) {
@@ -14,12 +16,12 @@ export class QueryJobSeekerController {
 
   static async searchTalent(req: Request, res: Response) {
     try {
-      const filters: Filters = {
+      const filters: TalentFilters = {
         ...req.query,
         page: Number(req.query.page) || 1,
         pageSize: Number(req.query.limit) || 20,
       };
-      const result = await SearchJobSeekerService.searchTalent(filters);
+      const result = await TalentService.searchTalent(filters);
       res.status(200).json(result);
     } catch (err: any) {
       res.status(400).json({ error: err.message });

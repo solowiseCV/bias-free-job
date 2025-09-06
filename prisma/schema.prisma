@@ -120,6 +120,14 @@ model JobSeeker {
   applications          Application[]        @relation("ApplicantApplications")
   interviews            Interview[]          @relation("ApplicantInterviews")
   notificationSetting   NotificationSetting?
+
+  @@index([interestedRoles])
+  @@index([skills])
+  @@index([experienceLevel])
+  @@index([workMode])
+  @@index([jobType])
+  @@index([industry])
+  @@index([hasDisability])
 }
 
 model CompanyProfile {
