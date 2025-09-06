@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 export class FilterService {
   static async getFilter(companyProfileId: string) {
-    return await prisma.filter.findUnique({
+    return await prisma.filter.findMany({
       where: { companyProfileId },
     });
   }
@@ -17,15 +17,19 @@ export class FilterService {
     let companyProfileId = filter.companyProfileId;
 
     if (!userId && !companyProfileId) {
-      throw new Error("userId is required");
+      throw new Error("User or Profile Id is required is required");
     }
 
-    const companyProfile = await prisma.companyProfile.findFirst({
-      where: { userId },
-    });
+    if (!companyProfileId) {
+      const companyProfile = await prisma.companyProfile.findFirst({
+        where: { userId },
+      });
 
-    if (companyProfile) {
-      companyProfileId = companyProfile.id;
+      if (companyProfile) {
+        companyProfileId = companyProfile.id;
+      } else {
+        throw new Error("Company Profile not found");
+      }
     }
 
     return await prisma.filter.create({
