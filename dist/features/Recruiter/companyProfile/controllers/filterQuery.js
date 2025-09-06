@@ -43,7 +43,7 @@ class CompanyFilterController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const filters = req.query;
+                const filters = req.body;
                 const result = yield filterService_1.FilterService.updateFilter(id, filters);
                 res.status(200).json(result);
             }

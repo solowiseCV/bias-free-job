@@ -15,7 +15,7 @@ CompanyRoutes.get(
   controller.getCompanyDetails
 );
 
-CompanyRoutes.get("/allCompanies", authMiddleware, controller.getAllCompanies);
+CompanyRoutes.get("/allCompanies", controller.getAllCompanies);
 CompanyRoutes.patch(
   "/companyUpdate",
   authMiddleware,

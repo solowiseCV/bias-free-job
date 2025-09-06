@@ -12,9 +12,12 @@ exports.companyTeamSchema = joi_1.default.object({
     website: joi_1.default.string().uri().optional(),
     location: joi_1.default.string().optional(),
     numberOfEmployees: joi_1.default.string().optional(),
-    teamMembers: joi_1.default.array().items(joi_1.default.object({
+    teamMembers: joi_1.default.array()
+        .items(joi_1.default.object({
         email: joi_1.default.string().email().required(),
         role: joi_1.default.string().required(),
-    })).min(1).required(),
+    }))
+        .min(1)
+        .optional(),
 });
 exports.updateCompanyTeamSchema = exports.companyTeamSchema.fork(Object.keys(exports.companyTeamSchema.describe().keys), (schema) => schema.optional());

@@ -15,7 +15,7 @@ const prisma = new PrismaClient();
 class FilterService {
     static getFilter(companyProfileId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma.filter.findUnique({
+            return yield prisma.filter.findMany({
                 where: { companyProfileId },
             });
         });
@@ -24,13 +24,18 @@ class FilterService {
         return __awaiter(this, void 0, void 0, function* () {
             let companyProfileId = filter.companyProfileId;
             if (!userId && !companyProfileId) {
-                throw new Error("userId is required");
+                throw new Error("User or Profile Id is required is required");
             }
-            const companyProfile = yield prisma.companyProfile.findFirst({
-                where: { userId },
-            });
-            if (companyProfile) {
-                companyProfileId = companyProfile.id;
+            if (!companyProfileId) {
+                const companyProfile = yield prisma.companyProfile.findFirst({
+                    where: { userId },
+                });
+                if (companyProfile) {
+                    companyProfileId = companyProfile.id;
+                }
+                else {
+                    throw new Error("Company Profile not found");
+                }
             }
             return yield prisma.filter.create({
                 data: Object.assign(Object.assign({}, filter), { userId, companyProfileId: companyProfileId || undefined }),
