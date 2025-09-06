@@ -425,7 +425,7 @@ class TalentService {
                     pageSize,
                     total: randomResults.length,
                     totalPages: Math.ceil(randomResults.length / pageSize),
-                    other: transformedOther,
+                    data: transformedOther,
                 };
             }
             const transformedData = results.map((item) => {
