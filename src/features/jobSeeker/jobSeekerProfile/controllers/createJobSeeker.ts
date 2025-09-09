@@ -38,4 +38,38 @@ export class CreateJobSeekerController {
       res.status(400).json({ error: err.message });
     }
   }
+
+  static async uploadResume(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user.userId;
+
+      if (!req.file) {
+        res.status(500).json({ message: "No file uploaded" });
+        return;
+      }
+
+      const dto: JobSeekerDto = req.body;
+
+      if (req.file) {
+        // const { originalname, filename, path, mimetype, size } = req.file;
+        const fileData: FileData = {
+          originalname: req.file.originalname,
+          buffer: req.file.buffer,
+        };
+        const dataUri = getDataUri(fileData);
+        const result = await cloudinary.uploader.upload(dataUri.content, {
+          folder: "resume",
+          resource_type: "auto",
+        });
+        dto.resume = result.secure_url;
+      }
+
+      const result = await JobSeekerService.upsertJobSeekerProfile(dto, userId);
+      res
+        .status(200)
+        .json({ message: "Profile created successfully", ...result });
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  }
 }

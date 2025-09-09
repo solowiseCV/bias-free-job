@@ -49,5 +49,37 @@ class CreateJobSeekerController {
             }
         });
     }
+    static uploadResume(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userId = req.user.userId;
+                if (!req.file) {
+                    res.status(500).json({ message: "No file uploaded" });
+                    return;
+                }
+                const dto = req.body;
+                if (req.file) {
+                    // const { originalname, filename, path, mimetype, size } = req.file;
+                    const fileData = {
+                        originalname: req.file.originalname,
+                        buffer: req.file.buffer,
+                    };
+                    const dataUri = (0, multer_1.getDataUri)(fileData);
+                    const result = yield cloudinary.uploader.upload(dataUri.content, {
+                        folder: "resume",
+                        resource_type: "auto",
+                    });
+                    dto.resume = result.secure_url;
+                }
+                const result = yield createJobSeeker_1.JobSeekerService.upsertJobSeekerProfile(dto, userId);
+                res
+                    .status(200)
+                    .json(Object.assign({ message: "Profile created successfully" }, result));
+            }
+            catch (err) {
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
 }
 exports.CreateJobSeekerController = CreateJobSeekerController;

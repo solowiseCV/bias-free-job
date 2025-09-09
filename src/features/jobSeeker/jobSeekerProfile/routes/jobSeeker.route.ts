@@ -6,7 +6,7 @@ import { authMiddleware } from "../../../../middlewares/authMiddleware";
 
 import { GetJobSeekerController } from "../controllers/getJobSeeker";
 import { CreateJobSeekerController } from "../controllers/createJobSeeker";
-import { singleupload } from "../../../../middlewares/multer";
+import { resumeUpload, singleupload } from "../../../../middlewares/multer";
 
 const router = express.Router();
 
@@ -15,6 +15,13 @@ router.post(
   authMiddleware,
   singleupload,
   CreateJobSeekerController.create
+);
+
+router.post(
+  "/upload/resume/:userId",
+  authMiddleware,
+  resumeUpload,
+  UpdateJobSeekerController.uploadResume
 );
 
 router.get(

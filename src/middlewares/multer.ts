@@ -2,12 +2,16 @@ import multer from "multer";
 import DataUriParser from "datauri/parser";
 import path from "path";
 
-
 const storage = multer.memoryStorage();
 
-
 const fileFilter = (req: any, file: any, cb: any) => {
-  const allowedMimeTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg", "image/jpeg"];
+  const allowedMimeTypes = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/jpg",
+    "image/jpeg",
+  ];
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
@@ -19,8 +23,14 @@ const fileFilter = (req: any, file: any, cb: any) => {
 export const singleupload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, 
+  limits: { fileSize: 5 * 1024 * 1024 },
 }).single("assessment");
+
+export const resumeUpload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).single("resume");
 
 // Interface for file data
 export interface FileData {

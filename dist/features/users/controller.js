@@ -56,6 +56,17 @@ class UserController {
             }
         });
     }
+    static allUsers(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield service_1.UserService.allUsers();
+                new response_util_1.default(200, true, "All users retrieved successfully", res, result);
+            }
+            catch (error) {
+                new response_util_1.default(500, false, "Internal server error", res, error instanceof Error ? error.message : "Unknown error");
+            }
+        });
+    }
     // Update user details
     static updateUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

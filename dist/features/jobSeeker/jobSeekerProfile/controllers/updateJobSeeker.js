@@ -43,5 +43,33 @@ class UpdateJobSeekerController {
             }
         });
     }
+    static uploadResume(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userId = req.user.userId;
+                if (!req.file) {
+                    res.status(500).json({ message: "No file uploaded" });
+                    return;
+                }
+                const fileData = {
+                    originalname: req.file.originalname,
+                    buffer: req.file.buffer,
+                };
+                const dataUri = (0, multer_1.getDataUri)(fileData);
+                const resumeResult = yield cloudinary.uploader.upload(dataUri.content, {
+                    folder: "resume",
+                    resource_type: "auto",
+                });
+                const resume = resumeResult.secure_url;
+                const result = yield updateJobSeeker_1.UpdateJobSeekerService.addResume(userId, resume);
+                res
+                    .status(200)
+                    .json(Object.assign({ message: "Resume uploaded successfully" }, result));
+            }
+            catch (err) {
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
 }
 exports.UpdateJobSeekerController = UpdateJobSeekerController;
