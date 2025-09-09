@@ -87,11 +87,32 @@ export class UserController {
     }
   }
 
+  static async allUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await UserService.allUsers();
+      new CustomResponse(
+        200,
+        true,
+        "All users retrieved successfully",
+        res,
+        result
+      );
+    } catch (error) {
+      new CustomResponse(
+        500,
+        false,
+        "Internal server error",
+        res,
+        error instanceof Error ? error.message : "Unknown error"
+      );
+    }
+  }
+
   // Update user details
   static async updateUser(req: Request, res: Response): Promise<void> {
     try {
       const userIdValidation = userIdSchema.safeParse(req.params);
-      
+
       if (!userIdValidation.success) {
         res.status(400).json({
           success: false,
@@ -105,7 +126,7 @@ export class UserController {
 
       // Validate request body
       const validationResult = updateUserSchema.safeParse(req.body);
-      
+
       if (!validationResult.success) {
         res.status(400).json({
           success: false,
@@ -121,12 +142,17 @@ export class UserController {
       if (Object.keys(updateData).length === 0 && !req.file) {
         res.status(400).json({
           success: false,
-          message: "At least one field must be provided for update or a file must be uploaded",
+          message:
+            "At least one field must be provided for update or a file must be uploaded",
         });
         return;
       }
 
-      const updatedUser = await UserService.updateUser(userId, updateData, req.file);
+      const updatedUser = await UserService.updateUser(
+        userId,
+        updateData,
+        req.file
+      );
 
       res.status(200).json({
         success: true,

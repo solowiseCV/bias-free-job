@@ -85,6 +85,20 @@ class UserService {
             }
         });
     }
+    static allUsers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield prisma.user.findMany({
+                    include: {
+                        jobSeeker: true,
+                    },
+                });
+            }
+            catch (error) {
+                throw new Error(`Failed to get users: ${error}`);
+            }
+        });
+    }
     // Update user details
     static updateUser(userId, updateData, file) {
         return __awaiter(this, void 0, void 0, function* () {

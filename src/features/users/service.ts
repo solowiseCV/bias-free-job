@@ -82,6 +82,18 @@ export class UserService {
     }
   }
 
+  static async allUsers() {
+    try {
+      return await prisma.user.findMany({
+        include: {
+          jobSeeker: true,
+        },
+      });
+    } catch (error) {
+      throw new Error(`Failed to get users: ${error}`);
+    }
+  }
+
   // Update user details
   static async updateUser(
     userId: string,
