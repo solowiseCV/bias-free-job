@@ -124,6 +124,32 @@ class InterviewService {
             return yield prisma.interview.findMany({});
         });
     }
+    getRecruiterUpcomingInterviews(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield prisma.interview.findMany({
+                where: {
+                    userId,
+                    status: client_1.InterviewStatus.scheduled,
+                    dateTime: {
+                        gte: new Date(),
+                    },
+                },
+            });
+        });
+    }
+    getJobseekerUpcomingInterviews(applicantId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield prisma.interview.findMany({
+                where: {
+                    applicantId,
+                    status: client_1.InterviewStatus.scheduled,
+                    dateTime: {
+                        gte: new Date(),
+                    },
+                },
+            });
+        });
+    }
     getJobSeekerInterviews(applicantId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

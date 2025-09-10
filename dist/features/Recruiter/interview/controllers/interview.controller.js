@@ -79,6 +79,42 @@ class InterviewController {
             }
         });
     }
+    getRecruiterUpcomingInterview(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userId = req.user.userId;
+                const result = yield interviewService.getRecruiterUpcomingInterviews(userId);
+                res.status(200).json(result);
+            }
+            catch (error) {
+                console.error("Error in getInterviews:", error);
+                if (error instanceof Error) {
+                    res.status(500).json({ error: error.message });
+                    return;
+                }
+                res.status(500).json({ error: "An unexpected server error occurred." });
+                return;
+            }
+        });
+    }
+    getJobseekerUpcomingInterview(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userId = req.user.userId;
+                const result = yield interviewService.getJobseekerUpcomingInterviews(userId);
+                res.status(200).json(result);
+            }
+            catch (error) {
+                console.error("Error in getInterviews:", error);
+                if (error instanceof Error) {
+                    res.status(500).json({ error: error.message });
+                    return;
+                }
+                res.status(500).json({ error: "An unexpected server error occurred." });
+                return;
+            }
+        });
+    }
     getJobSeekerInterviews(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

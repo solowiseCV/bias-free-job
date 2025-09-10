@@ -1,17 +1,20 @@
 import { Request, Response } from "express";
 import { TeamMembershipService } from "./teamMembership.service";
-import { 
-  addUserToTeamSchema, 
+import {
+  addUserToTeamSchema,
   createTeamMemberSchema,
-  hiringTeamIdSchema, 
-  hiringTeamAndUserIdSchema 
+  hiringTeamIdSchema,
+  hiringTeamAndUserIdSchema,
 } from "../../validations/teamMembership.validation";
 
 export class TeamMembershipController {
   // Get all team memberships for the current user
-  static async getUserTeamMemberships(req: Request, res: Response): Promise<void> {
+  static async getUserTeamMemberships(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
-      const userId = req.user?.id;
+      const userId = req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -21,7 +24,9 @@ export class TeamMembershipController {
         return;
       }
 
-      const memberships = await TeamMembershipService.getUserTeamMemberships(userId);
+      const memberships = await TeamMembershipService.getUserTeamMemberships(
+        userId
+      );
 
       res.status(200).json({
         success: true,
@@ -38,7 +43,10 @@ export class TeamMembershipController {
   }
 
   // Get all team members for a specific hiring team
-  static async getHiringTeamMembers(req: Request, res: Response): Promise<void> {
+  static async getHiringTeamMembers(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const validationResult = hiringTeamIdSchema.safeParse(req.params);
 
@@ -53,7 +61,9 @@ export class TeamMembershipController {
 
       const { hiringTeamId } = validationResult.data;
 
-      const members = await TeamMembershipService.getHiringTeamMembers(hiringTeamId);
+      const members = await TeamMembershipService.getHiringTeamMembers(
+        hiringTeamId
+      );
 
       res.status(200).json({
         success: true,
@@ -96,7 +106,11 @@ export class TeamMembershipController {
       const { hiringTeamId } = hiringTeamValidation.data;
       const { userEmail, role } = bodyValidation.data;
 
-      const membership = await TeamMembershipService.addUserToTeam(hiringTeamId, userEmail, role);
+      const membership = await TeamMembershipService.addUserToTeam(
+        hiringTeamId,
+        userEmail,
+        role
+      );
 
       res.status(201).json({
         success: true,
@@ -159,7 +173,10 @@ export class TeamMembershipController {
         message: "User removed from team successfully",
       });
     } catch (error) {
-      if (error instanceof Error && error.message === "Team membership not found") {
+      if (
+        error instanceof Error &&
+        error.message === "Team membership not found"
+      ) {
         res.status(404).json({
           success: false,
           message: error.message,
@@ -176,7 +193,10 @@ export class TeamMembershipController {
   }
 
   // Update team member role
-  static async updateTeamMemberRole(req: Request, res: Response): Promise<void> {
+  static async updateTeamMemberRole(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const paramsValidation = hiringTeamAndUserIdSchema.safeParse(req.params);
       const { role } = req.body;
@@ -200,11 +220,12 @@ export class TeamMembershipController {
 
       const { hiringTeamId, userId } = paramsValidation.data;
 
-      const updatedMembership = await TeamMembershipService.updateTeamMemberRole(
-        hiringTeamId,
-        userId,
-        role
-      );
+      const updatedMembership =
+        await TeamMembershipService.updateTeamMemberRole(
+          hiringTeamId,
+          userId,
+          role
+        );
 
       res.status(200).json({
         success: true,
@@ -212,7 +233,10 @@ export class TeamMembershipController {
         data: updatedMembership,
       });
     } catch (error) {
-      if (error instanceof Error && error.message === "Team membership not found") {
+      if (
+        error instanceof Error &&
+        error.message === "Team membership not found"
+      ) {
         res.status(404).json({
           success: false,
           message: error.message,
@@ -229,7 +253,10 @@ export class TeamMembershipController {
   }
 
   // Update team member access
-  static async updateTeamMemberAccess(req: Request, res: Response): Promise<void> {
+  static async updateTeamMemberAccess(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const paramsValidation = hiringTeamAndUserIdSchema.safeParse(req.params);
       const { access } = req.body;
@@ -253,11 +280,12 @@ export class TeamMembershipController {
 
       const { hiringTeamId, userId } = paramsValidation.data;
 
-      const updatedMembership = await TeamMembershipService.updateTeamMemberAccess(
-        hiringTeamId,
-        userId,
-        access
-      );
+      const updatedMembership =
+        await TeamMembershipService.updateTeamMemberAccess(
+          hiringTeamId,
+          userId,
+          access
+        );
 
       res.status(200).json({
         success: true,
@@ -265,7 +293,10 @@ export class TeamMembershipController {
         data: updatedMembership,
       });
     } catch (error) {
-      if (error instanceof Error && error.message === "Team membership not found") {
+      if (
+        error instanceof Error &&
+        error.message === "Team membership not found"
+      ) {
         res.status(404).json({
           success: false,
           message: error.message,
@@ -285,7 +316,7 @@ export class TeamMembershipController {
   static async checkTeamMembership(req: Request, res: Response): Promise<void> {
     try {
       const paramsValidation = hiringTeamIdSchema.safeParse(req.params);
-      const userId = req.user?.id;
+      const userId = req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -306,8 +337,14 @@ export class TeamMembershipController {
 
       const { hiringTeamId } = paramsValidation.data;
 
-      const isMember = await TeamMembershipService.isUserTeamMember(hiringTeamId, userId);
-      const role = await TeamMembershipService.getUserTeamRole(hiringTeamId, userId);
+      const isMember = await TeamMembershipService.isUserTeamMember(
+        hiringTeamId,
+        userId
+      );
+      const role = await TeamMembershipService.getUserTeamRole(
+        hiringTeamId,
+        userId
+      );
 
       res.status(200).json({
         success: true,
@@ -355,7 +392,11 @@ export class TeamMembershipController {
       const { hiringTeamId } = hiringTeamValidation.data;
       const { userEmail, role } = bodyValidation.data;
 
-      const membership = await TeamMembershipService.createTeamMember(hiringTeamId, userEmail, role);
+      const membership = await TeamMembershipService.createTeamMember(
+        hiringTeamId,
+        userEmail,
+        role
+      );
 
       res.status(201).json({
         success: true,
@@ -371,7 +412,10 @@ export class TeamMembershipController {
           });
           return;
         }
-        if (error.message === "A team member with this email already exists in this hiring team") {
+        if (
+          error.message ===
+          "A team member with this email already exists in this hiring team"
+        ) {
           res.status(409).json({
             success: false,
             message: error.message,
@@ -389,7 +433,10 @@ export class TeamMembershipController {
   }
 
   // Remove team member access (disable access without deleting)
-  static async removeTeamMemberAccess(req: Request, res: Response): Promise<void> {
+  static async removeTeamMemberAccess(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const validationResult = hiringTeamAndUserIdSchema.safeParse(req.params);
 
@@ -404,7 +451,11 @@ export class TeamMembershipController {
 
       const { hiringTeamId, userId } = validationResult.data;
 
-      const updatedMembership = await TeamMembershipService.removeTeamMemberAccess(hiringTeamId, userId);
+      const updatedMembership =
+        await TeamMembershipService.removeTeamMemberAccess(
+          hiringTeamId,
+          userId
+        );
 
       res.status(200).json({
         success: true,
@@ -412,7 +463,10 @@ export class TeamMembershipController {
         data: updatedMembership,
       });
     } catch (error) {
-      if (error instanceof Error && error.message === "Team membership not found") {
+      if (
+        error instanceof Error &&
+        error.message === "Team membership not found"
+      ) {
         res.status(404).json({
           success: false,
           message: error.message,
@@ -429,7 +483,10 @@ export class TeamMembershipController {
   }
 
   // Restore team member access
-  static async restoreTeamMemberAccess(req: Request, res: Response): Promise<void> {
+  static async restoreTeamMemberAccess(
+    req: Request,
+    res: Response
+  ): Promise<void> {
     try {
       const validationResult = hiringTeamAndUserIdSchema.safeParse(req.params);
 
@@ -444,7 +501,11 @@ export class TeamMembershipController {
 
       const { hiringTeamId, userId } = validationResult.data;
 
-      const updatedMembership = await TeamMembershipService.restoreTeamMemberAccess(hiringTeamId, userId);
+      const updatedMembership =
+        await TeamMembershipService.restoreTeamMemberAccess(
+          hiringTeamId,
+          userId
+        );
 
       res.status(200).json({
         success: true,
@@ -452,7 +513,10 @@ export class TeamMembershipController {
         data: updatedMembership,
       });
     } catch (error) {
-      if (error instanceof Error && error.message === "Team membership not found") {
+      if (
+        error instanceof Error &&
+        error.message === "Team membership not found"
+      ) {
         res.status(404).json({
           success: false,
           message: error.message,
@@ -467,4 +531,4 @@ export class TeamMembershipController {
       });
     }
   }
-} 
+}

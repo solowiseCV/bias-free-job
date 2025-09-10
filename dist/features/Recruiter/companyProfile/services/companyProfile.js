@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CompanyTeamService = void 0;
+// @ts-nocheck
 const client_1 = require("@prisma/client");
 const mail_1 = require("../../../../utils/mail");
 const nodemailer_1 = require("../../../../utils/nodemailer");
@@ -212,6 +213,94 @@ class CompanyTeamService {
                     },
                 },
             });
+        });
+    }
+    getHiredJobSeekers(companyId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const totalHired = yield prisma.application.count({
+                    where: {
+                        jobPosting: {
+                            companyProfileId: companyId,
+                        },
+                        status: "hired",
+                    },
+                });
+                const include = {
+                    user: {
+                        select: {
+                            firstname: true,
+                            lastname: true,
+                            email: true,
+                            avatar: true,
+                        },
+                    },
+                    applications: {
+                        where: {
+                            jobPosting: {
+                                companyProfileId: companyId,
+                            },
+                            status: "hired",
+                        },
+                        include: {
+                            jobPosting: {
+                                include: {
+                                    companyProfile: true,
+                                },
+                            },
+                        },
+                        orderBy: {
+                            updatedAt: "desc",
+                        },
+                        take: 1,
+                    },
+                };
+                const where = {
+                    applications: {
+                        some: {
+                            jobPosting: {
+                                companyProfileId: companyId,
+                            },
+                            status: "hired",
+                        },
+                    },
+                };
+                const hiredJobSeekersData = yield prisma.jobSeeker.findMany({
+                    where,
+                    include,
+                    orderBy: {
+                        applications: {
+                            some: {
+                                updatedAt: "desc",
+                            },
+                        },
+                    },
+                    take: 10,
+                });
+                const hiredJobSeekers = hiredJobSeekersData.map((jobSeeker) => {
+                    const hiredApplication = jobSeeker.applications[0];
+                    return {
+                        id: jobSeeker.id,
+                        userId: jobSeeker.userId,
+                        firstname: jobSeeker.user.firstname,
+                        lastname: jobSeeker.user.lastname,
+                        email: jobSeeker.user.email,
+                        bio: jobSeeker.bio,
+                        skills: jobSeeker.skills,
+                        location: jobSeeker.location,
+                        hiredAt: hiredApplication.appliedAt,
+                        companyName: hiredApplication.jobPosting.companyProfile.companyName,
+                    };
+                });
+                return {
+                    totalHired,
+                    hiredJobSeekers,
+                };
+            }
+            catch (error) {
+                console.error("Error fetching hired job seekers:", error);
+                throw new Error("Failed to fetch hired job seekers");
+            }
         });
     }
     getAllCompanies() {

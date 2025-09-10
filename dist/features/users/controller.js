@@ -175,5 +175,18 @@ class UserController {
             }
         });
     }
+    static getRecentActivities(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userId = req.user.userId;
+                const limit = parseInt(req.query.limit) || 10;
+                const result = yield service_1.UserService.getRecentActivities(userId, limit);
+                new response_util_1.default(200, true, "All recent activities", res, result);
+            }
+            catch (error) {
+                new response_util_1.default(500, false, "Internal server error", res, error instanceof Error ? error.message : "Unknown error");
+            }
+        });
+    }
 }
 exports.UserController = UserController;

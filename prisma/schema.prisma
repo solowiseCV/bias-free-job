@@ -120,7 +120,8 @@ model JobSeeker {
   applications          Application[]        @relation("ApplicantApplications")
   interviews            Interview[]          @relation("ApplicantInterviews")
   notificationSetting   NotificationSetting?
-
+  starredByCompanies    StarredCandidate[]    @relation("JobSeekerStarredBy")
+  
   @@index([interestedRoles])
   @@index([skills])
   @@index([experienceLevel])
@@ -131,21 +132,22 @@ model JobSeeker {
 }
 
 model CompanyProfile {
-  id                String       @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String       @unique @db.ObjectId
-  user              User         @relation("UserCompanyProfiles", fields: [userId], references: [id], onDelete: Cascade)
-  companyName       String       @unique
-  description       String
-  industry          String
-  website           String?
-  location          String?
-  numberOfEmployees String?
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  jobPostings       JobPosting[] @relation("CompanyJobPostings")
-  hiringTeam        HiringTeam?  @relation("CompanyHiringTeam")
-  interviews        Interview[]  @relation("CompanyInterviews")
-  filter            Filter?      @relation("FilterCompanyProfiles")
+  id                   String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String       @unique @db.ObjectId
+  user                 User         @relation("UserCompanyProfiles", fields: [userId], references: [id], onDelete: Cascade)
+  companyName          String       @unique
+  description          String
+  industry             String
+  website              String?
+  location             String?
+  numberOfEmployees    String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  jobPostings          JobPosting[] @relation("CompanyJobPostings")
+  hiringTeam           HiringTeam?  @relation("CompanyHiringTeam")
+  interviews           Interview[]  @relation("CompanyInterviews")
+  filter               Filter?      @relation("FilterCompanyProfiles")
+  starredCandidates    StarredCandidate[]    @relation("CompanyStarredCandidates")
 }
 
 model HiringTeam {
@@ -310,9 +312,12 @@ type EducationEntry {
 }
 
 type Certification {
-  title     String
-  authority String
-  issueDate DateTime
+  name        String
+  title       String
+  skills      String[]
+  startDate   DateTime
+  endDate     DateTime?
+  thumbnails  String[]
 }
 
 type PortfolioEntry {
@@ -320,6 +325,7 @@ type PortfolioEntry {
   description  String?
   link         String?
   technologies String[]
+  thumbnails  String[]
 }
 
 type LocationInfo {
@@ -360,4 +366,19 @@ model Country {
   currency      String?
 
   @@map("countries")
+}
+
+model StarredCandidate {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyProfileId String @db.ObjectId
+  companyProfile   CompanyProfile @relation(fields: [companyProfileId], references: [id], onDelete: Cascade, name: "CompanyStarredCandidates")
+  jobSeekerId      String @db.ObjectId
+  jobSeeker        JobSeeker @relation(fields: [jobSeekerId], references: [id], onDelete: Cascade, name: "JobSeekerStarredBy")
+  starredAt        DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([companyProfileId, jobSeekerId])
+  @@index([companyProfileId])
+  @@index([jobSeekerId])
 }

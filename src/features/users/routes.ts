@@ -5,9 +5,8 @@ import { authMiddleware } from "../../middlewares/authMiddleware";
 import { singleupload } from "../../middlewares/multer";
 
 const router = Router();
-router.get("/allUsers", UserController.allUsers);
 
-// router.use(authMiddleware);
+router.use(authMiddleware);
 
 router.get(
   "/userDetails/:userId",
@@ -15,7 +14,7 @@ router.get(
   UserController.getCurrentUser
 );
 
-router.get("/all", UserController.getAllUsers);
+router.get("/allUsers", authMiddleware, UserController.getAllUsers);
 
 router.patch(
   "/updateUser/:userId",
@@ -25,6 +24,12 @@ router.patch(
 );
 
 router.delete("/deleteUser/:userId", authMiddleware, UserController.deleteUser);
+
+router.get(
+  "/recent/activities",
+  authMiddleware,
+  UserController.getRecentActivities
+);
 
 // Team membership routes
 router.get(

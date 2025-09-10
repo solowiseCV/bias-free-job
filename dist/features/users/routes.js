@@ -6,12 +6,12 @@ const teamMembership_controller_1 = require("./teamMembership.controller");
 const authMiddleware_1 = require("../../middlewares/authMiddleware");
 const multer_1 = require("../../middlewares/multer");
 const router = (0, express_1.Router)();
-router.get("/allUsers", controller_1.UserController.allUsers);
-// router.use(authMiddleware);
+router.use(authMiddleware_1.authMiddleware);
 router.get("/userDetails/:userId", authMiddleware_1.authMiddleware, controller_1.UserController.getCurrentUser);
-router.get("/all", controller_1.UserController.getAllUsers);
+router.get("/allUsers", authMiddleware_1.authMiddleware, controller_1.UserController.getAllUsers);
 router.patch("/updateUser/:userId", authMiddleware_1.authMiddleware, multer_1.singleupload, controller_1.UserController.updateUser);
 router.delete("/deleteUser/:userId", authMiddleware_1.authMiddleware, controller_1.UserController.deleteUser);
+router.get("/recent/activities", authMiddleware_1.authMiddleware, controller_1.UserController.getRecentActivities);
 // Team membership routes
 router.get("/team-memberships", teamMembership_controller_1.TeamMembershipController.getUserTeamMemberships);
 // Get all team members for a specific hiring team

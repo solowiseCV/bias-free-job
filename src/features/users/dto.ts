@@ -42,3 +42,20 @@ export interface UserListResponseDTO {
     limit: number;
   };
 }
+
+export interface Activity {
+  id: string;
+  type: string;
+  title: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  details: {
+    jobTitle?: string;
+    companyName?: string;
+    location?: string;
+    dateTime?: Date;
+    interviewType?: string;
+    duration?: string;
+  };
+}
