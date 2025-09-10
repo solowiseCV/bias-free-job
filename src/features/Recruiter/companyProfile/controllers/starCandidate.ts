@@ -48,9 +48,9 @@ export class CandidateStarringController {
   // Get all starred candidates
   async getStarredCandidates(req: Request, res: Response): Promise<void> {
     try {
-      const companyId = req.params.companyId;
+      const companyProfileId = req.params.companyProfileId;
       const starredCandidates =
-        await candidateStarringService.getStarredCandidates(companyId);
+        await candidateStarringService.getStarredCandidates(companyProfileId);
 
       new CustomResponse(
         200,

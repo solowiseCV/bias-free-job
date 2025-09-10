@@ -47,8 +47,8 @@ class CandidateStarringController {
     getStarredCandidates(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const companyId = req.params.companyId;
-                const starredCandidates = yield candidateStarringService.getStarredCandidates(companyId);
+                const companyProfileId = req.params.companyProfileId;
+                const starredCandidates = yield candidateStarringService.getStarredCandidates(companyProfileId);
                 new response_util_1.default(200, true, "Starred candidates fetched successfully", res, starredCandidates);
             }
             catch (err) {

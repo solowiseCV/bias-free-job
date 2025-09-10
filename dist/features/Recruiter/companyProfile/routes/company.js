@@ -24,5 +24,5 @@ CompanyRoutes.post("/starCandidate", authMiddleware_1.authMiddleware, starCandid
 // Unstar candidate
 CompanyRoutes.delete("/starCandidate", authMiddleware_1.authMiddleware, starCandidate.unstarCandidate);
 // Get stared candidates
-CompanyRoutes.get("/starCandidate", authMiddleware_1.authMiddleware, starCandidate.getStarredCandidates);
+CompanyRoutes.get("/starCandidate/:companyProfileId", authMiddleware_1.authMiddleware, starCandidate.getStarredCandidates);
 exports.default = CompanyRoutes;

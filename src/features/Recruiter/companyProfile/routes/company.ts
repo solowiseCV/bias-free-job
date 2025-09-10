@@ -56,7 +56,7 @@ CompanyRoutes.delete(
 
 // Get stared candidates
 CompanyRoutes.get(
-  "/starCandidate",
+  "/starCandidate/:companyProfileId",
   authMiddleware,
   starCandidate.getStarredCandidates
 );
