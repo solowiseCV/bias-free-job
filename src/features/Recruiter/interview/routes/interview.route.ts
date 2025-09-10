@@ -14,6 +14,16 @@ interviewRoutes.get("/:id", authMiddleware, interviewController.getInterviews);
 interviewRoutes.get("/", interviewController.getAllInterview);
 
 interviewRoutes.get(
+  "/jobseeker/upcoming-interview",
+  interviewController.getJobseekerUpcomingInterview
+);
+
+interviewRoutes.get(
+  "/recruiter/upcoming-interview",
+  interviewController.getRecruiterUpcomingInterview
+);
+
+interviewRoutes.get(
   "/jobseeker",
   authMiddleware,
   interviewController.getJobSeekerInterviews

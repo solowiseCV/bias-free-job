@@ -18,7 +18,7 @@ class TeamMembershipController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+                const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
                 if (!userId) {
                     res.status(401).json({
                         success: false,
@@ -156,7 +156,8 @@ class TeamMembershipController {
                 });
             }
             catch (error) {
-                if (error instanceof Error && error.message === "Team membership not found") {
+                if (error instanceof Error &&
+                    error.message === "Team membership not found") {
                     res.status(404).json({
                         success: false,
                         message: error.message,
@@ -201,7 +202,8 @@ class TeamMembershipController {
                 });
             }
             catch (error) {
-                if (error instanceof Error && error.message === "Team membership not found") {
+                if (error instanceof Error &&
+                    error.message === "Team membership not found") {
                     res.status(404).json({
                         success: false,
                         message: error.message,
@@ -246,7 +248,8 @@ class TeamMembershipController {
                 });
             }
             catch (error) {
-                if (error instanceof Error && error.message === "Team membership not found") {
+                if (error instanceof Error &&
+                    error.message === "Team membership not found") {
                     res.status(404).json({
                         success: false,
                         message: error.message,
@@ -267,7 +270,7 @@ class TeamMembershipController {
             var _a;
             try {
                 const paramsValidation = teamMembership_validation_1.hiringTeamIdSchema.safeParse(req.params);
-                const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+                const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
                 if (!userId) {
                     res.status(401).json({
                         success: false,
@@ -346,7 +349,8 @@ class TeamMembershipController {
                         });
                         return;
                     }
-                    if (error.message === "A team member with this email already exists in this hiring team") {
+                    if (error.message ===
+                        "A team member with this email already exists in this hiring team") {
                         res.status(409).json({
                             success: false,
                             message: error.message,
@@ -384,7 +388,8 @@ class TeamMembershipController {
                 });
             }
             catch (error) {
-                if (error instanceof Error && error.message === "Team membership not found") {
+                if (error instanceof Error &&
+                    error.message === "Team membership not found") {
                     res.status(404).json({
                         success: false,
                         message: error.message,
@@ -421,7 +426,8 @@ class TeamMembershipController {
                 });
             }
             catch (error) {
-                if (error instanceof Error && error.message === "Team membership not found") {
+                if (error instanceof Error &&
+                    error.message === "Team membership not found") {
                     res.status(404).json({
                         success: false,
                         message: error.message,

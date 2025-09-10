@@ -100,6 +100,29 @@ class CompanyTeamController {
             }
         });
     }
+    getHiredCanditdates(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const companyProfileId = req.params.id;
+                if (!companyProfileId) {
+                    new response_util_1.default(400, false, "Company id is required", res);
+                    return;
+                }
+                const candidates = yield companyTeamService.getHiredJobSeekers(companyProfileId);
+                new response_util_1.default(200, true, "All companies retrieved successfully", res, candidates);
+                return;
+            }
+            catch (error) {
+                console.error("Error in getAllCompanies:", error);
+                if (error instanceof Error) {
+                    new response_util_1.default(500, false, "Couldn't fetch hired candidates", res, error.message);
+                    return;
+                }
+                new response_util_1.default(500, false, "An unexpected server error occurred", res);
+                return;
+            }
+        });
+    }
     updateCompanyTeam(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { error } = companyDetails_validation_1.updateCompanyTeamSchema.validate(req.body);

@@ -4,6 +4,7 @@ import {
   UpdateInterviewDTO,
   InterviewResponse,
 } from "../dtos/interview.dto";
+import { userIdSchema } from "../../../../validations/user.validation";
 
 const prisma = new PrismaClient();
 
@@ -139,6 +140,30 @@ export class InterviewService {
 
   async getAllInterviews() {
     return await prisma.interview.findMany({});
+  }
+
+  async getRecruiterUpcomingInterviews(userId: string) {
+    return await prisma.interview.findMany({
+      where: {
+        userId,
+        status: InterviewStatus.scheduled,
+        dateTime: {
+          gte: new Date(),
+        },
+      },
+    });
+  }
+
+  async getJobseekerUpcomingInterviews(applicantId: string) {
+    return await prisma.interview.findMany({
+      where: {
+        applicantId,
+        status: InterviewStatus.scheduled,
+        dateTime: {
+          gte: new Date(),
+        },
+      },
+    });
   }
 
   async getJobSeekerInterviews(

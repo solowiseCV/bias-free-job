@@ -4,6 +4,7 @@ import {
   UpdateUserRequest,
   UserResponseDTO,
   UserListResponseDTO,
+  Activity,
 } from "./dto";
 import configureCloudinary from "../../configs/cloudinary";
 import { getDataUri, FileData } from "../../middlewares/multer";
@@ -193,6 +194,90 @@ export class UserService {
       });
     } catch (error) {
       throw new Error(`Failed to delete user: ${error}`);
+    }
+  }
+
+  static async getRecentActivities(
+    userId: string,
+    limit: number = 10
+  ): Promise<Activity[]> {
+    try {
+      const jobSeeker = await prisma.jobSeeker.findFirst({
+        where: { userId },
+        include: {
+          applications: {
+            include: {
+              jobPosting: {
+                include: { companyProfile: true },
+              },
+            },
+            orderBy: { updatedAt: "desc" },
+            take: limit,
+          },
+          interviews: {
+            include: {
+              jobPosting: {
+                include: { companyProfile: true },
+              },
+              companyProfile: true,
+            },
+            orderBy: { updatedAt: "desc" },
+            take: limit,
+          },
+        },
+      });
+
+      if (!jobSeeker) {
+        return [];
+      }
+
+      const activities: Activity[] = [];
+
+      jobSeeker.applications.forEach((application) => {
+        activities.push({
+          id: application.id,
+          type: "application",
+          title: application.jobPosting.jobTitle,
+          status: application.status,
+          createdAt: application.appliedAt,
+          updatedAt: application.updatedAt || application.appliedAt,
+          details: {
+            jobTitle: application.jobPosting.jobTitle,
+            companyName: application.jobPosting.companyProfile?.companyName,
+            location: application.jobPosting.companyLocation,
+          },
+        });
+      });
+
+      jobSeeker.interviews.forEach((interview) => {
+        activities.push({
+          id: interview.id,
+          type: "interview",
+          title: interview.jobPosting.jobTitle,
+          status: interview.status,
+          createdAt: interview.createdAt,
+          updatedAt: interview.updatedAt || interview.createdAt,
+          details: {
+            jobTitle: interview.jobPosting.jobTitle,
+            companyName: interview.jobPosting.companyProfile?.companyName,
+            location: interview.location,
+            dateTime: interview.dateTime,
+            interviewType: interview.interviewType,
+            duration: interview.duration,
+          },
+        });
+      });
+
+      activities.sort((a, b) => {
+        const aTime = a.updatedAt.getTime();
+        const bTime = b.updatedAt.getTime();
+        return bTime - aTime; // Latest first
+      });
+
+      return activities.slice(0, limit);
+    } catch (error) {
+      console.error("Error fetching recent activities:", error);
+      throw new Error("Failed to fetch recent activities");
     }
   }
 

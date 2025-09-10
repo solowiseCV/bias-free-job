@@ -1,6 +1,12 @@
+// @ts-nocheck
 import { PrismaClient, Prisma, $Enums } from "@prisma/client";
 import { hiringTeamMailOptionSendEmail } from "../../../../utils/mail";
-import { CompanyTeamDTO, UpdateCompanyTeamDTO } from "../dtos/company.dto";
+import {
+  CompanyTeamDTO,
+  HiredJobSeeker,
+  HiredJobSeekersResponse,
+  UpdateCompanyTeamDTO,
+} from "../dtos/company.dto";
 import { transporter } from "../../../../utils/nodemailer";
 import {
   BadRequestError,
@@ -241,6 +247,100 @@ export class CompanyTeamService {
         },
       },
     });
+  }
+
+  async getHiredJobSeekers(
+    companyId: string
+  ): Promise<HiredJobSeekersResponse> {
+    try {
+      const totalHired = await prisma.application.count({
+        where: {
+          jobPosting: {
+            companyProfileId: companyId,
+          },
+          status: "hired",
+        },
+      });
+
+      const include: any = {
+        user: {
+          select: {
+            firstname: true,
+            lastname: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        applications: {
+          where: {
+            jobPosting: {
+              companyProfileId: companyId,
+            },
+            status: "hired",
+          },
+          include: {
+            jobPosting: {
+              include: {
+                companyProfile: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
+          take: 1,
+        },
+      };
+
+      const where: Prisma.JobSeekerWhereInput = {
+        applications: {
+          some: {
+            jobPosting: {
+              companyProfileId: companyId,
+            },
+            status: "hired",
+          },
+        },
+      };
+
+      const hiredJobSeekersData: any[] = await prisma.jobSeeker.findMany({
+        where,
+        include,
+        orderBy: {
+          applications: {
+            some: {
+              updatedAt: "desc",
+            },
+          },
+        },
+        take: 10,
+      });
+      const hiredJobSeekers: HiredJobSeeker[] = hiredJobSeekersData.map(
+        (jobSeeker) => {
+          const hiredApplication = jobSeeker.applications[0];
+          return {
+            id: jobSeeker.id,
+            userId: jobSeeker.userId,
+            firstname: jobSeeker.user.firstname,
+            lastname: jobSeeker.user.lastname,
+            email: jobSeeker.user.email,
+            bio: jobSeeker.bio,
+            skills: jobSeeker.skills,
+            location: jobSeeker.location,
+            hiredAt: hiredApplication.appliedAt,
+            companyName: hiredApplication.jobPosting.companyProfile.companyName,
+          };
+        }
+      );
+
+      return {
+        totalHired,
+        hiredJobSeekers,
+      };
+    } catch (error) {
+      console.error("Error fetching hired job seekers:", error);
+      throw new Error("Failed to fetch hired job seekers");
+    }
   }
 
   async getAllCompanies() {

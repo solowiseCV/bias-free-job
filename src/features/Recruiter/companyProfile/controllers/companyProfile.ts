@@ -155,6 +155,47 @@ export class CompanyTeamController {
     }
   }
 
+  async getHiredCanditdates(req: Request, res: Response) {
+    try {
+      const companyProfileId = req.params.id;
+      if (!companyProfileId) {
+        new CustomResponse(400, false, "Company id is required", res);
+        return;
+      }
+
+      const candidates = await companyTeamService.getHiredJobSeekers(
+        companyProfileId
+      );
+      new CustomResponse(
+        200,
+        true,
+        "All companies retrieved successfully",
+        res,
+        candidates
+      );
+      return;
+    } catch (error) {
+      console.error("Error in getAllCompanies:", error);
+      if (error instanceof Error) {
+        new CustomResponse(
+          500,
+          false,
+          "Couldn't fetch hired candidates",
+          res,
+          error.message
+        );
+        return;
+      }
+      new CustomResponse(
+        500,
+        false,
+        "An unexpected server error occurred",
+        res
+      );
+      return;
+    }
+  }
+
   async updateCompanyTeam(req: Request, res: Response) {
     const { error } = updateCompanyTeamSchema.validate(req.body);
     if (error) {

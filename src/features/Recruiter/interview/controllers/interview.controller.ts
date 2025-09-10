@@ -74,6 +74,42 @@ export class InterviewController {
     }
   }
 
+  async getRecruiterUpcomingInterview(req: Request, res: Response) {
+    try {
+      const userId = req.user.userId;
+      const result = await interviewService.getRecruiterUpcomingInterviews(
+        userId
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error in getInterviews:", error);
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: "An unexpected server error occurred." });
+      return;
+    }
+  }
+
+  async getJobseekerUpcomingInterview(req: Request, res: Response) {
+    try {
+      const userId = req.user.userId;
+      const result = await interviewService.getJobseekerUpcomingInterviews(
+        userId
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error in getInterviews:", error);
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+      res.status(500).json({ error: "An unexpected server error occurred." });
+      return;
+    }
+  }
+
   async getJobSeekerInterviews(req: Request, res: Response) {
     try {
       const result = await interviewService.getJobSeekerInterviews(

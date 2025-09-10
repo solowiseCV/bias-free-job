@@ -190,6 +190,85 @@ class UserService {
             }
         });
     }
+    static getRecentActivities(userId_1) {
+        return __awaiter(this, arguments, void 0, function* (userId, limit = 10) {
+            try {
+                const jobSeeker = yield prisma.jobSeeker.findFirst({
+                    where: { userId },
+                    include: {
+                        applications: {
+                            include: {
+                                jobPosting: {
+                                    include: { companyProfile: true },
+                                },
+                            },
+                            orderBy: { updatedAt: "desc" },
+                            take: limit,
+                        },
+                        interviews: {
+                            include: {
+                                jobPosting: {
+                                    include: { companyProfile: true },
+                                },
+                                companyProfile: true,
+                            },
+                            orderBy: { updatedAt: "desc" },
+                            take: limit,
+                        },
+                    },
+                });
+                if (!jobSeeker) {
+                    return [];
+                }
+                const activities = [];
+                jobSeeker.applications.forEach((application) => {
+                    var _a;
+                    activities.push({
+                        id: application.id,
+                        type: "application",
+                        title: application.jobPosting.jobTitle,
+                        status: application.status,
+                        createdAt: application.appliedAt,
+                        updatedAt: application.updatedAt || application.appliedAt,
+                        details: {
+                            jobTitle: application.jobPosting.jobTitle,
+                            companyName: (_a = application.jobPosting.companyProfile) === null || _a === void 0 ? void 0 : _a.companyName,
+                            location: application.jobPosting.companyLocation,
+                        },
+                    });
+                });
+                jobSeeker.interviews.forEach((interview) => {
+                    var _a;
+                    activities.push({
+                        id: interview.id,
+                        type: "interview",
+                        title: interview.jobPosting.jobTitle,
+                        status: interview.status,
+                        createdAt: interview.createdAt,
+                        updatedAt: interview.updatedAt || interview.createdAt,
+                        details: {
+                            jobTitle: interview.jobPosting.jobTitle,
+                            companyName: (_a = interview.jobPosting.companyProfile) === null || _a === void 0 ? void 0 : _a.companyName,
+                            location: interview.location,
+                            dateTime: interview.dateTime,
+                            interviewType: interview.interviewType,
+                            duration: interview.duration,
+                        },
+                    });
+                });
+                activities.sort((a, b) => {
+                    const aTime = a.updatedAt.getTime();
+                    const bTime = b.updatedAt.getTime();
+                    return bTime - aTime; // Latest first
+                });
+                return activities.slice(0, limit);
+            }
+            catch (error) {
+                console.error("Error fetching recent activities:", error);
+                throw new Error("Failed to fetch recent activities");
+            }
+        });
+    }
     // Get user by email
     static getUserByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {

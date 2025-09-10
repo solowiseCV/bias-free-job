@@ -255,4 +255,22 @@ export class UserController {
       );
     }
   }
+
+  static async getRecentActivities(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user.userId;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const result = await UserService.getRecentActivities(userId, limit);
+      new CustomResponse(200, true, "All recent activities", res, result);
+    } catch (error) {
+      new CustomResponse(
+        500,
+        false,
+        "Internal server error",
+        res,
+        error instanceof Error ? error.message : "Unknown error"
+      );
+    }
+  }
 }

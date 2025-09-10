@@ -11,6 +11,8 @@ const interviewController = new interview_controller_1.InterviewController();
 interviewRoutes.post("/schedule", authMiddleware_1.authMiddleware, interviewController.createInterview);
 interviewRoutes.get("/:id", authMiddleware_1.authMiddleware, interviewController.getInterviews);
 interviewRoutes.get("/", interviewController.getAllInterview);
+interviewRoutes.get("/jobseeker/upcoming-interview", interviewController.getJobseekerUpcomingInterview);
+interviewRoutes.get("/recruiter/upcoming-interview", interviewController.getRecruiterUpcomingInterview);
 interviewRoutes.get("/jobseeker", authMiddleware_1.authMiddleware, interviewController.getJobSeekerInterviews);
 interviewRoutes.delete("/:id", authMiddleware_1.authMiddleware, interviewController.deleteInterview);
 interviewRoutes.patch("/:id", authMiddleware_1.authMiddleware, interviewController.updateInterview);
