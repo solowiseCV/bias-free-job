@@ -18,7 +18,7 @@ router.post(
 );
 
 router.post(
-  "/upload/resume/:userId",
+  "/upload/resume",
   authMiddleware,
   resumeUpload,
   UpdateJobSeekerController.uploadResume
