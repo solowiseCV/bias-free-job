@@ -22,32 +22,38 @@ class CandidateStarringService {
                         companyProfileId,
                         jobSeekerId,
                     },
-                    include: {
-                        jobSeeker: {
-                            include: {
-                                user: {
-                                    select: {
-                                        firstname: true,
-                                        lastname: true,
-                                        email: true,
-                                        avatar: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
                 });
-                return {
-                    id: starredCandidate.id,
-                    jobSeekerId: starredCandidate.jobSeekerId,
-                    firstname: starredCandidate.jobSeeker.user.firstname,
-                    lastname: starredCandidate.jobSeeker.user.lastname,
-                    email: starredCandidate.jobSeeker.user.email,
-                    bio: starredCandidate.jobSeeker.bio,
-                    skills: starredCandidate.jobSeeker.skills,
-                    location: starredCandidate.jobSeeker.location,
-                    starredAt: starredCandidate.starredAt,
-                };
+                // const starredCandidate = await prisma.starredCandidate.create({
+                //   data: {
+                //     companyProfileId,
+                //     jobSeekerId,
+                //   },
+                //   include: {
+                //     jobSeeker: {
+                //       include: {
+                //         user: {
+                //           select: {
+                //             firstname: true,
+                //             lastname: true,
+                //             email: true,
+                //             avatar: true,
+                //           },
+                //         },
+                //       },
+                //     },
+                //   },
+                // });
+                // return {
+                //   id: starredCandidate.id,
+                //   jobSeekerId: starredCandidate.jobSeekerId,
+                //   firstname: starredCandidate.jobSeeker.user.firstname,
+                //   lastname: starredCandidate.jobSeeker.user.lastname,
+                //   email: starredCandidate.jobSeeker.user.email,
+                //   bio: starredCandidate.jobSeeker.bio,
+                //   skills: starredCandidate.jobSeeker.skills,
+                //   location: starredCandidate.jobSeeker.location,
+                //   starredAt: starredCandidate.starredAt,
+                // };
             }
             catch (error) {
                 console.error("Error starring candidate:", error);
