@@ -5,7 +5,7 @@ export class GetJobSeekerService {
   static async getJobSeekerByUserId(userId: string) {
     return await prisma.jobSeeker.findUnique({
       where: { userId },
-      includes: {
+      include: {
         user: true,
       },
     });

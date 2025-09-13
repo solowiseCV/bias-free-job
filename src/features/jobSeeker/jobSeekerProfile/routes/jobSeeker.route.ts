@@ -34,7 +34,7 @@ router.get("/", authMiddleware, GetJobSeekerController.getAllJobSeeker);
 
 router.get(
   "/user/:userId",
-  authMiddleware,
+  // authMiddleware,
   GetJobSeekerController.getSeekerByUSerId
 );
 
