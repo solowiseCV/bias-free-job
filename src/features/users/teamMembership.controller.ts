@@ -80,6 +80,62 @@ export class TeamMembershipController {
   }
 
   // Add a user to a hiring team
+  static async createHiringTeam(req: Request, res: Response): Promise<void> {
+    try {
+      const companyProfileId = req.params.companyProfileId;
+
+      if (!companyProfileId) {
+        res.status(400).json({
+          success: false,
+          message: "Company id required",
+        });
+        return;
+      }
+      const userId = req.user.userId;
+
+      const membership = await TeamMembershipService.createHiringTeam(
+        companyProfileId,
+        userId
+      );
+
+      res.status(201).json({
+        success: true,
+        message: "User added to team successfully",
+        data: membership,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "User not found") {
+          res.status(404).json({
+            success: false,
+            message: error.message,
+          });
+          return;
+        }
+        if (error.message === "Hiring team not found") {
+          res.status(404).json({
+            success: false,
+            message: error.message,
+          });
+          return;
+        }
+        if (error.message === "User is already a member of this hiring team") {
+          res.status(409).json({
+            success: false,
+            message: error.message,
+          });
+          return;
+        }
+      }
+
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+
   static async addUserToTeam(req: Request, res: Response): Promise<void> {
     try {
       const hiringTeamValidation = hiringTeamIdSchema.safeParse(req.params);

@@ -92,14 +92,6 @@ export class TalentService {
 
     const pipeline: any[] = [];
     const matchOr: any[] = [];
-
-    // Initial match to ensure a valid JobSeeker profile (userId exists and is linked)
-    pipeline.push({
-      $match: {
-        userId: { $exists: true, $ne: null }, // Ensures a userId is present
-      },
-    });
-
     if (roleArr && roleArr.length)
       matchOr.push({ interestedRoles: { $in: roleArr } });
     if (skillArr && skillArr.length)
@@ -114,9 +106,10 @@ export class TalentService {
       matchOr.push({ industry: { $in: industryArr } });
     if (hasDisability !== null) matchOr.push({ hasDisability });
 
-    if (matchOr.length) {
-      pipeline.push({ $match: { $or: matchOr } });
+    let total = 0;
+    let results: any[] = [];
 
+    if (matchOr.length) {
       const addFieldsStage: any = { $addFields: {} };
       addFieldsStage.$addFields.roleMatches =
         roleArr && roleArr.length
@@ -205,6 +198,7 @@ export class TalentService {
         });
       }
 
+      pipeline.push({ $match: { $or: matchOr } });
       pipeline.push(addFieldsStage);
       pipeline.push({
         $addFields: {
@@ -223,18 +217,12 @@ export class TalentService {
       });
       pipeline.push({ $match: { $expr: { $gt: ["$matchScore", 0] } } });
 
-      // Ensure a valid user exists after lookup
       pipeline.push({
         $lookup: {
           from: "User",
           localField: "userId",
           foreignField: "_id",
           as: "userDoc",
-        },
-      });
-      pipeline.push({
-        $match: {
-          "userDoc.0": { $exists: true }, // Ensures at least one user document is linked
         },
       });
       pipeline.push({
@@ -347,64 +335,16 @@ export class TalentService {
         cursor: {},
       });
 
-      let total = 0;
-      let results: any[] = [];
-
       if (dbResult?.cursor?.firstBatch?.length) {
         const first = dbResult.cursor.firstBatch[0];
         total = first?.total || 0;
         results = first?.results || [];
       }
+    }
 
-      const transformedData = results.map((item: any) => ({
-        id: item._id?.$oid || item._id,
-        userId: item.userId?.$oid || item.userId,
-        bio: item.bio ?? null,
-        location: item.location ?? null,
-        hasDisability: item.hasDisability ?? null,
-        interestedRoles: item.interestedRoles || [],
-        experienceLevel: item.experienceLevel ?? null,
-        workMode: item.workMode ?? null,
-        jobType: item.jobType ?? null,
-        skills: item.skills || [],
-        industry: item.industry ?? null,
-        experience: item.experience || [],
-        education: item.education || [],
-        certifications: item.certifications || [],
-        portfolio: item.portfolio || [],
-        resume: item.resume ?? null,
-        interests: item.interests || [],
-        profileCompletion: item.profileCompletion ?? null,
-        dailyAvailability: item.dailyAvailability || DEFAULT_DAILY_AVAILABILITY,
-        createdAt: item.createdAt ?? null,
-        updatedAt: item.updatedAt ?? null,
-        user: {
-          id:
-            item.user?.id?.$oid ||
-            item.userId?.$oid ||
-            item.user?.id ||
-            item.userId,
-          email: item.user?.email ?? null,
-          lastname: item.user?.lastname ?? null,
-          firstname: item.user?.firstname ?? null,
-          othername: item.user?.othername ?? null,
-          pronoun: item.user?.pronoun ?? null,
-          phone_number: item.user?.phone_number ?? null,
-          avatar: item.user?.avatar ?? null,
-        },
-        matchScore: item.matchScore,
-      }));
-
-      return {
-        page,
-        pageSize,
-        total,
-        totalPages: Math.ceil(total / pageSize),
-        data: transformedData,
-      };
-    } else {
+    if (!matchOr.length || !results.length) {
       const randomPipeline = [
-        { $match: { userId: { $exists: true, $ne: null } } }, // Ensure valid JobSeeker profile
+        { $match: {} },
         { $sample: { size: pageSize } },
         {
           $lookup: {
@@ -412,11 +352,6 @@ export class TalentService {
             localField: "userId",
             foreignField: "_id",
             as: "userDoc",
-          },
-        },
-        {
-          $match: {
-            "userDoc.0": { $exists: true }, // Ensure a user exists
           },
         },
         {
@@ -551,5 +486,52 @@ export class TalentService {
         data: transformedOther,
       };
     }
+
+    const transformedData = results.map((item: any) => ({
+      id: item._id?.$oid || item._id,
+      userId: item.userId?.$oid || item.userId,
+      bio: item.bio ?? null,
+      location: item.location ?? null,
+      hasDisability: item.hasDisability ?? null,
+      interestedRoles: item.interestedRoles || [],
+      experienceLevel: item.experienceLevel ?? null,
+      workMode: item.workMode ?? null,
+      jobType: item.jobType ?? null,
+      skills: item.skills || [],
+      industry: item.industry ?? null,
+      experience: item.experience || [],
+      education: item.education || [],
+      certifications: item.certifications || [],
+      portfolio: item.portfolio || [],
+      resume: item.resume ?? null,
+      interests: item.interests || [],
+      profileCompletion: item.profileCompletion ?? null,
+      dailyAvailability: item.dailyAvailability || DEFAULT_DAILY_AVAILABILITY,
+      createdAt: item.createdAt ?? null,
+      updatedAt: item.updatedAt ?? null,
+      user: {
+        id:
+          item.user?.id?.$oid ||
+          item.userId?.$oid ||
+          item.user?.id ||
+          item.userId,
+        email: item.user?.email ?? null,
+        lastname: item.user?.lastname ?? null,
+        firstname: item.user?.firstname ?? null,
+        othername: item.user?.othername ?? null,
+        pronoun: item.user?.pronoun ?? null,
+        phone_number: item.user?.phone_number ?? null,
+        avatar: item.user?.avatar ?? null,
+      },
+      matchScore: item.matchScore,
+    }));
+
+    return {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize),
+      data: transformedData,
+    };
   }
 }

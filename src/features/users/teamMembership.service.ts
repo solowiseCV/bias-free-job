@@ -33,7 +33,9 @@ export interface TeamMembershipDTO {
 
 export class TeamMembershipService {
   // Get all team memberships for a user
-  static async getUserTeamMemberships(userId: string): Promise<TeamMembershipDTO[]> {
+  static async getUserTeamMemberships(
+    userId: string
+  ): Promise<TeamMembershipDTO[]> {
     try {
       const memberships = await prisma.teamMember.findMany({
         where: { userId },
@@ -60,7 +62,7 @@ export class TeamMembershipService {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       });
 
       return memberships;
@@ -70,7 +72,9 @@ export class TeamMembershipService {
   }
 
   // Get all team members for a hiring team
-  static async getHiringTeamMembers(hiringTeamId: string): Promise<TeamMembershipDTO[]> {
+  static async getHiringTeamMembers(
+    hiringTeamId: string
+  ): Promise<TeamMembershipDTO[]> {
     try {
       const members = await prisma.teamMember.findMany({
         where: { hiringTeamId },
@@ -97,7 +101,7 @@ export class TeamMembershipService {
             },
           },
         },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: "asc" },
       });
 
       return members;
@@ -187,8 +191,69 @@ export class TeamMembershipService {
     }
   }
 
+  static async createHiringTeam(
+    companyProfileId: string,
+    userId: string
+  ): Promise<TeamMembershipDTO> {
+    try {
+      // Check if hiring team exists
+      const hiringTeam = await prisma.hiringTeam.create({
+        data: {
+          companyProfileId,
+        },
+      });
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      // Create team membership
+      const membership = await prisma.teamMember.create({
+        data: {
+          hiringTeamId: hiringTeam.id,
+          userId,
+          email: user?.email || "",
+          role: "superadmin",
+          access: true,
+          sentInvite: true,
+          acceptedInvite: true,
+        },
+        include: {
+          hiringTeam: {
+            include: {
+              companyProfile: {
+                select: {
+                  id: true,
+                  companyName: true,
+                  industry: true,
+                  location: true,
+                },
+              },
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              email: true,
+              firstname: true,
+              lastname: true,
+              avatar: true,
+            },
+          },
+        },
+      });
+
+      return membership;
+    } catch (error) {
+      throw new Error(`Failed to add user to team: ${error}`);
+    }
+  }
+
   // Remove a user from a hiring team
-  static async removeUserFromTeam(hiringTeamId: string, userId: string): Promise<void> {
+  static async removeUserFromTeam(
+    hiringTeamId: string,
+    userId: string
+  ): Promise<void> {
     try {
       const membership = await prisma.teamMember.findUnique({
         where: {
@@ -320,7 +385,10 @@ export class TeamMembershipService {
   }
 
   // Check if user is a member of a specific hiring team
-  static async isUserTeamMember(hiringTeamId: string, userId: string): Promise<boolean> {
+  static async isUserTeamMember(
+    hiringTeamId: string,
+    userId: string
+  ): Promise<boolean> {
     try {
       const membership = await prisma.teamMember.findUnique({
         where: {
@@ -338,7 +406,10 @@ export class TeamMembershipService {
   }
 
   // Get user's role in a specific hiring team
-  static async getUserTeamRole(hiringTeamId: string, userId: string): Promise<string | null> {
+  static async getUserTeamRole(
+    hiringTeamId: string,
+    userId: string
+  ): Promise<string | null> {
     try {
       const membership = await prisma.teamMember.findUnique({
         where: {
@@ -386,7 +457,9 @@ export class TeamMembershipService {
       });
 
       if (existingMember) {
-        throw new Error("A team member with this email already exists in this hiring team");
+        throw new Error(
+          "A team member with this email already exists in this hiring team"
+        );
       }
 
       // Create team member
@@ -536,4 +609,4 @@ export class TeamMembershipService {
       throw new Error(`Failed to restore team member access: ${error}`);
     }
   }
-} 
+}

@@ -73,6 +73,57 @@ class TeamMembershipController {
         });
     }
     // Add a user to a hiring team
+    static createHiringTeam(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const companyProfileId = req.params.companyProfileId;
+                if (!companyProfileId) {
+                    res.status(400).json({
+                        success: false,
+                        message: "Company id required",
+                    });
+                    return;
+                }
+                const userId = req.user.userId;
+                const membership = yield teamMembership_service_1.TeamMembershipService.createHiringTeam(companyProfileId, userId);
+                res.status(201).json({
+                    success: true,
+                    message: "User added to team successfully",
+                    data: membership,
+                });
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    if (error.message === "User not found") {
+                        res.status(404).json({
+                            success: false,
+                            message: error.message,
+                        });
+                        return;
+                    }
+                    if (error.message === "Hiring team not found") {
+                        res.status(404).json({
+                            success: false,
+                            message: error.message,
+                        });
+                        return;
+                    }
+                    if (error.message === "User is already a member of this hiring team") {
+                        res.status(409).json({
+                            success: false,
+                            message: error.message,
+                        });
+                        return;
+                    }
+                }
+                res.status(500).json({
+                    success: false,
+                    message: "Internal server error",
+                    error: error instanceof Error ? error.message : "Unknown error",
+                });
+            }
+        });
+    }
     static addUserToTeam(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

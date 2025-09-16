@@ -50,12 +50,6 @@ class TalentService {
             const salaryRange = filters.salaryRange || null;
             const pipeline = [];
             const matchOr = [];
-            // Initial match to ensure a valid JobSeeker profile (userId exists and is linked)
-            pipeline.push({
-                $match: {
-                    userId: { $exists: true, $ne: null }, // Ensures a userId is present
-                },
-            });
             if (roleArr && roleArr.length)
                 matchOr.push({ interestedRoles: { $in: roleArr } });
             if (skillArr && skillArr.length)
@@ -70,8 +64,9 @@ class TalentService {
                 matchOr.push({ industry: { $in: industryArr } });
             if (hasDisability !== null)
                 matchOr.push({ hasDisability });
+            let total = 0;
+            let results = [];
             if (matchOr.length) {
-                pipeline.push({ $match: { $or: matchOr } });
                 const addFieldsStage = { $addFields: {} };
                 addFieldsStage.$addFields.roleMatches =
                     roleArr && roleArr.length
@@ -158,6 +153,7 @@ class TalentService {
                         })),
                     });
                 }
+                pipeline.push({ $match: { $or: matchOr } });
                 pipeline.push(addFieldsStage);
                 pipeline.push({
                     $addFields: {
@@ -175,18 +171,12 @@ class TalentService {
                     },
                 });
                 pipeline.push({ $match: { $expr: { $gt: ["$matchScore", 0] } } });
-                // Ensure a valid user exists after lookup
                 pipeline.push({
                     $lookup: {
                         from: "User",
                         localField: "userId",
                         foreignField: "_id",
                         as: "userDoc",
-                    },
-                });
-                pipeline.push({
-                    $match: {
-                        "userDoc.0": { $exists: true }, // Ensures at least one user document is linked
                     },
                 });
                 pipeline.push({
@@ -290,64 +280,15 @@ class TalentService {
                     pipeline,
                     cursor: {},
                 });
-                let total = 0;
-                let results = [];
                 if ((_b = (_a = dbResult === null || dbResult === void 0 ? void 0 : dbResult.cursor) === null || _a === void 0 ? void 0 : _a.firstBatch) === null || _b === void 0 ? void 0 : _b.length) {
                     const first = dbResult.cursor.firstBatch[0];
                     total = (first === null || first === void 0 ? void 0 : first.total) || 0;
                     results = (first === null || first === void 0 ? void 0 : first.results) || [];
                 }
-                const transformedData = results.map((item) => {
-                    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6;
-                    return ({
-                        id: ((_a = item._id) === null || _a === void 0 ? void 0 : _a.$oid) || item._id,
-                        userId: ((_b = item.userId) === null || _b === void 0 ? void 0 : _b.$oid) || item.userId,
-                        bio: (_c = item.bio) !== null && _c !== void 0 ? _c : null,
-                        location: (_d = item.location) !== null && _d !== void 0 ? _d : null,
-                        hasDisability: (_e = item.hasDisability) !== null && _e !== void 0 ? _e : null,
-                        interestedRoles: item.interestedRoles || [],
-                        experienceLevel: (_f = item.experienceLevel) !== null && _f !== void 0 ? _f : null,
-                        workMode: (_g = item.workMode) !== null && _g !== void 0 ? _g : null,
-                        jobType: (_h = item.jobType) !== null && _h !== void 0 ? _h : null,
-                        skills: item.skills || [],
-                        industry: (_j = item.industry) !== null && _j !== void 0 ? _j : null,
-                        experience: item.experience || [],
-                        education: item.education || [],
-                        certifications: item.certifications || [],
-                        portfolio: item.portfolio || [],
-                        resume: (_k = item.resume) !== null && _k !== void 0 ? _k : null,
-                        interests: item.interests || [],
-                        profileCompletion: (_l = item.profileCompletion) !== null && _l !== void 0 ? _l : null,
-                        dailyAvailability: item.dailyAvailability || DEFAULT_DAILY_AVAILABILITY,
-                        createdAt: (_m = item.createdAt) !== null && _m !== void 0 ? _m : null,
-                        updatedAt: (_o = item.updatedAt) !== null && _o !== void 0 ? _o : null,
-                        user: {
-                            id: ((_q = (_p = item.user) === null || _p === void 0 ? void 0 : _p.id) === null || _q === void 0 ? void 0 : _q.$oid) ||
-                                ((_r = item.userId) === null || _r === void 0 ? void 0 : _r.$oid) ||
-                                ((_s = item.user) === null || _s === void 0 ? void 0 : _s.id) ||
-                                item.userId,
-                            email: (_u = (_t = item.user) === null || _t === void 0 ? void 0 : _t.email) !== null && _u !== void 0 ? _u : null,
-                            lastname: (_w = (_v = item.user) === null || _v === void 0 ? void 0 : _v.lastname) !== null && _w !== void 0 ? _w : null,
-                            firstname: (_y = (_x = item.user) === null || _x === void 0 ? void 0 : _x.firstname) !== null && _y !== void 0 ? _y : null,
-                            othername: (_0 = (_z = item.user) === null || _z === void 0 ? void 0 : _z.othername) !== null && _0 !== void 0 ? _0 : null,
-                            pronoun: (_2 = (_1 = item.user) === null || _1 === void 0 ? void 0 : _1.pronoun) !== null && _2 !== void 0 ? _2 : null,
-                            phone_number: (_4 = (_3 = item.user) === null || _3 === void 0 ? void 0 : _3.phone_number) !== null && _4 !== void 0 ? _4 : null,
-                            avatar: (_6 = (_5 = item.user) === null || _5 === void 0 ? void 0 : _5.avatar) !== null && _6 !== void 0 ? _6 : null,
-                        },
-                        matchScore: item.matchScore,
-                    });
-                });
-                return {
-                    page,
-                    pageSize,
-                    total,
-                    totalPages: Math.ceil(total / pageSize),
-                    data: transformedData,
-                };
             }
-            else {
+            if (!matchOr.length || !results.length) {
                 const randomPipeline = [
-                    { $match: { userId: { $exists: true, $ne: null } } }, // Ensure valid JobSeeker profile
+                    { $match: {} },
                     { $sample: { size: pageSize } },
                     {
                         $lookup: {
@@ -355,11 +296,6 @@ class TalentService {
                             localField: "userId",
                             foreignField: "_id",
                             as: "userDoc",
-                        },
-                    },
-                    {
-                        $match: {
-                            "userDoc.0": { $exists: true }, // Ensure a user exists
                         },
                     },
                     {
@@ -492,6 +428,53 @@ class TalentService {
                     data: transformedOther,
                 };
             }
+            const transformedData = results.map((item) => {
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6;
+                return ({
+                    id: ((_a = item._id) === null || _a === void 0 ? void 0 : _a.$oid) || item._id,
+                    userId: ((_b = item.userId) === null || _b === void 0 ? void 0 : _b.$oid) || item.userId,
+                    bio: (_c = item.bio) !== null && _c !== void 0 ? _c : null,
+                    location: (_d = item.location) !== null && _d !== void 0 ? _d : null,
+                    hasDisability: (_e = item.hasDisability) !== null && _e !== void 0 ? _e : null,
+                    interestedRoles: item.interestedRoles || [],
+                    experienceLevel: (_f = item.experienceLevel) !== null && _f !== void 0 ? _f : null,
+                    workMode: (_g = item.workMode) !== null && _g !== void 0 ? _g : null,
+                    jobType: (_h = item.jobType) !== null && _h !== void 0 ? _h : null,
+                    skills: item.skills || [],
+                    industry: (_j = item.industry) !== null && _j !== void 0 ? _j : null,
+                    experience: item.experience || [],
+                    education: item.education || [],
+                    certifications: item.certifications || [],
+                    portfolio: item.portfolio || [],
+                    resume: (_k = item.resume) !== null && _k !== void 0 ? _k : null,
+                    interests: item.interests || [],
+                    profileCompletion: (_l = item.profileCompletion) !== null && _l !== void 0 ? _l : null,
+                    dailyAvailability: item.dailyAvailability || DEFAULT_DAILY_AVAILABILITY,
+                    createdAt: (_m = item.createdAt) !== null && _m !== void 0 ? _m : null,
+                    updatedAt: (_o = item.updatedAt) !== null && _o !== void 0 ? _o : null,
+                    user: {
+                        id: ((_q = (_p = item.user) === null || _p === void 0 ? void 0 : _p.id) === null || _q === void 0 ? void 0 : _q.$oid) ||
+                            ((_r = item.userId) === null || _r === void 0 ? void 0 : _r.$oid) ||
+                            ((_s = item.user) === null || _s === void 0 ? void 0 : _s.id) ||
+                            item.userId,
+                        email: (_u = (_t = item.user) === null || _t === void 0 ? void 0 : _t.email) !== null && _u !== void 0 ? _u : null,
+                        lastname: (_w = (_v = item.user) === null || _v === void 0 ? void 0 : _v.lastname) !== null && _w !== void 0 ? _w : null,
+                        firstname: (_y = (_x = item.user) === null || _x === void 0 ? void 0 : _x.firstname) !== null && _y !== void 0 ? _y : null,
+                        othername: (_0 = (_z = item.user) === null || _z === void 0 ? void 0 : _z.othername) !== null && _0 !== void 0 ? _0 : null,
+                        pronoun: (_2 = (_1 = item.user) === null || _1 === void 0 ? void 0 : _1.pronoun) !== null && _2 !== void 0 ? _2 : null,
+                        phone_number: (_4 = (_3 = item.user) === null || _3 === void 0 ? void 0 : _3.phone_number) !== null && _4 !== void 0 ? _4 : null,
+                        avatar: (_6 = (_5 = item.user) === null || _5 === void 0 ? void 0 : _5.avatar) !== null && _6 !== void 0 ? _6 : null,
+                    },
+                    matchScore: item.matchScore,
+                });
+            });
+            return {
+                page,
+                pageSize,
+                total,
+                totalPages: Math.ceil(total / pageSize),
+                data: transformedData,
+            };
         });
     }
 }
