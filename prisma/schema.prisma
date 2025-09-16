@@ -155,6 +155,7 @@ model HiringTeam {
   companyProfileId String         @unique @db.ObjectId
   companyProfile   CompanyProfile @relation("CompanyHiringTeam", fields: [companyProfileId], references: [id], onDelete: Cascade)
   teamMembers      TeamMember[]   @relation("HiringTeamMembers")
+  interviews       Interview[]    @relation("HiringTeamInterviews")
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }
@@ -257,6 +258,9 @@ model Interview {
   duration         String          @default("1 hour")
   notes            String?         @db.String
   status           InterviewStatus @default(scheduled)
+  type             String?
+  hiringTeamId     String?         @db.ObjectId // Optional, can be null on creation
+  hiringTeam       HiringTeam?     @relation("HiringTeamInterviews", fields: [hiringTeamId], references: [id], onDelete: SetNull) // Optional relation
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
@@ -267,6 +271,7 @@ model Interview {
   @@index([applicantId])
   @@index([dateTime])
   @@index([companyProfileId])
+  @@index([hiringTeamId])
 }
 
 model NotificationSetting {

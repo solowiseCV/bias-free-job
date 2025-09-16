@@ -16,6 +16,8 @@ router.get("/recent/activities", authMiddleware_1.authMiddleware, controller_1.U
 router.get("/team-memberships", teamMembership_controller_1.TeamMembershipController.getUserTeamMemberships);
 // Get all team members for a specific hiring team
 router.get("/hiring-team/:hiringTeamId/members", teamMembership_controller_1.TeamMembershipController.getHiringTeamMembers);
+// Create hiring team
+router.post("/hiring-team/create/:companyProfileId", teamMembership_controller_1.TeamMembershipController.createHiringTeam);
 // Add a user to a hiring team (user must exist)
 router.post("/hiring-team/:hiringTeamId/members", teamMembership_controller_1.TeamMembershipController.addUserToTeam);
 // Create a team member (by email - user doesn't need to exist yet)

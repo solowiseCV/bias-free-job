@@ -6,16 +6,16 @@ const client_1 = require("@prisma/client");
 // Validation schema for adding user to team (user must exist)
 exports.addUserToTeamSchema = zod_1.z.object({
     userEmail: zod_1.z.string().email("Invalid email format"),
-    role: zod_1.z.nativeEnum(client_1.$Enums.TeamRole).optional().default(client_1.$Enums.TeamRole.recruiter),
+    role: zod_1.z.nativeEnum(client_1.TeamRole).optional().default(client_1.TeamRole.recruiter),
 });
 // Validation schema for creating team member (by email - user doesn't need to exist)
 exports.createTeamMemberSchema = zod_1.z.object({
     userEmail: zod_1.z.string().email("Invalid email format"),
-    role: zod_1.z.nativeEnum(client_1.$Enums.TeamRole).optional().default(client_1.$Enums.TeamRole.recruiter),
+    role: zod_1.z.nativeEnum(client_1.TeamRole).optional().default(client_1.TeamRole.recruiter),
 });
 // Validation schema for updating team member
 exports.updateTeamMemberSchema = zod_1.z.object({
-    role: zod_1.z.nativeEnum(client_1.$Enums.TeamRole).optional(),
+    role: zod_1.z.nativeEnum(client_1.TeamRole).optional(),
     access: zod_1.z.boolean().optional(),
 });
 // Validation schema for hiring team ID parameter

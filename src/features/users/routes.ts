@@ -43,6 +43,12 @@ router.get(
   TeamMembershipController.getHiringTeamMembers
 );
 
+// Create hiring team
+router.post(
+  "/hiring-team/create/:companyProfileId",
+  TeamMembershipController.createHiringTeam
+);
+
 // Add a user to a hiring team (user must exist)
 router.post(
   "/hiring-team/:hiringTeamId/members",

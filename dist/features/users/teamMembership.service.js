@@ -42,7 +42,7 @@ class TeamMembershipService {
                             },
                         },
                     },
-                    orderBy: { createdAt: 'desc' },
+                    orderBy: { createdAt: "desc" },
                 });
                 return memberships;
             }
@@ -80,7 +80,7 @@ class TeamMembershipService {
                             },
                         },
                     },
-                    orderBy: { createdAt: 'asc' },
+                    orderBy: { createdAt: "asc" },
                 });
                 return members;
             }
@@ -126,6 +126,60 @@ class TeamMembershipService {
                         userId: user.id,
                         email: userEmail,
                         role,
+                        access: true,
+                        sentInvite: true,
+                        acceptedInvite: true,
+                    },
+                    include: {
+                        hiringTeam: {
+                            include: {
+                                companyProfile: {
+                                    select: {
+                                        id: true,
+                                        companyName: true,
+                                        industry: true,
+                                        location: true,
+                                    },
+                                },
+                            },
+                        },
+                        user: {
+                            select: {
+                                id: true,
+                                email: true,
+                                firstname: true,
+                                lastname: true,
+                                avatar: true,
+                            },
+                        },
+                    },
+                });
+                return membership;
+            }
+            catch (error) {
+                throw new Error(`Failed to add user to team: ${error}`);
+            }
+        });
+    }
+    static createHiringTeam(companyProfileId, userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // Check if hiring team exists
+                const hiringTeam = yield prisma.hiringTeam.create({
+                    data: {
+                        companyProfileId,
+                    },
+                });
+                const user = yield prisma.user.findUnique({
+                    where: { id: userId },
+                });
+                // Create team membership
+                const membership = yield prisma.teamMember.create({
+                    data: {
+                        hiringTeamId: hiringTeam.id,
+                        userId,
+                        email: (user === null || user === void 0 ? void 0 : user.email) || "",
+                        role: "superadmin",
                         access: true,
                         sentInvite: true,
                         acceptedInvite: true,
