@@ -10,6 +10,7 @@ import twofaRoutes from "./authentication/routes/twoFactorAuth.route";
 import userRoutes from "./users/routes";
 import interviewRoutes from "./Recruiter/interview/routes/interview.route";
 import countryRoutes from "./country/routes/country.route";
+import chatRoutes from "./chat/routes/chat.route";
 
 appRouter.use("/auth", authRoutes);
 appRouter.use("/2FaAuth", twofaRoutes);
@@ -21,5 +22,6 @@ appRouter.use("/settings", applicationRoutes);
 appRouter.use("/users", userRoutes);
 appRouter.use("/interview", interviewRoutes);
 appRouter.use("/country", countryRoutes);
+appRouter.use("/chat", chatRoutes);
 
 export default appRouter;
