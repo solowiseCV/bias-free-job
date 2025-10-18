@@ -21,7 +21,7 @@ class ChatController {
         this.createConversation = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+                const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
                 if (!userId) {
                     logger_middleware_1.default.warn("Unauthorized attempt to create conversation");
                     res.status(401).json({ error: "Unauthorized" });
@@ -40,7 +40,7 @@ class ChatController {
             var _a;
             try {
                 const userId = req.params.userId;
-                if (!userId || userId !== ((_a = req.user) === null || _a === void 0 ? void 0 : _a.id)) {
+                if (!userId || userId !== ((_a = req.user) === null || _a === void 0 ? void 0 : _a.userId)) {
                     logger_middleware_1.default.warn("Unauthorized attempt to fetch conversations");
                     res.status(401).json({ error: "Unauthorized" });
                     return;
