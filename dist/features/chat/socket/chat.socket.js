@@ -19,10 +19,10 @@ const chatService = new chat_service_1.ChatService();
 function setupSocket(io) {
     io.on("connection", (socket) => {
         logger_middleware_1.default.info(`User connected: ${socket.id}`);
-        socket.on("joinConversation", (_a) => __awaiter(this, [_a], void 0, function* ({ conversationId, userId, }) {
+        socket.on("joinConversation", ({ conversationId, userId }) => {
             socket.join(conversationId);
             logger_middleware_1.default.info(`User ${userId} joined conversation ${conversationId}`);
-        }));
+        });
         socket.on("sendMessage", (_a) => __awaiter(this, [_a], void 0, function* ({ conversationId, userId, content, }) {
             try {
                 const message = yield chatService.sendMessage({ conversationId, content }, userId);

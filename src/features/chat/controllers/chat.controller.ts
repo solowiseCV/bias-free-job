@@ -13,7 +13,7 @@ export class ChatController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const userId = req.user?.id;
+      const userId = req.user?.userId;
       if (!userId) {
         logger.warn("Unauthorized attempt to create conversation");
         res.status(401).json({ error: "Unauthorized" });
@@ -38,7 +38,7 @@ export class ChatController {
   ): Promise<void> => {
     try {
       const userId = req.params.userId;
-      if (!userId || userId !== req.user?.id) {
+      if (!userId || userId !== req.user?.userId) {
         logger.warn("Unauthorized attempt to fetch conversations");
         res.status(401).json({ error: "Unauthorized" });
         return;

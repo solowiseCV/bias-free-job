@@ -9,19 +9,10 @@ export function setupSocket(io: Server) {
   io.on("connection", (socket: Socket) => {
     logger.info(`User connected: ${socket.id}`);
 
-    socket.on(
-      "joinConversation",
-      async ({
-        conversationId,
-        userId,
-      }: {
-        conversationId: string;
-        userId: string;
-      }) => {
-        socket.join(conversationId);
-        logger.info(`User ${userId} joined conversation ${conversationId}`);
-      }
-    );
+    socket.on("joinConversation", ({ conversationId, userId }) => {
+      socket.join(conversationId);
+      logger.info(`User ${userId} joined conversation ${conversationId}`);
+    });
 
     socket.on(
       "sendMessage",

@@ -5,13 +5,82 @@ import { CreateConversationDto, SendMessageDto } from "../dtos/chat.dto";
 const prisma = new PrismaClient();
 
 export class ChatService {
+  // async createConversation(dto: CreateConversationDto, userId: string) {
+  //   try {
+  //     // Ensure user is part of the conversation
+  //     if (!dto.participantIds.includes(userId)) {
+  //       dto.participantIds.push(userId);
+  //     }
+
+  //     const conversation = await prisma.conversation.create({
+  //       data: {
+  //         participants: {
+  //           create: dto.participantIds.map((id) => ({
+  //             user: { connect: { id } },
+  //           })),
+  //         },
+  //       },
+  //       include: {
+  //         participants: {
+  //           include: {
+  //             user: { select: { id: true, firstname: true, lastname: true } },
+  //           },
+  //         },
+  //       },
+  //     });
+
+  //     logger.info(`Created conversation ${conversation.id} for user ${userId}`);
+  //     return conversation;
+  //   } catch (err) {
+  //     logger.error("Error creating conversation:", err);
+  //     throw err;
+  //   }
+  // }
+
   async createConversation(dto: CreateConversationDto, userId: string) {
     try {
-      // Ensure user is part of the conversation
+      // Ensure userId is included in participantIds
       if (!dto.participantIds.includes(userId)) {
         dto.participantIds.push(userId);
       }
 
+      // Sort participantIds to ensure consistent comparison
+      const sortedParticipantIds = [...dto.participantIds].sort();
+
+      // Check for existing conversation with the same participants
+      const existingConversation = await prisma.conversation.findFirst({
+        where: {
+          participants: {
+            every: {
+              userId: { in: sortedParticipantIds },
+            },
+          },
+        },
+        include: {
+          participants: {
+            include: {
+              user: { select: { id: true, firstname: true, lastname: true } },
+            },
+          },
+        },
+      });
+
+      // Check if the conversation has the exact same participants
+      if (
+        existingConversation &&
+        existingConversation.participants.length ===
+          sortedParticipantIds.length &&
+        existingConversation.participants.every((p) =>
+          sortedParticipantIds.includes(p.userId)
+        )
+      ) {
+        logger.info(
+          `Found existing conversation ${existingConversation.id} for user ${userId}`
+        );
+        return existingConversation;
+      }
+
+      // Create new conversation if none exists
       const conversation = await prisma.conversation.create({
         data: {
           participants: {
