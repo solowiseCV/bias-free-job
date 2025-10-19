@@ -47,8 +47,11 @@ export class SearchJobSeekerService {
       pageSize: 20,
     }
   ) {
-    const page = filters.page || 1;
-    const pageSize = filters.pageSize || 20;
+    const page = Math.max(1, filters.page || 1);
+    const pageSize = Math.max(1, filters.pageSize || 20);
+    const skip = Math.max(0, (page - 1) * pageSize);
+
+    // Normalize filter inputs
     const normalize = (v: any) => {
       if (v === undefined || v === null) return null;
       if (Array.isArray(v))
@@ -68,18 +71,15 @@ export class SearchJobSeekerService {
     const workMode = filters.workMode ? String(filters.workMode).trim() : null;
     const jobType = filters.jobType ? String(filters.jobType).trim() : null;
     const industry = filters.industry ? String(filters.industry).trim() : null;
-    const hasDisabilityRaw = filters.hasDisability;
     const hasDisability =
-      hasDisabilityRaw === true || hasDisabilityRaw === "true"
+      filters.hasDisability === true || filters.hasDisability === "true"
         ? true
-        : hasDisabilityRaw === false || hasDisabilityRaw === "false"
+        : filters.hasDisability === false || filters.hasDisability === "false"
         ? false
         : null;
 
-    const skip = Math.max(0, (Math.max(1, page) - 1) * pageSize);
-
+    // Initialize pipeline and match conditions
     const pipeline: any[] = [];
-
     const matchOr: any[] = [];
     if (roleArr && roleArr.length)
       matchOr.push({ interestedRoles: { $in: roleArr } });
@@ -91,13 +91,44 @@ export class SearchJobSeekerService {
     if (industry) matchOr.push({ industry });
     if (hasDisability !== null) matchOr.push({ hasDisability });
 
+    // Common transformation function
+    const transformResults = (items: any[]) =>
+      items.map((item) => ({
+        location: item.location || { city: null, country: null },
+        experience: item.experience || [],
+        education: item.education || [],
+        certifications: item.certifications || [],
+        portfolio: item.portfolio || [],
+        id: item._id?.$oid || null,
+        userId: item.userId?.$oid || null,
+        bio: item.bio || null,
+        hasDisability: item.hasDisability || null,
+        interestedRoles: item.interestedRoles || [],
+        experienceLevel: item.experienceLevel || null,
+        workMode: item.workMode || null,
+        jobType: item.jobType || null,
+        skills: item.skills || [],
+        industry: item.industry || null,
+        resume: item.resume || null,
+        interests: item.interests || [],
+        profileCompletion: item.profileCompletion || null,
+        createdAt: item.createdAt || null,
+        updatedAt: item.updatedAt || null,
+        user: {
+          id: item.user?.id?.$oid || item.userId?.$oid || null,
+          email: item.user?.email || null,
+          lastname: item.user?.lastname || null,
+          firstname: item.user?.firstname || null,
+          avatar: item.user?.avatar || null,
+        },
+      }));
+
     let total = 0;
     let results: any[] = [];
 
+    // Search with filters
     if (matchOr.length) {
-      // Matching data pipeline
       const addFieldsStage: any = { $addFields: {} };
-
       addFieldsStage.$addFields.roleMatches =
         roleArr && roleArr.length
           ? {
@@ -109,7 +140,6 @@ export class SearchJobSeekerService {
               },
             }
           : 0;
-
       addFieldsStage.$addFields.skillMatches =
         skillArr && skillArr.length
           ? {
@@ -118,7 +148,6 @@ export class SearchJobSeekerService {
               },
             }
           : 0;
-
       addFieldsStage.$addFields.experienceLevelMatch = experienceLevel
         ? {
             $cond: [
@@ -130,7 +159,6 @@ export class SearchJobSeekerService {
             ],
           }
         : 0;
-
       addFieldsStage.$addFields.workModeMatch = workMode
         ? {
             $cond: [
@@ -140,11 +168,9 @@ export class SearchJobSeekerService {
             ],
           }
         : 0;
-
       addFieldsStage.$addFields.jobTypeMatch = jobType
         ? { $cond: [{ $eq: [{ $ifNull: ["$jobType", null] }, jobType] }, 1, 0] }
         : 0;
-
       addFieldsStage.$addFields.industryMatch = industry
         ? {
             $cond: [
@@ -154,7 +180,6 @@ export class SearchJobSeekerService {
             ],
           }
         : 0;
-
       addFieldsStage.$addFields.hasDisabilityMatch =
         hasDisability !== null
           ? {
@@ -168,7 +193,6 @@ export class SearchJobSeekerService {
 
       pipeline.push({ $match: { $or: matchOr } });
       pipeline.push(addFieldsStage);
-
       pipeline.push({
         $addFields: {
           matchScore: {
@@ -184,9 +208,7 @@ export class SearchJobSeekerService {
           },
         },
       });
-
       pipeline.push({ $match: { $expr: { $gt: ["$matchScore", 0] } } });
-
       pipeline.push({
         $lookup: {
           from: "User",
@@ -198,7 +220,6 @@ export class SearchJobSeekerService {
       pipeline.push({
         $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true },
       });
-
       pipeline.push({
         $project: {
           _id: 1,
@@ -222,7 +243,6 @@ export class SearchJobSeekerService {
           matchScore: 1,
         },
       });
-
       pipeline.push({
         $sort: { matchScore: -1, profileCompletion: -1, _id: 1 },
       });
@@ -233,11 +253,8 @@ export class SearchJobSeekerService {
         },
       });
       pipeline.push({
-        $unwind: { path: "$metadata", preserveNullAndEmptyArrays: true },
-      });
-      pipeline.push({
         $project: {
-          total: "$metadata.total",
+          total: { $ifNull: [{ $arrayElemAt: ["$metadata.total", 0] }, 0] },
           results: 1,
         },
       });
@@ -248,18 +265,26 @@ export class SearchJobSeekerService {
         cursor: {},
       });
 
-      if (dbResult?.cursor?.firstBatch && dbResult.cursor.firstBatch.length) {
+      if (dbResult?.cursor?.firstBatch?.length) {
         const first = dbResult.cursor.firstBatch[0];
         total = first?.total || 0;
         results = first?.results || [];
-      } else if (Array.isArray(dbResult) && dbResult.length) {
-        total = dbResult[0]?.total || 0;
-        results = dbResult[0]?.results || [];
       }
     }
 
-    // If no matches or no filters, fetch random data for 'other'
-    if (!matchOr.length || results.length === 0) {
+    // Random results if no filters or no matches
+    if (!matchOr.length || !results.length) {
+      const totalCountPipeline = [{ $match: {} }, { $count: "total" }];
+      const totalCountResult = await prisma.$runCommandRaw({
+        aggregate: "JobSeeker",
+        pipeline: totalCountPipeline,
+        cursor: {},
+      });
+
+      if (totalCountResult?.cursor?.firstBatch?.length) {
+        total = totalCountResult.cursor.firstBatch[0].total || 0;
+      }
+
       const randomPipeline = [
         { $match: {} },
         { $sample: { size: pageSize } },
@@ -301,94 +326,372 @@ export class SearchJobSeekerService {
         cursor: {},
       });
 
-      let randomResults: any[] = [];
-      if (
-        randomResult?.cursor?.firstBatch &&
-        randomResult.cursor.firstBatch.length
-      ) {
-        randomResults = randomResult.cursor.firstBatch;
-      } else if (Array.isArray(randomResult) && randomResult.length) {
-        randomResults = randomResult;
+      if (randomResult?.cursor?.firstBatch?.length) {
+        results = randomResult.cursor.firstBatch;
       }
-
-      // Transform random results to desired format without defaults
-      const transformedOther = randomResults.map((item) => ({
-        location: item.location || { city: null, country: null }, // Use existing data or null
-        experience: item.experience || [], // Use existing data or empty array
-        education: item.education || [], // Use existing data or empty array
-        certifications: item.certifications || [], // Use existing data or empty array
-        portfolio: item.portfolio || [], // Use existing data or empty array
-        id: item._id?.$oid || null, // Convert to string ID or null
-        userId: item.userId?.$oid || null, // Convert to string ID or null
-        bio: item.bio || null, // Use existing data or null
-        hasDisability: item.hasDisability || null,
-        interestedRoles: item.interestedRoles || [],
-        experienceLevel: item.experienceLevel || null,
-        workMode: item.workMode || null,
-        jobType: item.jobType || null,
-        skills: item.skills || [],
-        industry: item.industry || null,
-        resume: item.resume || null,
-        interests: item.interests || [],
-        profileCompletion: item.profileCompletion || null,
-        createdAt: item.createdAt || null,
-        updatedAt: item.updatedAt || null,
-        user: {
-          id: item.user?.id?.$oid || item.userId?.$oid || null,
-          email: item.user?.email || null,
-          lastname: item.user?.lastname || null,
-          firstname: item.user?.firstname || null,
-          avatar: item.user?.avatar || null,
-        },
-      }));
-
-      return {
-        page: Math.max(1, page),
-        limit: pageSize,
-        total: transformedOther.length,
-        other: transformedOther,
-      };
     }
 
-    // Transform matching results to desired format without defaults
-    const transformedData = results.map((item) => ({
-      location: item.location || { city: null, country: null }, // Use existing data or null
-      experience: item.experience || [], // Use existing data or empty array
-      education: item.education || [], // Use existing data or empty array
-      certifications: item.certifications || [], // Use existing data or empty array
-      portfolio: item.portfolio || [], // Use existing data or empty array
-      id: item._id?.$oid || null, // Convert to string ID or null
-      userId: item.userId?.$oid || null, // Convert to string ID or null
-      bio: item.bio || null, // Use existing data or null
-      hasDisability: item.hasDisability || null,
-      interestedRoles: item.interestedRoles || [],
-      experienceLevel: item.experienceLevel || null,
-      workMode: item.workMode || null,
-      jobType: item.jobType || null,
-      skills: item.skills || [],
-      industry: item.industry || null,
-      resume: item.resume || null,
-      interests: item.interests || [],
-      profileCompletion: item.profileCompletion || null,
-      createdAt: item.createdAt || null,
-      updatedAt: item.updatedAt || null,
-      user: {
-        id: item.user?.id?.$oid || item.userId?.$oid || null,
-        email: item.user?.email || null,
-        lastname: item.user?.lastname || null,
-        firstname: item.user?.firstname || null,
-        avatar: item.user?.avatar || null,
-      },
-    }));
+    // Transform results
+    const transformedData = transformResults(results);
 
+    // Return consistent pagination data
     return {
-      page: Math.max(1, page),
+      page,
       pageSize,
       total,
       totalPages: Math.ceil(total / pageSize),
       data: transformedData,
     };
   }
+
+  // static async searchTalent(
+  //   filters: Filters = {
+  //     page: 1,
+  //     pageSize: 20,
+  //   }
+  // ) {
+  //   const page = filters.page || 1;
+  //   const pageSize = filters.pageSize || 20;
+  //   const normalize = (v: any) => {
+  //     if (v === undefined || v === null) return null;
+  //     if (Array.isArray(v))
+  //       return v.filter((x) => x !== null && String(x).trim() !== "");
+  //     if (typeof v === "string") {
+  //       const t = v.trim();
+  //       return t === "" ? null : [t];
+  //     }
+  //     return [v];
+  //   };
+
+  //   const roleArr = normalize(filters.role);
+  //   const skillArr = normalize(filters.skill);
+  //   const experienceLevel = filters.experienceLevel
+  //     ? String(filters.experienceLevel).trim()
+  //     : null;
+  //   const workMode = filters.workMode ? String(filters.workMode).trim() : null;
+  //   const jobType = filters.jobType ? String(filters.jobType).trim() : null;
+  //   const industry = filters.industry ? String(filters.industry).trim() : null;
+  //   const hasDisabilityRaw = filters.hasDisability;
+  //   const hasDisability =
+  //     hasDisabilityRaw === true || hasDisabilityRaw === "true"
+  //       ? true
+  //       : hasDisabilityRaw === false || hasDisabilityRaw === "false"
+  //       ? false
+  //       : null;
+
+  //   const skip = Math.max(0, (Math.max(1, page) - 1) * pageSize);
+
+  //   const pipeline: any[] = [];
+
+  //   const matchOr: any[] = [];
+  //   if (roleArr && roleArr.length)
+  //     matchOr.push({ interestedRoles: { $in: roleArr } });
+  //   if (skillArr && skillArr.length)
+  //     matchOr.push({ skills: { $in: skillArr } });
+  //   if (experienceLevel) matchOr.push({ experienceLevel });
+  //   if (workMode) matchOr.push({ workMode });
+  //   if (jobType) matchOr.push({ jobType });
+  //   if (industry) matchOr.push({ industry });
+  //   if (hasDisability !== null) matchOr.push({ hasDisability });
+
+  //   let total = 0;
+  //   let results: any[] = [];
+
+  //   if (matchOr.length) {
+  //     // Matching data pipeline
+  //     const addFieldsStage: any = { $addFields: {} };
+
+  //     addFieldsStage.$addFields.roleMatches =
+  //       roleArr && roleArr.length
+  //         ? {
+  //             $size: {
+  //               $ifNull: [
+  //                 { $setIntersection: ["$interestedRoles", roleArr] },
+  //                 [],
+  //               ],
+  //             },
+  //           }
+  //         : 0;
+
+  //     addFieldsStage.$addFields.skillMatches =
+  //       skillArr && skillArr.length
+  //         ? {
+  //             $size: {
+  //               $ifNull: [{ $setIntersection: ["$skills", skillArr] }, []],
+  //             },
+  //           }
+  //         : 0;
+
+  //     addFieldsStage.$addFields.experienceLevelMatch = experienceLevel
+  //       ? {
+  //           $cond: [
+  //             {
+  //               $eq: [{ $ifNull: ["$experienceLevel", null] }, experienceLevel],
+  //             },
+  //             1,
+  //             0,
+  //           ],
+  //         }
+  //       : 0;
+
+  //     addFieldsStage.$addFields.workModeMatch = workMode
+  //       ? {
+  //           $cond: [
+  //             { $eq: [{ $ifNull: ["$workMode", null] }, workMode] },
+  //             1,
+  //             0,
+  //           ],
+  //         }
+  //       : 0;
+
+  //     addFieldsStage.$addFields.jobTypeMatch = jobType
+  //       ? { $cond: [{ $eq: [{ $ifNull: ["$jobType", null] }, jobType] }, 1, 0] }
+  //       : 0;
+
+  //     addFieldsStage.$addFields.industryMatch = industry
+  //       ? {
+  //           $cond: [
+  //             { $eq: [{ $ifNull: ["$industry", null] }, industry] },
+  //             1,
+  //             0,
+  //           ],
+  //         }
+  //       : 0;
+
+  //     addFieldsStage.$addFields.hasDisabilityMatch =
+  //       hasDisability !== null
+  //         ? {
+  //             $cond: [
+  //               { $eq: [{ $ifNull: ["$hasDisability", null] }, hasDisability] },
+  //               1,
+  //               0,
+  //             ],
+  //           }
+  //         : 0;
+
+  //     pipeline.push({ $match: { $or: matchOr } });
+  //     pipeline.push(addFieldsStage);
+
+  //     pipeline.push({
+  //       $addFields: {
+  //         matchScore: {
+  //           $add: [
+  //             "$roleMatches",
+  //             "$skillMatches",
+  //             "$experienceLevelMatch",
+  //             "$workModeMatch",
+  //             "$jobTypeMatch",
+  //             "$industryMatch",
+  //             "$hasDisabilityMatch",
+  //           ],
+  //         },
+  //       },
+  //     });
+
+  //     pipeline.push({ $match: { $expr: { $gt: ["$matchScore", 0] } } });
+
+  //     pipeline.push({
+  //       $lookup: {
+  //         from: "User",
+  //         localField: "userId",
+  //         foreignField: "_id",
+  //         as: "userDoc",
+  //       },
+  //     });
+  //     pipeline.push({
+  //       $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true },
+  //     });
+
+  //     pipeline.push({
+  //       $project: {
+  //         _id: 1,
+  //         userId: 1,
+  //         "user.id": "$userDoc._id",
+  //         "user.firstname": "$userDoc.firstname",
+  //         "user.lastname": "$userDoc.lastname",
+  //         "user.email": "$userDoc.email",
+  //         "user.avatar": "$userDoc.avatar",
+  //         "user.othername": "$userDoc.othername",
+  //         "user.pronoun": "$userDoc.pronoun",
+  //         "user.phone_number": "$userDoc.phone_number",
+  //         interestedRoles: 1,
+  //         skills: 1,
+  //         experienceLevel: 1,
+  //         workMode: 1,
+  //         jobType: 1,
+  //         industry: 1,
+  //         hasDisability: 1,
+  //         profileCompletion: 1,
+  //         matchScore: 1,
+  //       },
+  //     });
+
+  //     pipeline.push({
+  //       $sort: { matchScore: -1, profileCompletion: -1, _id: 1 },
+  //     });
+  //     pipeline.push({
+  //       $facet: {
+  //         metadata: [{ $count: "total" }],
+  //         results: [{ $skip: skip }, { $limit: pageSize }],
+  //       },
+  //     });
+  //     pipeline.push({
+  //       $unwind: { path: "$metadata", preserveNullAndEmptyArrays: true },
+  //     });
+  //     pipeline.push({
+  //       $project: {
+  //         total: "$metadata.total",
+  //         results: 1,
+  //       },
+  //     });
+
+  //     const dbResult = await prisma.$runCommandRaw({
+  //       aggregate: "JobSeeker",
+  //       pipeline,
+  //       cursor: {},
+  //     });
+
+  //     if (dbResult?.cursor?.firstBatch && dbResult.cursor.firstBatch.length) {
+  //       const first = dbResult.cursor.firstBatch[0];
+  //       total = first?.total || 0;
+  //       results = first?.results || [];
+  //     } else if (Array.isArray(dbResult) && dbResult.length) {
+  //       total = dbResult[0]?.total || 0;
+  //       results = dbResult[0]?.results || [];
+  //     }
+  //   }
+
+  //   // If no matches or no filters, fetch random data for 'other'
+  //   if (!matchOr.length || results.length === 0) {
+  //     const randomPipeline = [
+  //       { $match: {} },
+  //       { $sample: { size: pageSize } },
+  //       {
+  //         $lookup: {
+  //           from: "User",
+  //           localField: "userId",
+  //           foreignField: "_id",
+  //           as: "userDoc",
+  //         },
+  //       },
+  //       {
+  //         $unwind: { path: "$userDoc", preserveNullAndEmptyArrays: true },
+  //       },
+  //       {
+  //         $project: {
+  //           _id: 1,
+  //           userId: 1,
+  //           "user.id": "$userDoc._id",
+  //           "user.firstname": "$userDoc.firstname",
+  //           "user.lastname": "$userDoc.lastname",
+  //           "user.email": "$userDoc.email",
+  //           "user.avatar": "$userDoc.avatar",
+  //           interestedRoles: 1,
+  //           skills: 1,
+  //           experienceLevel: 1,
+  //           workMode: 1,
+  //           jobType: 1,
+  //           industry: 1,
+  //           hasDisability: 1,
+  //           profileCompletion: 1,
+  //         },
+  //       },
+  //     ];
+
+  //     const randomResult = await prisma.$runCommandRaw({
+  //       aggregate: "JobSeeker",
+  //       pipeline: randomPipeline,
+  //       cursor: {},
+  //     });
+
+  //     let randomResults: any[] = [];
+  //     if (
+  //       randomResult?.cursor?.firstBatch &&
+  //       randomResult.cursor.firstBatch.length
+  //     ) {
+  //       randomResults = randomResult.cursor.firstBatch;
+  //     } else if (Array.isArray(randomResult) && randomResult.length) {
+  //       randomResults = randomResult;
+  //     }
+
+  //     // Transform random results to desired format without defaults
+  //     const transformedOther = randomResults.map((item) => ({
+  //       location: item.location || { city: null, country: null }, // Use existing data or null
+  //       experience: item.experience || [], // Use existing data or empty array
+  //       education: item.education || [], // Use existing data or empty array
+  //       certifications: item.certifications || [], // Use existing data or empty array
+  //       portfolio: item.portfolio || [], // Use existing data or empty array
+  //       id: item._id?.$oid || null, // Convert to string ID or null
+  //       userId: item.userId?.$oid || null, // Convert to string ID or null
+  //       bio: item.bio || null, // Use existing data or null
+  //       hasDisability: item.hasDisability || null,
+  //       interestedRoles: item.interestedRoles || [],
+  //       experienceLevel: item.experienceLevel || null,
+  //       workMode: item.workMode || null,
+  //       jobType: item.jobType || null,
+  //       skills: item.skills || [],
+  //       industry: item.industry || null,
+  //       resume: item.resume || null,
+  //       interests: item.interests || [],
+  //       profileCompletion: item.profileCompletion || null,
+  //       createdAt: item.createdAt || null,
+  //       updatedAt: item.updatedAt || null,
+  //       user: {
+  //         id: item.user?.id?.$oid || item.userId?.$oid || null,
+  //         email: item.user?.email || null,
+  //         lastname: item.user?.lastname || null,
+  //         firstname: item.user?.firstname || null,
+  //         avatar: item.user?.avatar || null,
+  //       },
+  //     }));
+
+  //     return {
+  //       page: Math.max(1, page),
+  //       limit: pageSize,
+  //       total: transformedOther.length,
+  //       other: transformedOther,
+  //     };
+  //   }
+
+  //   // Transform matching results to desired format without defaults
+  //   const transformedData = results.map((item) => ({
+  //     location: item.location || { city: null, country: null }, // Use existing data or null
+  //     experience: item.experience || [], // Use existing data or empty array
+  //     education: item.education || [], // Use existing data or empty array
+  //     certifications: item.certifications || [], // Use existing data or empty array
+  //     portfolio: item.portfolio || [], // Use existing data or empty array
+  //     id: item._id?.$oid || null, // Convert to string ID or null
+  //     userId: item.userId?.$oid || null, // Convert to string ID or null
+  //     bio: item.bio || null, // Use existing data or null
+  //     hasDisability: item.hasDisability || null,
+  //     interestedRoles: item.interestedRoles || [],
+  //     experienceLevel: item.experienceLevel || null,
+  //     workMode: item.workMode || null,
+  //     jobType: item.jobType || null,
+  //     skills: item.skills || [],
+  //     industry: item.industry || null,
+  //     resume: item.resume || null,
+  //     interests: item.interests || [],
+  //     profileCompletion: item.profileCompletion || null,
+  //     createdAt: item.createdAt || null,
+  //     updatedAt: item.updatedAt || null,
+  //     user: {
+  //       id: item.user?.id?.$oid || item.userId?.$oid || null,
+  //       email: item.user?.email || null,
+  //       lastname: item.user?.lastname || null,
+  //       firstname: item.user?.firstname || null,
+  //       avatar: item.user?.avatar || null,
+  //     },
+  //   }));
+
+  //   return {
+  //     page: Math.max(1, page),
+  //     pageSize,
+  //     total,
+  //     totalPages: Math.ceil(total / pageSize),
+  //     data: transformedData,
+  //   };
+  // }
 
   static async getFilter(userId: string) {
     return await prisma.filter.findFirst({
