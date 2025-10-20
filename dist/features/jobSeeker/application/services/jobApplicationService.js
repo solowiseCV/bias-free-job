@@ -232,7 +232,13 @@ class JobApplicationService {
                     orderBy: { appliedAt: "desc" },
                     include: {
                         applicant: true,
-                        jobPosting: true,
+                        jobPosting: {
+                            include: {
+                                companyProfile: true,
+                                applications: true,
+                                interviews: true,
+                            },
+                        },
                     },
                 }),
                 prisma.application.count({
