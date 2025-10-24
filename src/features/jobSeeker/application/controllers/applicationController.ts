@@ -7,7 +7,10 @@ import {
 } from "../dtos/postJob.dto";
 import { BadRequestError } from "../../../../lib/appError";
 import CustomResponse from "../../../../utils/helpers/response.util";
+import { SaveJobService } from "../services/SaveJobs";
+
 const jobApplicationService = new JobApplicationService();
+const saveJobService = new SaveJobService();
 
 export class ApplicationController {
   // Create application
@@ -149,6 +152,59 @@ export class ApplicationController {
       );
 
       new CustomResponse(200, true, "Application deleted successfully", res);
+    } catch (err: any) {
+      console.log("Failed to delete application: ", err);
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  async saveJob(req: Request, res: Response) {
+    try {
+      const userId = req.user.userId;
+      const jobPostingId = req.params.jobPostingId;
+
+      const saveJob = await saveJobService.saveJob(userId, jobPostingId);
+
+      new CustomResponse(200, true, "Job saved successfully", res, saveJob);
+    } catch (err: any) {
+      console.log("Failed to delete application: ", err);
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  async getSavedJobs(req: Request, res: Response) {
+    try {
+      const userId = req.user.userId;
+
+      const saveJob = await saveJobService.getSavedJobs(userId);
+
+      new CustomResponse(200, true, "Successful!", res, saveJob);
+    } catch (err: any) {
+      console.log("Failed to delete application: ", err);
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  async getSavedJob(req: Request, res: Response) {
+    try {
+      const id = req.params.id;
+
+      const saveJob = await saveJobService.getSavedJob(id);
+
+      new CustomResponse(200, true, "Successful!", res, saveJob);
+    } catch (err: any) {
+      console.log("Failed to delete application: ", err);
+      res.status(400).json({ error: err.message });
+    }
+  }
+
+  async deleteSavedJobs(req: Request, res: Response) {
+    try {
+      const id = req.params.id;
+
+      const saveJob = await saveJobService.deleteSavedJob(id);
+
+      new CustomResponse(200, true, "Successful!", res, saveJob);
     } catch (err: any) {
       console.log("Failed to delete application: ", err);
       res.status(400).json({ error: err.message });

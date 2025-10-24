@@ -11,4 +11,8 @@ applicationRoutes.get("/job-applications/unmasked/:id", authMiddleware_1.authMid
 applicationRoutes.get("/user-applications/", authMiddleware_1.authMiddleware, controller.getUserApplications);
 applicationRoutes.patch("/update/:id", authMiddleware_1.authMiddleware, controller.updateApplication);
 applicationRoutes.delete("/delete/:id", authMiddleware_1.authMiddleware, controller.deleteApplication);
+applicationRoutes.post("/save-job/:jobPostingId", authMiddleware_1.authMiddleware, controller.saveJob);
+applicationRoutes.get("/saved/jobs", authMiddleware_1.authMiddleware, controller.getSavedJobs);
+applicationRoutes.get("/saved/job/:id", authMiddleware_1.authMiddleware, controller.getSavedJob);
+applicationRoutes.get("/delete/savedjob/:id", authMiddleware_1.authMiddleware, controller.deleteSavedJobs);
 exports.default = applicationRoutes;

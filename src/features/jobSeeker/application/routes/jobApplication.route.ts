@@ -41,4 +41,20 @@ applicationRoutes.delete(
   controller.deleteApplication
 );
 
+applicationRoutes.post(
+  "/save-job/:jobPostingId",
+  authMiddleware,
+  controller.saveJob
+);
+
+applicationRoutes.get("/saved/jobs", authMiddleware, controller.getSavedJobs);
+
+applicationRoutes.get("/saved/job/:id", authMiddleware, controller.getSavedJob);
+
+applicationRoutes.get(
+  "/delete/savedjob/:id",
+  authMiddleware,
+  controller.deleteSavedJobs
+);
+
 export default applicationRoutes;

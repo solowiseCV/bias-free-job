@@ -89,7 +89,8 @@ model User {
   twoFactorSecret       String?
   filters               Filter[]         @relation("UserFilters")
   messages              Message[]        @relation("UserMessages")
-  conversations         ConversationParticipant[]  
+  conversations         ConversationParticipant[]
+  savedJobs             SavedJob[]
 }
 
 model JobSeeker {
@@ -208,8 +209,9 @@ model JobPosting {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime?        @updatedAt
 
-  applications Application[] @relation("JobApplications")
-  interviews   Interview[]   @relation("JobInterviews")
+  applications     Application[]    @relation("JobApplications")
+  interviews       Interview[]      @relation("JobInterviews")
+  savedBy          SavedJob[]
 
   @@unique([companyProfileId, jobTitle, companyLocation, industry])
   @@index([companyProfileId])
@@ -418,4 +420,15 @@ model ConversationParticipant {
   conversationId String      @db.ObjectId
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   @@unique([userId, conversationId])
+}
+
+model SavedJob {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  jobPostingId String   @db.ObjectId
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobPosting   JobPosting @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, jobPostingId])
 }
