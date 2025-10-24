@@ -16,7 +16,9 @@ exports.ApplicationController = void 0;
 const jobApplicationService_1 = require("../services/jobApplicationService");
 const appError_1 = require("../../../../lib/appError");
 const response_util_1 = __importDefault(require("../../../../utils/helpers/response.util"));
+const SaveJobs_1 = require("../services/SaveJobs");
 const jobApplicationService = new jobApplicationService_1.JobApplicationService();
+const saveJobService = new SaveJobs_1.SaveJobService();
 class ApplicationController {
     // Create application
     createAplication(req, res) {
@@ -118,6 +120,59 @@ class ApplicationController {
             try {
                 yield jobApplicationService.deleteApplication(req.user.userId, req.params.id);
                 new response_util_1.default(200, true, "Application deleted successfully", res);
+            }
+            catch (err) {
+                console.log("Failed to delete application: ", err);
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
+    saveJob(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userId = req.user.userId;
+                const jobPostingId = req.params.jobPostingId;
+                const saveJob = yield saveJobService.saveJob(userId, jobPostingId);
+                new response_util_1.default(200, true, "Job saved successfully", res, saveJob);
+            }
+            catch (err) {
+                console.log("Failed to delete application: ", err);
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
+    getSavedJobs(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userId = req.user.userId;
+                const saveJob = yield saveJobService.getSavedJobs(userId);
+                new response_util_1.default(200, true, "Successful!", res, saveJob);
+            }
+            catch (err) {
+                console.log("Failed to delete application: ", err);
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
+    getSavedJob(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id = req.params.id;
+                const saveJob = yield saveJobService.getSavedJob(id);
+                new response_util_1.default(200, true, "Successful!", res, saveJob);
+            }
+            catch (err) {
+                console.log("Failed to delete application: ", err);
+                res.status(400).json({ error: err.message });
+            }
+        });
+    }
+    deleteSavedJobs(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id = req.params.id;
+                const saveJob = yield saveJobService.deleteSavedJob(id);
+                new response_util_1.default(200, true, "Successful!", res, saveJob);
             }
             catch (err) {
                 console.log("Failed to delete application: ", err);
